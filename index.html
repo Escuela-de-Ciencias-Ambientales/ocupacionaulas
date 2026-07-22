@@ -114,7 +114,7 @@
     .turno-afternoon { background: linear-gradient(180deg, #F4FCF7, #FFFFFF) !important; color: #007A53; }
     .turno-night { background: linear-gradient(180deg, #FBF7FF, #FFFFFF) !important; color: #6D36C9; }
 
-    .free {
+    .free-slot {
       height: 76px; min-width: 116px;
       display:grid; place-items:center;
       color: #A9B5C2; font-size: 18px;
@@ -189,7 +189,7 @@
           <strong>Ocupación de aulas</strong>
         </div>
       </div>
-      <div class="meta-pill">Periodo <b>202620</b> · Reporte base 04/06/2026</div>
+      <div class="meta-pill">Periodo <b>202620</b> · Reporte base 10/07/2026</div>
     </div>
   </header>
 
@@ -201,8 +201,8 @@
       </div>
       <div class="panel stats" aria-label="Resumen del horario">
         <div class="stat"><strong id="stat-aulas">7</strong><span>Aulas</span></div>
-        <div class="stat"><strong id="stat-registros">50</strong><span>Registros</span></div>
-        <div class="stat"><strong>6</strong><span>Días lectivos</span></div>
+        <div class="stat"><strong id="stat-registros">0</strong><span>Registros</span></div>
+        <div class="stat"><strong id="stat-dias">0</strong><span>Días lectivos</span></div>
       </div>
     </section>
 
@@ -242,7 +242,7 @@
   <div class="tooltip" id="tooltip" role="tooltip" aria-hidden="true"></div>
 
   <footer class="page footer">
-    <strong>Nota técnica:</strong> página estática preparada para GitHub Pages. Los datos están incrustados en este archivo HTML, por lo que no requiere servidor ni base de datos externa. Para incorporar logos oficiales, se recomienda agregarlos como archivos separados sin modificar su color, proporción ni área de protección.
+    <strong>Fuente:</strong> reporte institucional de ocupación de aulas fechado 10/07/2026, para el periodo del 20/07/2026 al 14/11/2026. Los registros sin código visible en el PDF se identifican expresamente como tales.
   </footer>
 
   <script>
@@ -948,6 +948,79 @@
             "grupo": "01"
       }
 ];
+
+    // Ajustes derivados del reporte institucional del 10/07/2026.
+    function updateRecord(id, changes) {
+      const record = DATA.find(item => item.id === id);
+      if (!record) throw new Error(`No se encontró el registro ${id}`);
+      Object.assign(record, changes);
+      return record;
+    }
+
+    function cloneRecord(sourceId, id, changes) {
+      const source = DATA.find(item => item.id === sourceId);
+      if (!source) throw new Error(`No se encontró el registro base ${sourceId}`);
+      const record = { ...source, ...changes, id };
+      DATA.push(record);
+      return record;
+    }
+
+    function addUnspecifiedRecord({ id, aula, aulaOriginal, hora, horaRaw, turno, dia, profesor }) {
+      DATA.push({
+        id,
+        aula,
+        aula_original: aulaOriginal,
+        hora,
+        hora_raw: horaRaw,
+        turno,
+        dia,
+        profesor,
+        codigo: 'NO INDICADO',
+        curso: 'OCUPACIÓN SIN CÓDIGO VISIBLE EN EL PDF',
+        nrc: 'No indicado',
+        grupo: 'No indicado'
+      });
+    }
+
+    updateRecord('ev032', { hora: '13:00-16:00', hora_raw: '1300-1600', dia: 'LUNES', profesor: 'JOSE CASTRO SOLIS' });
+    cloneRecord('ev032', 'pdf051', { dia: 'MIÉRCOLES', profesor: 'ROY CRUZ MORALES' });
+    updateRecord('ev036', { hora: '16:31-19:00', hora_raw: '1631-1900' });
+
+    cloneRecord('ev007', 'pdf052', { dia: 'MIÉRCOLES' });
+
+    cloneRecord('ev028', 'pdf053', { dia: 'JUEVES' });
+    updateRecord('ev029', { profesor: 'ROSALIA RODRIGUEZ PORRAS / MARIA AVELLAN ZUMBADO' });
+    updateRecord('ev039', { profesor: 'PRISCILLA RIGG AGUILAR' });
+    updateRecord('ev042', { profesor: 'IGOR ZUÑIGA GARITA / GUSTAVO VARGAS ROJAS' });
+
+    cloneRecord('ev015', 'pdf054', { dia: 'SÁBADO', profesor: 'MARIA GAMBOA JIMENEZ' });
+    updateRecord('ev040', { profesor: 'PRISCILLA RIGG AGUILAR' });
+    updateRecord('ev018', { profesor: 'KARLA VETRANI CHAVARRIA / MARIA CHAVES VILLALOBOS' });
+    cloneRecord('ev010', 'pdf055', { dia: 'LUNES', profesor: 'VICTOR MEZA PICADO' });
+    updateRecord('ev013', { profesor: 'MANFRED MURRELL BLANCO / ALINA AGUILAR ARGUEDAS' });
+    cloneRecord('ev013', 'pdf056', { dia: 'MIÉRCOLES', profesor: 'SHERRYL CAMPOS MORALES' });
+    DATA.push({ id: 'pdf057', aula: '708', aula_original: '0708', hora: '17:00-18:40', hora_raw: '1700-1840', turno: 'Noche', dia: 'LUNES', profesor: 'KRISTEL CASTILLO VEGA', codigo: 'MAT002', curso: 'CURSO NO INDICADO EN EL PDF', nrc: '53688', grupo: '24' });
+    DATA.push({ id: 'pdf058', aula: '708', aula_original: '0708', hora: '17:00-19:30', hora_raw: '1700-1930', turno: 'Noche', dia: 'MIÉRCOLES', profesor: 'KRISTEL CASTILLO VEGA', codigo: 'MAT002', curso: 'CURSO NO INDICADO EN EL PDF', nrc: '53688', grupo: '24' });
+
+    cloneRecord('ev003', 'pdf059', { dia: 'VIERNES', profesor: 'ERNESTO MONTERO SANCHEZ' });
+    updateRecord('ev004', { profesor: 'JESUS UGALDE GOMEZ / FEDERICO ALICE GUIER' });
+    updateRecord('ev031', { hora: '13:00-16:00', hora_raw: '1300-1600' });
+    cloneRecord('ev031', 'pdf060', { dia: 'JUEVES', profesor: 'JESUS UGALDE GOMEZ' });
+    DATA.push({ id: 'pdf061', aula: '709', aula_original: '0709', hora: '14:00-16:30', hora_raw: '1400-1630', turno: 'Tarde', dia: 'JUEVES', profesor: 'VICTOR GRANADOS FERNANDEZ', codigo: 'FIY512', curso: 'CURSO NO INDICADO EN EL PDF', nrc: '53299', grupo: '01' });
+
+    updateRecord('ev025', { aula: '710', aula_original: '0710', hora: '08:00-11:00', hora_raw: '0800-1100', turno: 'Mañana', dia: 'MIÉRCOLES' });
+    updateRecord('ev014', { codigo: 'AME442O', nrc: '53743' });
+    updateRecord('ev037', { aula: '710', aula_original: '0710', dia: 'MARTES' });
+    updateRecord('ev024', { hora: '16:30-19:30', hora_raw: '1630-1930', turno: 'Noche' });
+    updateRecord('ev026', { profesor: 'MARIA CHAVES VILLALOBOS / LAURA LEANDRO ZUÑIGA' });
+    addUnspecifiedRecord({ id: 'pdf062', aula: '710', aulaOriginal: '0710', hora: '08:00-12:00', horaRaw: '0800-1200', turno: 'Mañana', dia: 'MARTES', profesor: 'ALINA AGUILAR ARGUEDAS' });
+    addUnspecifiedRecord({ id: 'pdf063', aula: '710', aulaOriginal: '0710', hora: '08:00-12:00', horaRaw: '0800-1200', turno: 'Mañana', dia: 'MIÉRCOLES', profesor: 'ALBERT MORERA BEITA' });
+    addUnspecifiedRecord({ id: 'pdf064', aula: '710', aulaOriginal: '0710', hora: '08:00-12:00', horaRaw: '0800-1200', turno: 'Mañana', dia: 'VIERNES', profesor: 'VANESSA VALERIO HERNANDEZ' });
+    updateRecord('ev050', { profesor: 'MARIA ALVAREZ JIMENEZ / DAMIAN SANCHEZ RODRIGUEZ' });
+
+    updateRecord('ev006', { profesor: 'SHERRYL CAMPOS MORALES / RONNY VILLALOBOS CHACON' });
+    updateRecord('ev043', { hora: '17:01-18:40', hora_raw: '1701-1840', turno: 'Noche' });
+
     const DAYS = ['LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
     const TURNS = ['Mañana', 'Tarde', 'Noche'];
     const AULAS = ['L601', 'L602', 'L603', '708', '709', '710', '711'];
@@ -956,6 +1029,10 @@
     const aulaFilter = document.getElementById('aulaFilter');
     const searchInput = document.getElementById('searchInput');
     const tooltip = document.getElementById('tooltip');
+
+    document.getElementById('stat-aulas').textContent = AULAS.length;
+    document.getElementById('stat-registros').textContent = DATA.length;
+    document.getElementById('stat-dias').textContent = DAYS.length;
 
     AULAS.forEach(aula => {
       const opt = document.createElement('option');
@@ -1052,7 +1129,7 @@
           const td = document.createElement('td');
           const events = sortEvents(data.filter(r => r.aula === aula && r.turno === turno && r.dia === day));
           if (events.length === 0) {
-            td.innerHTML = '<div class="free" aria-label="Disponible">–</div>';
+            td.innerHTML = '<div class="free-slot" aria-label="Disponible">–</div>';
           } else {
             const wrapper = document.createElement('div');
             wrapper.className = 'cell-events';
