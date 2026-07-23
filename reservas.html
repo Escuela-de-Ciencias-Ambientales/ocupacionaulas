@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reservación de aulas | EDECA</title>
+  <meta name="description" content="Área privada para la reservación de aulas por parte del personal docente de EDECA." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="reservas.css?v=15" />
+</head>
+<body>
+  <header class="private-header">
+    <div class="page private-header-row">
+      <a class="private-brand" href="index.html">
+        <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
+        <span>Escuela de Ciencias Ambientales</span>
+      </a>
+      <div class="header-actions">
+        <a class="back-to-schedule" href="index.html">Ver ocupación pública</a>
+        <div class="header-account" id="headerAccount" hidden>
+          <div class="header-account-identity">
+            <strong id="currentUserName">Docente</strong>
+            <span id="currentUserRole">Docente</span>
+            <button class="account-password-link" id="openPasswordDialog" type="button">Cambiar contraseña</button>
+          </div>
+          <button class="text-button" id="logoutButton" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page private-main">
+    <section class="private-intro">
+      <div>
+        <p class="eyebrow">Área docente</p>
+        <h1>Reservación de aulas</h1>
+        <p id="cycleDescription">Consulta la disponibilidad de las aulas y confirma tu reserva cuando el periodo esté habilitado.</p>
+      </div>
+      <span class="connection-status" id="connectionStatus">Preparando conexión…</span>
+    </section>
+
+    <div class="system-message" id="systemMessage" role="status" aria-live="polite" hidden></div>
+
+    <section class="cycle-banner panel" id="cycleBanner" hidden aria-live="polite">
+      <div>
+        <p class="eyebrow">Periodo de reservación</p>
+        <h2 id="cycleName">Periodo sin configurar</h2>
+        <p id="cycleDates"></p>
+      </div>
+      <span class="cycle-state is-closed" id="cycleState">Cerrado</span>
+    </section>
+
+    <section class="user-view" id="userView" hidden>
+      <div class="booking-grid">
+        <form class="booking-form" id="bookingForm">
+          <div class="form-heading">
+            <span class="step-number">01</span>
+            <div><strong>Nueva reserva</strong><span>Todos los campos son obligatorios.</span></div>
+          </div>
+          <div class="field-grid">
+            <div><label for="bookingDate">Fecha</label><input id="bookingDate" name="date" type="date" required /></div>
+            <div><label for="bookingRoom">Aula</label><select id="bookingRoom" name="room" required></select></div>
+            <div><label for="bookingStart">Hora de inicio</label><input id="bookingStart" name="start" type="time" min="07:00" max="21:00" step="1800" required /></div>
+            <div><label for="bookingEnd">Hora de finalización</label><input id="bookingEnd" name="end" type="time" min="07:30" max="21:00" step="1800" required /></div>
+          </div>
+          <div id="adminProfessorField" hidden><label for="bookingProfessor">Reservar a nombre de</label><select id="bookingProfessor" name="professor"></select></div>
+          <label for="bookingActivity">Actividad</label>
+          <input id="bookingActivity" name="activity" type="text" maxlength="120" placeholder="Ej.: Reunión de proyecto" required />
+          <div class="availability-check" id="availabilityCheck">Selecciona la fecha y el horario para comprobar disponibilidad.</div>
+          <button class="primary-button" id="saveBookingButton" type="submit">Guardar reserva</button>
+        </form>
+
+        <section class="my-bookings" aria-labelledby="myBookingsTitle">
+          <div class="section-heading">
+            <div><p class="eyebrow">Tu agenda</p><h3 id="myBookingsTitle">Mis próximas reservas</h3></div>
+            <button class="icon-button" id="refreshButton" type="button" aria-label="Actualizar reservas">↻</button>
+          </div>
+          <div class="booking-list" id="myBookingsList"><p class="empty-state">No tienes reservas próximas.</p></div>
+        </section>
+      </div>
+
+    </section>
+
+    <section class="schedule-browser panel" id="scheduleBrowser" aria-labelledby="scheduleEditorTitle" hidden>
+      <div class="section-heading compact-heading">
+        <div>
+          <p class="eyebrow">Horario y reservas</p>
+          <h2 id="scheduleEditorTitle">Disponibilidad semanal por aula</h2>
+          <p id="scheduleEditorDescription">Selecciona una semana y un aula. Pulsa “Reservar” directamente en el espacio que necesitas.</p>
+        </div>
+        <div class="editor-filters">
+          <div><label for="editorWeek">Semana</label><input id="editorWeek" type="date" /></div>
+          <div><label for="editorRoom">Aula</label><select id="editorRoom"></select></div>
+        </div>
+      </div>
+      <div class="weekly-editor" id="weeklyEditor" aria-live="polite"></div>
+    </section>
+
+    <section class="admin-panel panel" id="adminPanel" aria-labelledby="adminTitle" hidden>
+      <div class="section-heading"><div><p class="eyebrow" id="adminAccessLabel">Acceso administrativo</p><h2 id="adminTitle">Administración de reservas</h2></div></div>
+      <section class="cycle-admin" aria-labelledby="cycleAdminTitle">
+        <div class="section-heading compact-heading">
+          <div><h3 id="cycleAdminTitle">Control del ciclo</h3><p>Primero configura el periodo y carga la ocupación académica. Después podrás abrir las reservas.</p></div>
+          <span class="cycle-state is-closed" id="adminCycleState">Cerrado</span>
+        </div>
+        <form id="cycleForm" class="cycle-form superadmin-only">
+          <div><label for="adminCycleName">Nombre del ciclo</label><input id="adminCycleName" name="name" placeholder="I Ciclo 2027" maxlength="80" required /></div>
+          <div><label for="adminReservationStart">Reservas desde</label><input id="adminReservationStart" name="reservationStart" type="date" required /></div>
+          <div><label for="adminReservationEnd">Reservas hasta</label><input id="adminReservationEnd" name="reservationEnd" type="date" required /></div>
+          <div><label for="adminAcademicEnd">Ocupación de clases hasta</label><input id="adminAcademicEnd" name="academicEnd" type="date" required /></div>
+          <div><label for="adminOpensAt">Apertura del sistema</label><input id="adminOpensAt" name="opensAt" type="datetime-local" required /></div>
+          <div><label for="adminClosesAt">Cierre del sistema</label><input id="adminClosesAt" name="closesAt" type="datetime-local" required /></div>
+          <button class="primary-button" type="submit">Guardar configuración y mantener cerrado</button>
+        </form>
+        <div class="schedule-upload superadmin-only">
+          <div><h3>Ocupación académica prioritaria</h3><p id="scheduleStatus">Aún no se ha cargado para este ciclo.</p></div>
+          <div class="upload-actions">
+            <a class="secondary-button" href="plantillas/plantilla_ocupacion_aulas.xlsx" download>Descargar plantilla Excel</a>
+            <label class="secondary-button file-button" for="scheduleFile">Seleccionar Excel</label>
+            <input id="scheduleFile" type="file" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" />
+            <button class="primary-button compact-button" id="uploadScheduleButton" type="button">Cargar y reemplazar horario</button>
+          </div>
+        </div>
+        <div class="cycle-actions superadmin-only">
+          <p id="cycleActionHelp">Las reservas permanecerán cerradas hasta completar la configuración.</p>
+          <button class="primary-button compact-button" id="toggleReservationsButton" type="button" disabled>Abrir reservas</button>
+        </div>
+      </section>
+      <div class="account-management-grid">
+        <div class="account-form-column">
+          <div class="form-message" id="createUserMessage" role="status" aria-live="polite" hidden></div>
+          <form class="admin-form" id="createUserForm" novalidate>
+            <h3>Crear una cuenta</h3>
+            <p class="form-note account-limit-note">Máximo permitido: 50 cuentas docentes activas.</p>
+            <label for="newUserName">Nombre completo</label><input id="newUserName" name="name" maxlength="100" required />
+            <label for="newUserEmail">Correo electrónico</label><input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
+            <label for="newUserPassword">Contraseña temporal</label><input id="newUserPassword" name="password" type="password" minlength="8" title="Mínimo 8 caracteres, una mayúscula y un número" required />
+            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role"><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="admin">Superadministrador</option></select>
+            <button class="primary-button" type="submit">Crear cuenta</button>
+          </form>
+        </div>
+        <section class="bulk-users-card superadmin-only" id="bulkUsersCard">
+          <h3>Cargar docentes desde Excel</h3>
+          <p>Nombre y correo autorizan el registro personal. Si agregas una contraseña temporal, la cuenta se crea de inmediato.</p>
+          <a class="secondary-button full-button" href="plantillas/plantilla_cuentas_docentes.xlsx" download>Descargar plantilla de cuentas</a>
+          <label class="secondary-button file-button full-button" for="usersFile">Seleccionar Excel</label>
+          <input id="usersFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
+          <p class="file-summary" id="usersFileSummary">No se ha seleccionado ningún archivo.</p>
+          <button class="primary-button" id="uploadUsersButton" type="button">Procesar docentes</button>
+        </section>
+      </div>
+      <section class="admin-bookings">
+        <h3>Reservas activas</h3>
+        <div class="booking-list" id="adminBookingsList"><p class="empty-state">No hay reservas activas.</p></div>
+      </section>
+    </section>
+  </main>
+
+  <dialog class="schedule-dialog password-dialog" id="passwordDialog">
+    <form id="changePasswordForm" method="dialog">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Seguridad de la cuenta</p><h2>Cambiar contraseña</h2></div>
+        <button class="dialog-close" id="closePasswordDialog" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <p class="booking-dialog-intro">Usa al menos 8 caracteres, una letra mayúscula y un número.</p>
+      <div class="form-message" id="passwordMessage" role="status" aria-live="polite" hidden></div>
+      <div class="password-dialog-fields">
+        <div>
+          <label for="newPassword">Nueva contraseña</label>
+          <div class="password-input">
+            <input id="newPassword" name="password" type="password" minlength="8" autocomplete="new-password" required />
+            <button class="password-toggle" type="button" aria-label="Mostrar contraseña" aria-pressed="false" aria-controls="newPassword"><span class="password-eye" aria-hidden="true"></span></button>
+          </div>
+        </div>
+        <div>
+          <label for="confirmPassword">Confirmar contraseña</label>
+          <div class="password-input">
+            <input id="confirmPassword" name="confirmPassword" type="password" minlength="8" autocomplete="new-password" required />
+            <button class="password-toggle" type="button" aria-label="Mostrar contraseña" aria-pressed="false" aria-controls="confirmPassword"><span class="password-eye" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancelPasswordDialog" type="button">Cancelar</button>
+        <button class="primary-button compact-button" type="submit">Actualizar contraseña</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="schedule-dialog booking-dialog" id="bookingDialog">
+    <form id="bookingDialogForm" method="dialog">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Reservación de aulas</p><h2>Crear reserva</h2></div>
+        <button class="dialog-close" id="closeBookingDialog" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <p class="booking-dialog-intro">El aula, la fecha y el tramo seleccionado ya están precargados. Puedes ajustar las horas dentro del espacio disponible.</p>
+      <div class="field-grid">
+        <div><label for="dialogBookingDate">Fecha</label><input id="dialogBookingDate" type="date" required /></div>
+        <div><label for="dialogBookingRoom">Aula</label><select id="dialogBookingRoom" required></select></div>
+        <div><label for="dialogBookingStart">Hora de inicio</label><input id="dialogBookingStart" type="time" min="07:00" max="21:00" step="1800" required /></div>
+        <div><label for="dialogBookingEnd">Hora de finalización</label><input id="dialogBookingEnd" type="time" min="07:30" max="21:00" step="1800" required /></div>
+      </div>
+      <div id="dialogAdminProfessorField" hidden>
+        <label for="dialogBookingProfessor">Reservar a nombre de</label>
+        <select id="dialogBookingProfessor"></select>
+      </div>
+      <label for="dialogBookingActivity">Actividad</label>
+      <input id="dialogBookingActivity" type="text" maxlength="120" placeholder="Ej.: Reunión de proyecto" required />
+      <div class="availability-check" id="dialogAvailabilityCheck">Horario disponible.</div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancelBookingDialog" type="button">Cancelar</button>
+        <button class="primary-button compact-button" id="saveDialogBookingButton" type="submit">Guardar reserva</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="schedule-dialog" id="scheduleDialog">
+    <form id="scheduleEntryForm" method="dialog">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Ocupación académica</p><h2 id="scheduleDialogTitle">Reservar espacio</h2></div>
+        <button class="dialog-close" id="closeScheduleDialog" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <input id="scheduleEntryId" type="hidden" />
+      <div class="field-grid">
+        <div><label for="scheduleEntryRoom">Aula</label><select id="scheduleEntryRoom" required></select></div>
+        <div><label for="scheduleEntryDay">Día</label><select id="scheduleEntryDay" required><option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option><option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option></select></div>
+        <div><label for="scheduleEntryStart">Hora de inicio</label><input id="scheduleEntryStart" type="time" min="07:00" max="20:30" step="1800" required /></div>
+        <div><label for="scheduleEntryEnd">Hora de finalización</label><input id="scheduleEntryEnd" type="time" min="07:30" max="21:00" step="1800" required /></div>
+      </div>
+      <div class="schedule-details-grid">
+        <div class="schedule-field-wide">
+          <label for="scheduleEntryCourseName">Nombre del curso o actividad</label>
+          <input id="scheduleEntryCourseName" type="text" maxlength="160" placeholder="Ej.: Geología Ambiental y Suelos" />
+        </div>
+        <div>
+          <label for="scheduleEntryCourseCode">Código <span class="optional-label">(opcional)</span></label>
+          <input id="scheduleEntryCourseCode" type="text" maxlength="40" placeholder="Ej.: AME408" />
+        </div>
+        <div>
+          <label for="scheduleEntryGroup">Grupo <span class="optional-label">(opcional)</span></label>
+          <input id="scheduleEntryGroup" type="text" maxlength="40" placeholder="Ej.: 01" />
+        </div>
+        <div>
+          <label for="scheduleEntryNrc">NRC <span class="optional-label">(opcional)</span></label>
+          <input id="scheduleEntryNrc" type="text" maxlength="40" inputmode="numeric" placeholder="Ej.: 51769" />
+        </div>
+        <div class="schedule-field-wide">
+          <label for="scheduleEntryProfessor">Profesor o responsable</label>
+          <input id="scheduleEntryProfessor" type="text" maxlength="120" list="scheduleProfessorOptions" autocomplete="off" placeholder="Escribe para buscar o selecciona un docente" />
+          <datalist id="scheduleProfessorOptions"></datalist>
+        </div>
+      </div>
+      <p class="schedule-dialog-help">Código, grupo y NRC son opcionales. Para actividades institucionales basta indicar el nombre de la actividad o responsable.</p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancelScheduleDialog" type="button">Cancelar</button>
+        <button class="primary-button compact-button" id="saveScheduleEntryButton" type="submit">Guardar ocupación</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="config.js?v=5"></script>
+  <script src="password-toggle.js?v=2"></script>
+  <script src="reservas.js?v=17"></script>
+</body>
+</html>

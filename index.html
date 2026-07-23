@@ -237,6 +237,10 @@
     .identity-copy strong { display:block; margin-top:2px; color:var(--ink); font-size:clamp(25px,3.2vw,38px); line-height:1; letter-spacing:-.025em; }
     .report-meta { color:var(--una-gray); font-size:13px; line-height:1.5; text-align:right; }
     .report-meta strong { display:block; color:var(--una-red-dark); font-size:14px; }
+    .session-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:11px 19px; border:1px solid var(--una-red-dark); border-radius:999px; color:#fff; background:linear-gradient(135deg,var(--una-red),var(--una-red-dark)); box-shadow:0 8px 20px rgba(188,18,35,.18); font-size:13px; font-weight:850; letter-spacing:.01em; text-decoration:none; transition:transform .18s ease,box-shadow .18s ease,background .18s ease; }
+    .session-button::after { content:'→'; font-size:17px; line-height:1; transition:transform .18s ease; }
+    .session-button:hover, .session-button:focus-visible { color:#fff; background:linear-gradient(135deg,var(--una-red-dark),#8f0c1b); box-shadow:0 10px 24px rgba(188,18,35,.26); transform:translateY(-1px); }
+    .session-button:hover::after, .session-button:focus-visible::after { transform:translateX(3px); }
 
     .intro { grid-template-columns:minmax(0,1fr) auto; gap:24px; padding:36px 0 24px; }
     .lead { padding:4px 0; border:0; background:transparent; box-shadow:none; }
@@ -329,6 +333,7 @@
         </div>
       </div>
       <div class="institutional-lockup">
+        <a class="session-button" href="ingreso.html?v=6">Ingreso a reservas</a>
         <div class="report-meta"><strong>Periodo: II Ciclo 2026</strong>Reporte base 10/07/2026</div>
         <span class="brand-divider" aria-hidden="true"></span>
         <a class="logo-link logo-una" href="https://www.una.ac.cr/" target="_blank" rel="noopener" aria-label="Universidad Nacional, Costa Rica">
@@ -350,6 +355,139 @@
         <div class="stat"><strong id="stat-dias">0</strong><span>Días lectivos</span></div>
       </div>
     </section>
+
+    <section class="reservation-portal panel" id="reservationPortal" aria-labelledby="reservationTitle" hidden>
+      <div class="portal-heading">
+        <div>
+          <p class="eyebrow">Gestión rápida</p>
+          <h2 id="reservationTitle">Reservar un aula</h2>
+          <p>Ingresa con tu cuenta institucional, selecciona la fecha y confirma un horario disponible.</p>
+        </div>
+        <span class="connection-status" id="connectionStatus">Preparando conexión…</span>
+      </div>
+
+      <div class="system-message" id="systemMessage" role="status" aria-live="polite" hidden></div>
+
+      <div class="guest-view" id="guestView">
+        <form class="login-card" id="loginForm">
+          <div class="form-heading">
+            <span class="step-number">01</span>
+            <div><strong>Ingreso a reservas</strong><span>Usa tu correo institucional y contraseña.</span></div>
+          </div>
+          <label for="loginEmail">Correo electrónico</label>
+          <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido.apellido@una.cr" pattern="[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
+          <label for="loginPassword">Contraseña</label>
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password" minlength="8" required />
+          <button class="primary-button" type="submit">Ingresar</button>
+          <p class="form-note">Las cuentas son creadas por la administración de la Escuela.</p>
+        </form>
+        <div class="access-summary">
+          <span class="step-number">02</span>
+          <h3>Reserva sin complicaciones</h3>
+          <ol>
+            <li>Selecciona fecha, aula y horario.</li>
+            <li>Indica brevemente la actividad.</li>
+            <li>Confirma y la reserva aparecerá de inmediato.</li>
+          </ol>
+          <p>El sistema bloquea automáticamente cualquier cruce con clases o reservas existentes.</p>
+        </div>
+      </div>
+
+      <div class="user-view" id="userView" hidden>
+        <div class="account-strip">
+          <strong id="currentUserName">Docente</strong>
+          <div class="account-actions">
+            <button class="text-button" id="logoutButton" type="button">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <div class="booking-grid">
+          <form class="booking-form" id="bookingForm">
+            <div class="form-heading">
+              <span class="step-number">01</span>
+              <div><strong>Nueva reserva</strong><span>Todos los campos son obligatorios.</span></div>
+            </div>
+            <div class="field-grid">
+              <div>
+                <label for="bookingDate">Fecha</label>
+                <input id="bookingDate" name="date" type="date" required />
+              </div>
+              <div>
+                <label for="bookingRoom">Aula</label>
+                <select id="bookingRoom" name="room" required></select>
+              </div>
+              <div>
+                <label for="bookingStart">Hora de inicio</label>
+                <input id="bookingStart" name="start" type="time" min="07:00" max="21:00" step="1800" required />
+              </div>
+              <div>
+                <label for="bookingEnd">Hora de finalización</label>
+                <input id="bookingEnd" name="end" type="time" min="07:30" max="21:30" step="1800" required />
+              </div>
+            </div>
+            <label for="bookingActivity">Actividad</label>
+            <input id="bookingActivity" name="activity" type="text" maxlength="120" placeholder="Ej.: Reunión de proyecto" required />
+            <div class="availability-check" id="availabilityCheck">Selecciona la fecha y el horario para comprobar disponibilidad.</div>
+            <button class="primary-button" id="saveBookingButton" type="submit">Guardar reserva</button>
+          </form>
+
+          <section class="my-bookings" aria-labelledby="myBookingsTitle">
+            <div class="section-heading">
+              <div><p class="eyebrow">Tu agenda</p><h3 id="myBookingsTitle">Mis próximas reservas</h3></div>
+              <button class="icon-button" id="refreshButton" type="button" aria-label="Actualizar reservas">↻</button>
+            </div>
+            <div class="booking-list" id="myBookingsList"><p class="empty-state">No tienes reservas próximas.</p></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="reservation-board panel" aria-labelledby="boardTitle" hidden>
+      <div class="section-heading board-heading">
+        <div><p class="eyebrow">Actualización inmediata</p><h2 id="boardTitle">Disponibilidad por aula</h2></div>
+        <div class="board-filters">
+          <label for="boardDate">Fecha</label>
+          <input id="boardDate" type="date" />
+          <label for="boardRoom">Aula</label>
+          <select id="boardRoom"><option value="TODAS">Todas</option></select>
+        </div>
+      </div>
+      <div class="availability-board" id="availabilityBoard" aria-live="polite"></div>
+      <h3 class="reservation-detail-title">Detalle de reservas registradas</h3>
+      <div class="reservation-list public-list" id="publicReservationsList">
+        <p class="empty-state">No hay reservas registradas para esta fecha.</p>
+      </div>
+    </section>
+
+    <section class="admin-panel panel" id="adminPanel" aria-labelledby="adminTitle" hidden>
+      <div class="section-heading">
+        <div><p class="eyebrow">Acceso maestro</p><h2 id="adminTitle">Administración</h2></div>
+      </div>
+      <div class="admin-grid">
+        <form class="admin-form" id="createUserForm">
+          <h3>Crear cuenta docente</h3>
+          <p class="form-note account-limit-note">Máximo permitido: 50 cuentas docentes activas.</p>
+          <label for="newUserName">Nombre completo</label>
+          <input id="newUserName" name="name" maxlength="100" required />
+          <label for="newUserEmail">Correo electrónico</label>
+          <input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" pattern="[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
+          <label for="newUserPassword">Contraseña temporal</label>
+          <input id="newUserPassword" name="password" type="password" minlength="8" required />
+          <label for="newUserRole">Tipo de acceso</label>
+          <select id="newUserRole" name="role"><option value="teacher">Docente</option><option value="admin">Administrador</option></select>
+          <button class="primary-button" type="submit">Crear cuenta</button>
+        </form>
+        <section>
+          <h3>Reservas activas</h3>
+          <div class="booking-list" id="adminBookingsList"><p class="empty-state">No hay reservas activas.</p></div>
+        </section>
+      </div>
+    </section>
+
+    <div class="schedule-heading" hidden>
+      <div><p class="eyebrow">Referencia académica</p><h2>Horario fijo de ocupación</h2></div>
+      <p>Estas clases bloquean automáticamente los espacios correspondientes al crear una reserva.</p>
+    </div>
 
     <section class="toolbar" aria-label="Filtros de visualización">
       <div class="filters">
@@ -1132,7 +1270,15 @@
 
     const DAYS = ['LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
     const TURNS = ['Mañana', 'Tarde', 'Noche'];
-    const AULAS = ['L601', 'L602', 'L603', '708', '709', '710', '711'];
+    const AULAS = ['L601', 'L602', 'L603', '708', '709', '710', '711', 'SS-3P', 'SR-1P'];
+    const ROOM_DISPLAY_NAMES = {
+      L601: 'Laboratorio L601',
+      L602: 'Laboratorio L602',
+      L603: 'Laboratorio L603',
+      'SS-3P': 'Sala de sesiones tercer piso',
+      'SR-1P': 'Sala reuniones primer piso'
+    };
+    const roomDisplayName = aula => ROOM_DISPLAY_NAMES[aula] || `Aula ${aula}`;
 
     const root = document.getElementById('scheduleRoot');
     const aulaFilter = document.getElementById('aulaFilter');
@@ -1146,7 +1292,7 @@
     AULAS.forEach(aula => {
       const opt = document.createElement('option');
       opt.value = aula;
-      opt.textContent = `Aula ${aula}`;
+      opt.textContent = roomDisplayName(aula);
       aulaFilter.appendChild(opt);
     });
 
@@ -1219,11 +1365,11 @@
       const count = data.filter(r => r.aula === aula).length;
       section.innerHTML = `
         <div class="aula-head">
-          <h2>Aula ${escapeHtml(aula)}</h2>
+          <h2>${escapeHtml(roomDisplayName(aula))}</h2>
           <span>${count} registro${count === 1 ? '' : 's'} de ocupación</span>
         </div>
         <div class="schedule-wrap">
-          <table class="schedule" aria-label="Horario del aula ${escapeHtml(aula)}">
+          <table class="schedule" aria-label="Horario de ${escapeHtml(roomDisplayName(aula))}">
             <thead>
               <tr><th>Jornada</th>${DAYS.map(day => `<th>${day}</th>`).join('')}</tr>
             </thead>
@@ -1271,7 +1417,7 @@
       const tbody = document.createElement('tbody');
       data.forEach(record => {
         const tr = document.createElement('tr');
-        tr.innerHTML = keys.map(k => `<td>${escapeHtml(record[k])}</td>`).join('');
+        tr.innerHTML = keys.map(k => `<td>${escapeHtml(k === 'aula' ? roomDisplayName(record[k]) : record[k])}</td>`).join('');
         tbody.appendChild(tr);
       });
       table.appendChild(tbody);
@@ -1287,7 +1433,7 @@
           <span class="label">NRC</span><span class="value">${escapeHtml(record.nrc)}</span>
           <span class="label">Grupo</span><span class="value">${escapeHtml(record.grupo)}</span>
           <span class="label">Horario</span><span class="value">${escapeHtml(record.dia)} · ${escapeHtml(record.hora)}</span>
-          <span class="label">Aula</span><span class="value">${escapeHtml(record.aula)}</span>
+          <span class="label">Aula</span><span class="value">${escapeHtml(roomDisplayName(record.aula))}</span>
           <span class="label">Jornada</span><span class="value">${escapeHtml(record.turno)}</span>
         </div>
       `;

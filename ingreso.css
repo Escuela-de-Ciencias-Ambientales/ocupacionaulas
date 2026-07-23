@@ -1,0 +1,40 @@
+:root { --red:#b5121b; --red-dark:#8e0e16; --green:#087a55; --ink:#202827; --muted:#65716e; --line:#dde5e2; }
+* { box-sizing:border-box; }
+body { min-height:100vh; margin:0; color:var(--ink); background:linear-gradient(120deg,#f8faf9 0 58%,#eef6f2 58% 100%); font-family:"Source Sans 3",Arial,sans-serif; }
+.access-header { display:flex; align-items:center; justify-content:space-between; width:min(1120px,calc(100% - 32px)); margin:0 auto; padding:24px 0; }
+.brand { display:flex; align-items:center; gap:14px; color:var(--ink); font-size:20px; font-weight:800; text-decoration:none; }
+.brand img { width:76px; height:76px; object-fit:contain; }
+.una-logo { width:84px; height:72px; object-fit:contain; }
+.access-main { display:grid; grid-template-columns:minmax(0,1fr) minmax(350px,440px); gap:70px; align-items:center; width:min(1040px,calc(100% - 32px)); min-height:calc(100vh - 150px); margin:0 auto; padding:36px 0 70px; }
+.eyebrow { margin:0 0 10px; color:var(--red); font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+.access-copy h1 { max-width:650px; margin:0; font-size:clamp(44px,7vw,78px); line-height:.96; letter-spacing:-.045em; }
+.access-copy > p:not(.eyebrow) { max-width:55ch; margin:24px 0; color:var(--muted); font-size:18px; line-height:1.65; }
+.access-copy a { color:var(--green); font-weight:800; text-decoration:none; }
+.access-copy a:hover,.access-copy a:focus-visible { text-decoration:underline; }
+.login-panel { padding:34px; border:1px solid var(--line); border-radius:22px; background:#fff; box-shadow:0 24px 65px rgba(26,53,44,.12); }
+.lock-mark { display:grid; width:58px; height:58px; place-items:center; border-radius:16px; color:#fff; background:linear-gradient(135deg,var(--green),#0a5d45); font-size:11px; font-weight:900; letter-spacing:.08em; }
+.login-panel h2 { margin:22px 0 4px; font-size:29px; }
+.login-panel > p { margin:0 0 22px; color:var(--muted); }
+label { display:block; margin:15px 0 6px; font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+input { width:100%; min-height:50px; padding:11px 13px; border:1px solid #cdd8d4; border-radius:11px; color:var(--ink); background:#fff; font:inherit; }
+input:focus { border-color:var(--green); outline:3px solid rgba(8,122,85,.13); }
+button { width:100%; min-height:50px; margin-top:20px; border:0; border-radius:11px; color:#fff; background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
+button:hover,button:focus-visible { background:var(--red-dark); }
+button:disabled { cursor:not-allowed; opacity:.55; }
+.access-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:20px 0; padding:5px; border-radius:12px; background:#f1f5f3; }
+.tab-button { min-height:42px; margin:0; color:var(--muted); background:transparent; }
+.tab-button:hover,.tab-button:focus-visible { color:var(--ink); background:#fff; }
+.tab-button.is-active { color:#fff; background:var(--green); box-shadow:0 4px 12px rgba(8,122,85,.18); }
+.password-help { margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.4; }
+.login-panel small { display:block; margin-top:18px; color:var(--muted); line-height:1.45; }
+.message { margin:0 0 16px; padding:11px 12px; border-radius:10px; color:#8f1c27; background:#fff0f1; font-size:14px; }
+.message.is-success { color:#075c40; background:#eff9f4; }
+@media (max-width:760px) { body { background:#f8faf9; } .access-header { padding:16px 0; } .brand { font-size:17px; } .brand img { width:62px;height:62px; } .una-logo { width:70px;height:60px; } .access-main { grid-template-columns:1fr; gap:30px; padding:24px 0 52px; } .access-copy h1 { font-size:46px; } .access-copy > p:not(.eyebrow) { font-size:16px; } .login-panel { padding:24px; } }
+@media (max-width:430px) { .brand span { max-width:155px; line-height:1.1; } .access-copy h1 { font-size:39px; } }
+.password-input { position:relative; width:100%; }
+.password-input input { padding-right:52px; }
+.password-toggle { position:absolute; z-index:2; top:50%; right:8px; width:38px !important; min-height:38px !important; margin:0 !important; padding:0 !important; transform:translateY(-50%); border:0; border-radius:9px; color:#4f635d; background:transparent !important; box-shadow:none !important; cursor:pointer; }
+.password-toggle:hover,.password-toggle:focus-visible { color:#087a55; background:#e8f5ef !important; outline:2px solid rgba(8,122,85,.18); }
+.password-eye { position:absolute; top:50%; left:50%; width:20px; height:13px; transform:translate(-50%,-50%) rotate(-2deg); border:2px solid currentColor; border-radius:70% 20% 70% 20%; }
+.password-eye::after { position:absolute; top:50%; left:50%; width:5px; height:5px; content:""; transform:translate(-50%,-50%); border-radius:50%; background:currentColor; }
+.password-toggle[aria-pressed="true"] .password-eye::before { position:absolute; z-index:1; top:50%; left:-3px; width:24px; height:2px; content:""; transform:rotate(-38deg); background:currentColor; box-shadow:0 0 0 2px #fff; }

@@ -1,0 +1,5 @@
+-- Después de crear el primer usuario en Authentication > Users,
+-- reemplaza el correo y ejecuta esta consulta una sola vez.
+update public.profiles
+set role = 'admin', active = true
+where email = 'administrador@una.cr';
