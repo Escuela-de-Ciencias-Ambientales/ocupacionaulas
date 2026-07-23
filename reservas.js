@@ -29,6 +29,7 @@
     scheduleEditorDescription: byId('scheduleEditorDescription'), editorWeek: byId('editorWeek'),
     adminPanel: byId('adminPanel'), createUserForm: byId('createUserForm'), createUserMessage: byId('createUserMessage'),
     adminBookingsList: byId('adminBookingsList'),
+    visitCounterPanel: byId('visitCounterPanel'), visitTodayCount: byId('visitTodayCount'), visitTotalCount: byId('visitTotalCount'),
     cycleBanner: byId('cycleBanner'), cycleName: byId('cycleName'), cycleDates: byId('cycleDates'), cycleState: byId('cycleState'),
     cycleDescription: byId('cycleDescription'), adminCycleState: byId('adminCycleState'), cycleForm: byId('cycleForm'),
     adminCycleName: byId('adminCycleName'), adminReservationStart: byId('adminReservationStart'),
@@ -453,8 +454,20 @@
     if (!data.active) { await state.client.auth.signOut(); throw new Error('Esta cuenta está desactivada. Contacta a la administración.'); }
     state.profile = data; renderSession();
   }
-  async function reloadAll() { await loadCycle(); await loadFixedOccupancies(); await loadTeachers(); await loadReservations(); }
-  async function signOut() { clearMessage(); await state.client.auth.signOut(); window.location.replace('ingreso.html?v=6'); }
+  async function loadVisitStats() {
+    if (!isSuperadmin()) return;
+    const { data, error } = await state.client.rpc('get_page_visit_stats', { p_page_key: 'ocupacionaulas' });
+    if (error) {
+      elements.visitTodayCount.textContent = '—';
+      elements.visitTotalCount.textContent = '—';
+      return;
+    }
+    const stats = Array.isArray(data) ? data[0] : data;
+    elements.visitTodayCount.textContent = Number(stats?.today_count || 0).toLocaleString('es-CR');
+    elements.visitTotalCount.textContent = Number(stats?.total_count || 0).toLocaleString('es-CR');
+  }
+  async function reloadAll() { await loadCycle(); await loadFixedOccupancies(); await loadTeachers(); await loadReservations(); await loadVisitStats(); }
+  async function signOut() { clearMessage(); await state.client.auth.signOut(); window.location.replace('ingreso.html?v=7'); }
 
   async function saveReservation(event) {
     event.preventDefault(); clearMessage();
@@ -755,9 +768,9 @@
     try {
       state.client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
       elements.connectionStatus.textContent = 'Sistema disponible'; const { data } = await state.client.auth.getSession(); state.session = data.session;
-      if (!state.session) { window.location.replace('ingreso.html?v=6'); return; }
+      if (!state.session) { window.location.replace('ingreso.html?v=7'); return; }
       await loadProfile(); await loadRooms(); await reloadAll();
-      state.client.auth.onAuthStateChange(async (_event, session) => { state.session = session; if (session) { await loadProfile(); await reloadAll(); } else window.location.replace('ingreso.html?v=6'); });
+      state.client.auth.onAuthStateChange(async (_event, session) => { state.session = session; if (session) { await loadProfile(); await reloadAll(); } else window.location.replace('ingreso.html?v=7'); });
     } catch (error) { elements.connectionStatus.textContent = 'Conexión no disponible'; elements.connectionStatus.classList.add('is-offline'); showMessage(`No fue posible conectar con el sistema: ${error.message}`, 'error'); }
   }
   initialize();

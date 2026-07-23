@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="reservas.css?v=15" />
+  <link rel="stylesheet" href="reservas.css?v=16" />
 </head>
 <body>
   <header class="private-header">
@@ -100,6 +100,17 @@
 
     <section class="admin-panel panel" id="adminPanel" aria-labelledby="adminTitle" hidden>
       <div class="section-heading"><div><p class="eyebrow" id="adminAccessLabel">Acceso administrativo</p><h2 id="adminTitle">Administración de reservas</h2></div></div>
+      <section class="visit-counter-panel superadmin-only" id="visitCounterPanel" hidden aria-labelledby="visitCounterTitle">
+        <div>
+          <p class="eyebrow">Actividad de la página pública</p>
+          <h3 id="visitCounterTitle">Contador de visitas</h3>
+          <p>Se registra como máximo una visita por navegador cada día, sin recopilar información personal.</p>
+        </div>
+        <div class="visit-counter-stats">
+          <div><span>Visitas de hoy</span><strong id="visitTodayCount">—</strong></div>
+          <div><span>Visitas totales</span><strong id="visitTotalCount">—</strong></div>
+        </div>
+      </section>
       <section class="cycle-admin" aria-labelledby="cycleAdminTitle">
         <div class="section-heading compact-heading">
           <div><h3 id="cycleAdminTitle">Control del ciclo</h3><p>Primero configura el periodo y carga la ocupación académica. Después podrás abrir las reservas.</p></div>
@@ -264,6 +275,6 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="config.js?v=5"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="reservas.js?v=17"></script>
+  <script src="reservas.js?v=18"></script>
 </body>
 </html>
