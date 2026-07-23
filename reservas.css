@@ -26,8 +26,21 @@ body { min-height:100vh; margin:0; color:var(--reserve-ink); background:#f4f7f6;
 .account-password-link:hover,.account-password-link:focus-visible { color:#055d40; }
 .back-to-schedule { color:var(--reserve-green); font-size:14px; font-weight:800; text-decoration:none; }
 .back-to-schedule:hover,.back-to-schedule:focus-visible { text-decoration:underline; }
-.private-main { padding:40px 0 70px; }
-.private-intro { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:24px; }
+.private-main {
+  --section-gap:32px;
+  display:flex;
+  flex-direction:column;
+  gap:var(--section-gap);
+  padding:40px 0 70px;
+}
+.private-main > .private-intro,
+.private-main > .system-message,
+.private-main > .cycle-banner,
+.private-main > .user-view,
+.private-main > .schedule-browser,
+.private-main > .admin-panel { margin:0; }
+.private-main > .user-view .booking-grid { margin-top:0; }
+.private-intro { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
 .private-intro h1 { margin:0; font-size:clamp(38px,5vw,60px); line-height:1; letter-spacing:-.04em; }
 .private-intro p:not(.eyebrow) { max-width:62ch; margin:14px 0 0; color:var(--reserve-muted); font-size:17px; line-height:1.55; }
 
@@ -606,6 +619,7 @@ body { min-height:100vh; margin:0; color:var(--reserve-ink); background:#f4f7f6;
 }
 
 @media (max-width: 640px) {
+  .private-main { --section-gap:24px; }
   .private-header-row { min-height:80px; align-items:flex-start; flex-direction:column; padding:12px 0 14px; }
   .private-brand { max-width:240px; font-size:16px; line-height:1.1; }
   .private-brand img { width:60px;height:60px; }
