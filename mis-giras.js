@@ -83,7 +83,9 @@
     $('myTripDriverOne').value=drivers[0]||''; $('myTripDriverTwo').value=drivers[1]||'';
     $('myTripObservations').value=trip.observations||''; $('myTripSheetNumber').value=trip.trip_sheet_number||'';
     $('myTripDepartureMileage').value=trip.departure_mileage??''; $('myTripArrivalMileage').value=trip.arrival_mileage??'';
-    $('myTripFuelLevel').value=trip.fuel_level||''; $('myTripVehicleCondition').value=trip.vehicle_condition||'';
+    $('myTripDepartureFuelLevel').value=trip.departure_fuel_level||trip.fuel_level||'';
+    $('myTripArrivalFuelLevel').value=trip.arrival_fuel_level||'';
+    $('myTripVehicleCondition').value=trip.vehicle_condition||'';
     $('myTripConditionDetail').value=trip.vehicle_condition_detail||''; $('myTripIrregularities').value=trip.irregularity_notes||'';
     $('saveTripHistoryEdit').disabled=['cancelled','rejected'].includes(trip.status);
     setEditMessage(''); $('myTripPhotoDetail').hidden=true;
@@ -105,7 +107,9 @@
       p_objective:$('myTripObjective').value.trim(),p_itinerary:$('myTripItinerary').value.trim(),p_observations:$('myTripObservations').value.trim(),
       p_additional_drivers:[$('myTripDriverOne').value.trim(),$('myTripDriverTwo').value.trim()].filter(Boolean),
       p_trip_sheet_number:$('myTripSheetNumber').value.trim(),p_departure_mileage:departure,p_arrival_mileage:arrival,
-      p_fuel_level:$('myTripFuelLevel').value||null,p_vehicle_condition:$('myTripVehicleCondition').value||null,
+      p_departure_fuel_level:$('myTripDepartureFuelLevel').value||null,
+      p_arrival_fuel_level:$('myTripArrivalFuelLevel').value||null,
+      p_vehicle_condition:$('myTripVehicleCondition').value||null,
       p_vehicle_condition_detail:$('myTripConditionDetail').value.trim(),p_irregularity_notes:$('myTripIrregularities').value.trim()
     });
     button.disabled=false; button.textContent=original;
@@ -122,7 +126,9 @@
       'Cantidad de personas':trip.party_size||1,'Destino':trip.destination,'Objetivo':trip.objective,'Itinerario':trip.itinerary||'',
       'Observaciones de reserva':trip.observations||'','Chofer adicional 1':trip.additional_drivers?.[0]||'','Chofer adicional 2':trip.additional_drivers?.[1]||'',
       'Número de boleta':trip.trip_sheet_number||'','Kilometraje de salida':trip.departure_mileage??'','Kilometraje de llegada':trip.arrival_mileage??'',
-      'Combustible':fuelNames[trip.fuel_level]||'','Estado del vehículo':conditionNames[trip.vehicle_condition]||'',
+      'Combustible de salida':fuelNames[trip.departure_fuel_level||trip.fuel_level]||'',
+      'Combustible de llegada':fuelNames[trip.arrival_fuel_level]||'',
+      'Estado del vehículo':conditionNames[trip.vehicle_condition]||'',
       'Detalle del estado':trip.vehicle_condition_detail||'','Observaciones de irregularidades':trip.irregularity_notes||'',
       'Fotografía':trip.trip_photo_path?'Cargada':trip.trip_photo_exempted_at?'Exonerada':trip.photo_required?'Pendiente':'No requerida'
     };});

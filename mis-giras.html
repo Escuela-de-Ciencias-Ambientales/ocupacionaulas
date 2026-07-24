@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=4" />
-  <link rel="stylesheet" href="mis-giras.css?v=1" />
+  <link rel="stylesheet" href="mis-giras.css?v=2" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
 </head>
 <body>
@@ -99,7 +99,8 @@
           <div><label for="myTripSheetNumber">Número de boleta de gira</label><input id="myTripSheetNumber" maxlength="60" /></div>
           <div><label for="myTripDepartureMileage">Kilometraje de salida</label><input id="myTripDepartureMileage" type="number" min="0" step="1" /></div>
           <div><label for="myTripArrivalMileage">Kilometraje de llegada</label><input id="myTripArrivalMileage" type="number" min="0" step="1" /></div>
-          <div><label for="myTripFuelLevel">Combustible</label><select id="myTripFuelLevel"><option value="">No indicado</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
+          <div><label for="myTripDepartureFuelLevel">Combustible de salida</label><select id="myTripDepartureFuelLevel"><option value="">No indicado</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
+          <div><label for="myTripArrivalFuelLevel">Combustible de llegada</label><select id="myTripArrivalFuelLevel"><option value="">No indicado</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
           <div><label for="myTripVehicleCondition">Estado del vehículo</label><select id="myTripVehicleCondition"><option value="">No indicado</option><option value="clean">Limpio</option><option value="dirty">Sucio</option><option value="other">Otro</option></select></div>
           <div class="field-wide" id="myTripConditionDetailField"><label for="myTripConditionDetail">Detalle del estado</label><textarea id="myTripConditionDetail" maxlength="500" placeholder="Describe el estado cuando selecciones “Otro”"></textarea></div>
           <div class="field-wide"><label for="myTripIrregularities">Observaciones de irregularidades</label><textarea id="myTripIrregularities" maxlength="1000" placeholder="Daños, ruidos, alertas, problemas mecánicos, suciedad u otra situación detectada"></textarea></div>
@@ -118,7 +119,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="config.js?v=5"></script>
-  <script src="mis-giras.js?v=1"></script>
+  <script src="mis-giras.js?v=2"></script>
   <script src="field-labels.js?v=1"></script>
 </body>
 </html>
