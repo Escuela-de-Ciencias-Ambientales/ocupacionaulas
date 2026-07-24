@@ -1338,7 +1338,22 @@
       'SS-3P': 'Sala de sesiones tercer piso',
       'SR-1P': 'Sala reuniones primer piso'
     };
-    const roomDisplayName = aula => ROOM_DISPLAY_NAMES[aula] || `Aula ${aula}`;
+    const ROOM_CAPACITIES = {
+      L601: 27,
+      L602: 20,
+      L603: 30,
+      '708': 42,
+      '709': 33,
+      '710': 27,
+      '711': 28,
+      'SS-3P': 24,
+      'SR-1P': 10
+    };
+    const roomDisplayName = aula => {
+      const name = ROOM_DISPLAY_NAMES[aula] || `Aula ${aula}`;
+      const capacity = ROOM_CAPACITIES[aula];
+      return capacity ? `${name} (Capacidad ${capacity})` : name;
+    };
 
     const root = document.getElementById('scheduleRoot');
     const aulaFilter = document.getElementById('aulaFilter');
