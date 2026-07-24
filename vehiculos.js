@@ -602,7 +602,16 @@
     $('tripPhotoPreview').hidden = true;
     $('tripPhotoPreview').removeAttribute('src');
     setMessage($('tripPhotoMessage'), '');
-    $('tripPhotoDescription').textContent = `${item.destination} · gira finalizada el ${formatDateTime(item.ends_at)}.`;
+    const now = new Date();
+    const startsAt = new Date(item.starts_at);
+    const endsAt = new Date(item.ends_at);
+    let timingDescription = `gira finalizada el ${formatDateTime(item.ends_at)}`;
+    if (now < startsAt) {
+      timingDescription = `reserva programada para el ${formatDateTime(item.starts_at)}`;
+    } else if (now <= endsAt) {
+      timingDescription = `gira en curso hasta el ${formatDateTime(item.ends_at)}`;
+    }
+    $('tripPhotoDescription').textContent = `${item.destination} · ${timingDescription}.`;
     $('tripPhotoDialog').showModal();
   }
 
