@@ -108,6 +108,14 @@
       && !item.trip_photo_exempted_at);
   }
 
+  function uploadablePhotosFor(userId = state.session?.user?.id, source = state.reservations) {
+    return source.filter((item) => item.user_id === userId
+      && item.status === 'confirmed'
+      && item.photo_required
+      && !item.trip_photo_path
+      && !item.trip_photo_exempted_at);
+  }
+
   function currentMaintenance(vehicleId) {
     const now = new Date();
     return state.maintenance.find((item) => String(item.vehicle_id) === String(vehicleId) && item.active
@@ -309,18 +317,29 @@
   }
 
   function renderPendingPhotos() {
-    const pending = pendingPhotosFor();
+    const pending = uploadablePhotosFor();
     const target = $('pendingTripPhotos');
     if (!pending.length) {
-      target.innerHTML = '<p class="empty-state">No tienes fotografías pendientes.</p>';
+      target.innerHTML = '<p class="empty-state">No tienes reservas pendientes de fotografía.</p>';
       return;
     }
     target.innerHTML = pending.map((item) => {
       const vehicle = state.vehicles.find((entry) => String(entry.id) === String(item.vehicle_id));
+      const now = new Date();
+      const startsAt = new Date(item.starts_at);
+      const endsAt = new Date(item.ends_at);
+      const timing = now < startsAt
+        ? `Reserva programada para el ${formatDateTime(item.starts_at)}`
+        : now <= endsAt
+          ? `Gira en curso hasta el ${formatDateTime(item.ends_at)}`
+          : `Gira finalizada el ${formatDateTime(item.ends_at)}`;
+      const reminder = now <= endsAt
+        ? 'La fotografía ya está habilitada para esta reserva.'
+        : 'Debes completar esta bitácora antes de reservar nuevamente.';
       return `<article class="vehicle-reservation-item is-photo-pending">
         <span class="vehicle-plate">${escapeHtml(vehicle?.plate || 'Vehículo')}</span>
-        <div><h4>${escapeHtml(item.destination)}</h4><p>Gira finalizada el ${formatDateTime(item.ends_at)}</p>
-        <p>Debes completar esta bitácora antes de reservar nuevamente.</p></div>
+        <div><h4>${escapeHtml(item.destination)}</h4><p>${timing}</p>
+        <p>${reminder}</p></div>
         <button class="primary-button compact-button" type="button" data-upload-trip-photo="${item.id}">Cargar fotografía</button>
       </article>`;
     }).join('');

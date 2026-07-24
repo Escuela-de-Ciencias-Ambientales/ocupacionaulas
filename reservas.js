@@ -21,6 +21,7 @@
   const byId = (id) => document.getElementById(id);
   const elements = {
     connectionStatus: byId('connectionStatus'), systemMessage: byId('systemMessage'), userView: byId('userView'),
+    manageUsersLink: byId('manageUsersLink'),
     headerAccount: byId('headerAccount'),
     logoutButton: byId('logoutButton'), currentUserName: byId('currentUserName'), currentUserRole: byId('currentUserRole'), bookingForm: byId('bookingForm'),
     bookingDate: byId('bookingDate'), bookingRoom: byId('bookingRoom'), bookingStart: byId('bookingStart'),
@@ -261,6 +262,7 @@
     const loggedIn = Boolean(state.session && state.profile);
     elements.headerAccount.hidden = !loggedIn;
     elements.userView.hidden = !loggedIn; elements.scheduleBrowser.hidden = !loggedIn; elements.adminPanel.hidden = !loggedIn || !isAdmin();
+    elements.manageUsersLink.hidden = !loggedIn || !isAdmin();
     if (!loggedIn) return;
     elements.currentUserName.textContent = state.profile.full_name;
     elements.currentUserRole.textContent = isSuperadmin() ? 'Superadministrador' : isAdmin() ? 'Administrador de reservas' : 'Docente';

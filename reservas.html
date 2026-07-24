@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
-  <link rel="stylesheet" href="vehiculos.css?v=2" />
+  <link rel="stylesheet" href="vehiculos.css?v=3" />
 </head>
 <body>
   <header class="private-header">
@@ -44,10 +44,13 @@
 
     <div class="system-message" id="systemMessage" role="status" aria-live="polite" hidden></div>
 
-    <nav class="module-switch" aria-label="Tipo de reservación">
-      <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
-      <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
-    </nav>
+    <div class="module-toolbar">
+      <nav class="module-switch" aria-label="Tipo de reservación">
+        <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
+        <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
+      </nav>
+      <a class="secondary-button compact-button manage-users-link" id="manageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
+    </div>
 
     <div id="classroomPrivateModule">
     <section class="cycle-banner panel" id="cycleBanner" hidden aria-live="polite">
@@ -108,19 +111,7 @@
     <section class="admin-panel panel" id="adminPanel" aria-labelledby="adminTitle" hidden>
       <div class="section-heading">
         <div><p class="eyebrow" id="adminAccessLabel">Acceso administrativo</p><h2 id="adminTitle">Administración de reservas</h2></div>
-        <a class="secondary-button compact-button" href="usuarios.html">Administrar usuarios</a>
       </div>
-      <section class="visit-counter-panel superadmin-only" id="visitCounterPanel" hidden aria-labelledby="visitCounterTitle">
-        <div>
-          <p class="eyebrow">Actividad de la página pública</p>
-          <h3 id="visitCounterTitle">Contador de visitas</h3>
-          <p>Se registra como máximo una visita por navegador cada día, sin recopilar información personal.</p>
-        </div>
-        <div class="visit-counter-stats">
-          <div><span>Visitas de hoy</span><strong id="visitTodayCount">—</strong></div>
-          <div><span>Visitas totales</span><strong id="visitTotalCount">—</strong></div>
-        </div>
-      </section>
       <section class="cycle-admin" aria-labelledby="cycleAdminTitle">
         <div class="section-heading compact-heading">
           <div><h3 id="cycleAdminTitle">Control del ciclo</h3><p>Primero configura el periodo y carga la ocupación académica. Después podrás abrir las reservas.</p></div>
@@ -233,13 +224,14 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow">Bitácora fotográfica</p>
-            <h2 id="pendingTripPhotosTitle">Fotografías pendientes de giras</h2>
-            <p>Carga una fotografía al finalizar cada gira. Mientras exista una bitácora pendiente no podrás reservar nuevamente.</p>
+            <h2 id="pendingTripPhotosTitle">Fotografías de bitácora de tus giras</h2>
+            <p>Puedes cargar una única fotografía desde que se confirma la reserva. Si la gira finaliza sin fotografía, no podrás reservar nuevamente hasta completarla.</p>
           </div>
         </div>
         <div class="vehicle-reservation-list" id="pendingTripPhotos">
-          <p class="empty-state">No tienes fotografías pendientes.</p>
+          <p class="empty-state">No tienes reservas pendientes de fotografía.</p>
         </div>
+        <p class="trip-photo-warning"><strong>Importante:</strong> Cualquier anomalía detectada en el vehículo, por favor documentarla y reportarla a la administración.</p>
       </section>
 
       <section class="vehicle-panel" id="vehicleAdminPanel" hidden aria-labelledby="vehicleAdminTitle">
@@ -325,6 +317,18 @@
           <div class="service-public-grid" id="adminServiceAlerts"></div>
         </section>
       </section>
+    </section>
+
+    <section class="visit-counter-panel superadmin-only" id="visitCounterPanel" hidden aria-labelledby="visitCounterTitle">
+      <div>
+        <p class="eyebrow">Actividad de la página pública</p>
+        <h3 id="visitCounterTitle">Contador de visitas</h3>
+        <p>Se registra como máximo una visita por navegador cada día, sin recopilar información personal.</p>
+      </div>
+      <div class="visit-counter-stats">
+        <div><span>Visitas de hoy</span><strong id="visitTodayCount">—</strong></div>
+        <div><span>Visitas totales</span><strong id="visitTotalCount">—</strong></div>
+      </div>
     </section>
   </main>
 
@@ -504,8 +508,8 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="config.js?v=5"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="reservas.js?v=22"></script>
+  <script src="reservas.js?v=23"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
-  <script src="vehiculos.js?v=8"></script>
+  <script src="vehiculos.js?v=9"></script>
 </body>
 </html>
