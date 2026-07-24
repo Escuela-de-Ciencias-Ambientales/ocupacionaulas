@@ -86,7 +86,15 @@
     $('myTripDepartureFuelLevel').value=trip.departure_fuel_level||trip.fuel_level||'';
     $('myTripArrivalFuelLevel').value=trip.arrival_fuel_level||'';
     $('myTripVehicleCondition').value=trip.vehicle_condition||'';
-    $('myTripConditionDetail').value=trip.vehicle_condition_detail||''; $('myTripIrregularities').value=trip.irregularity_notes||'';
+    $('myTripFuelingMileage').value=trip.fueling_mileage??'';
+    $('myTripServiceStation').value=trip.service_station_location||'';
+    $('myTripFuelLiters').value=trip.fuel_liters??'';
+    $('myTripFuelType').value=trip.fuel_type||'';
+    $('myTripInvoiceAmount').value=trip.invoice_amount??'';
+    $('myTripInvoiceDate').value=trip.invoice_date||'';
+    $('myTripInvoiceNumber').value=trip.invoice_number||'';
+    $('myTripVoucherAuthorization').value=trip.voucher_authorization_number||'';
+    $('myTripIrregularities').value=trip.irregularity_notes||'';
     $('saveTripHistoryEdit').disabled=['cancelled','rejected'].includes(trip.status);
     setEditMessage(''); $('myTripPhotoDetail').hidden=true;
     if(trip.trip_photo_path){
@@ -100,7 +108,6 @@
     const departure=$('myTripDepartureMileage').value?Number($('myTripDepartureMileage').value):null;
     const arrival=$('myTripArrivalMileage').value?Number($('myTripArrivalMileage').value):null;
     if(departure!==null&&arrival!==null&&arrival<departure){setEditMessage('El kilometraje de llegada no puede ser menor que el de salida.');return;}
-    if($('myTripVehicleCondition').value==='other'&&$('myTripConditionDetail').value.trim().length<3){setEditMessage('Detalla el estado del vehículo cuando seleccionas “Otro”.');return;}
     const button=$('saveTripHistoryEdit'); const original=button.textContent; button.disabled=true; button.textContent='Guardando…';
     const {data,error}=await state.client.rpc('update_my_vehicle_trip_details',{
       p_id:state.selected.id,p_party_size:Number($('myTripPartySize').value),p_destination:$('myTripDestination').value.trim(),
@@ -110,7 +117,15 @@
       p_departure_fuel_level:$('myTripDepartureFuelLevel').value||null,
       p_arrival_fuel_level:$('myTripArrivalFuelLevel').value||null,
       p_vehicle_condition:$('myTripVehicleCondition').value||null,
-      p_vehicle_condition_detail:$('myTripConditionDetail').value.trim(),p_irregularity_notes:$('myTripIrregularities').value.trim()
+      p_fueling_mileage:$('myTripFuelingMileage').value?Number($('myTripFuelingMileage').value):null,
+      p_service_station_location:$('myTripServiceStation').value.trim(),
+      p_fuel_liters:$('myTripFuelLiters').value?Number($('myTripFuelLiters').value):null,
+      p_fuel_type:$('myTripFuelType').value||null,
+      p_invoice_amount:$('myTripInvoiceAmount').value?Number($('myTripInvoiceAmount').value):null,
+      p_invoice_date:$('myTripInvoiceDate').value||null,
+      p_invoice_number:$('myTripInvoiceNumber').value.trim(),
+      p_voucher_authorization_number:$('myTripVoucherAuthorization').value.trim(),
+      p_irregularity_notes:$('myTripIrregularities').value.trim()
     });
     button.disabled=false; button.textContent=original;
     if(error){setEditMessage(error.message);return;}
@@ -129,7 +144,13 @@
       'Combustible de salida':fuelNames[trip.departure_fuel_level||trip.fuel_level]||'',
       'Combustible de llegada':fuelNames[trip.arrival_fuel_level]||'',
       'Estado del vehículo':conditionNames[trip.vehicle_condition]||'',
-      'Detalle del estado':trip.vehicle_condition_detail||'','Observaciones de irregularidades':trip.irregularity_notes||'',
+      'Kilometraje de abastecimiento':trip.fueling_mileage??'',
+      'Estación de servicio o gasolinera':trip.service_station_location||'',
+      'Litros de combustible':trip.fuel_liters??'',
+      'Tipo de combustible':({diesel:'Diésel',regular:'Gasolina regular',super:'Gasolina súper',other:'Otro'})[trip.fuel_type]||'',
+      'Monto de factura':trip.invoice_amount??'','Fecha de factura':trip.invoice_date||'',
+      'Número de factura':trip.invoice_number||'','Número de autorización del voucher':trip.voucher_authorization_number||'',
+      'Observaciones':trip.irregularity_notes||'',
       'Fotografía':trip.trip_photo_path?'Cargada':trip.trip_photo_exempted_at?'Exonerada':trip.photo_required?'Pendiente':'No requerida'
     };});
     if(!rows.length){setMessage('No hay giras para exportar con los filtros actuales.');return;}
