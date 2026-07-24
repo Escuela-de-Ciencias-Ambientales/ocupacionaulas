@@ -611,7 +611,7 @@
     } else if (now <= endsAt) {
       timingDescription = `gira en curso hasta el ${formatDateTime(item.ends_at)}`;
     }
-    $('tripPhotoDescription').textContent = `${item.destination} · ${timingDescription}.`;
+    $('tripPhotoDescription').textContent = `${item.destination} · ${timingDescription}`;
     $('tripPhotoDialog').showModal();
   }
 
