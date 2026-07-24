@@ -11,6 +11,17 @@
     'SS-3P': 'Sala de sesiones tercer piso',
     'SR-1P': 'Sala reuniones primer piso'
   };
+  const roomCapacities = {
+    L601: 27,
+    L602: 20,
+    L603: 30,
+    '708': 42,
+    '709': 33,
+    '710': 27,
+    '711': 28,
+    'SS-3P': 24,
+    'SR-1P': 10
+  };
   const dayNames = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
   const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
   const dayMap = { DOMINGO: 0, LUNES: 1, MARTES: 2, MIERCOLES: 3, MIÉRCOLES: 3, JUEVES: 4, VIERNES: 5, SABADO: 6, SÁBADO: 6 };
@@ -75,7 +86,11 @@
   function escapeHtml(value) {
     return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
   }
-  function roomDisplayName(code) { return roomDisplayNames[code] || `Aula ${code}`; }
+  function roomDisplayName(code) {
+    const name = roomDisplayNames[code] || `Aula ${code}`;
+    const capacity = roomCapacities[code];
+    return capacity ? `${name} (Capacidad ${capacity})` : name;
+  }
 
   function showMessage(message, type = 'success') {
     elements.systemMessage.textContent = message;
