@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
-  <link rel="stylesheet" href="vehiculos.css?v=3" />
+  <link rel="stylesheet" href="vehiculos.css?v=4" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
 </head>
 <body>
   <header class="private-header">
@@ -75,7 +76,7 @@
             <div><label for="bookingStart">Hora de inicio</label><input id="bookingStart" name="start" type="time" min="07:00" max="21:00" step="1800" required /></div>
             <div><label for="bookingEnd">Hora de finalización</label><input id="bookingEnd" name="end" type="time" min="07:30" max="21:00" step="1800" required /></div>
           </div>
-          <div id="adminProfessorField" hidden><label for="bookingProfessor">Reservar a nombre de</label><select id="bookingProfessor" name="professor"></select></div>
+          <div id="adminProfessorField" hidden><label for="bookingProfessor" data-required-label>Reservar a nombre de</label><select id="bookingProfessor" name="professor"></select></div>
           <label for="bookingActivity">Actividad</label>
           <input id="bookingActivity" name="activity" type="text" maxlength="120" placeholder="Ej.: Reunión de proyecto" required />
           <div class="availability-check" id="availabilityCheck">Selecciona la fecha y el horario para comprobar disponibilidad.</div>
@@ -150,7 +151,7 @@
              <label for="newUserEmail">Correo electrónico</label><input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
              <label for="newUserUnit">Unidad institucional</label><select id="newUserUnit" name="unit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select>
              <label for="newUserPassword">Contraseña temporal</label><input id="newUserPassword" name="password" type="password" minlength="8" title="Mínimo 8 caracteres, una mayúscula y un número" required />
-            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role"><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="admin">Superadministrador</option></select>
+            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="admin">Superadministrador</option></select>
             <button class="primary-button" type="submit">Crear cuenta</button>
           </form>
         </div>
@@ -213,7 +214,10 @@
       <section class="vehicle-panel" aria-labelledby="myVehicleReservationsTitle">
         <div class="section-heading">
           <div><p class="eyebrow">Tu agenda</p><h2 id="myVehicleReservationsTitle">Mis próximas reservas de vehículos</h2></div>
-          <button class="icon-button" id="refreshVehicleReservations" type="button" aria-label="Actualizar">↻</button>
+          <div class="vehicle-heading-actions">
+            <a class="secondary-button compact-button" href="mis-giras.html">Ver historial de giras</a>
+            <button class="icon-button" id="refreshVehicleReservations" type="button" aria-label="Actualizar">↻</button>
+          </div>
         </div>
         <div class="vehicle-reservation-list" id="myVehicleReservations">
           <p class="empty-state">No tienes reservas de vehículos próximas.</p>
@@ -377,7 +381,7 @@
         <div><label for="dialogBookingEnd">Hora de finalización</label><input id="dialogBookingEnd" type="time" min="07:30" max="21:00" step="1800" required /></div>
       </div>
       <div id="dialogAdminProfessorField" hidden>
-        <label for="dialogBookingProfessor">Reservar a nombre de</label>
+        <label for="dialogBookingProfessor" data-required-label>Reservar a nombre de</label>
         <select id="dialogBookingProfessor"></select>
       </div>
       <label for="dialogBookingActivity">Actividad</label>
@@ -445,7 +449,7 @@
         <div class="field-wide"><label for="vehicleBookingVehicle">Vehículo</label><select id="vehicleBookingVehicle" required></select></div>
         <div><label for="vehicleBookingStart">Fecha y hora de salida</label><input id="vehicleBookingStart" type="datetime-local" required /></div>
         <div><label for="vehicleBookingEnd">Fecha y hora de regreso</label><input id="vehicleBookingEnd" type="datetime-local" required /></div>
-        <div class="field-wide" id="vehicleResponsibleField" hidden><label for="vehicleBookingResponsible">Reservar a nombre de</label><select id="vehicleBookingResponsible"></select></div>
+        <div class="field-wide" id="vehicleResponsibleField" hidden><label for="vehicleBookingResponsible" data-required-label>Reservar a nombre de</label><select id="vehicleBookingResponsible"></select></div>
         <div class="field-wide"><label for="vehicleBookingUnit">Unidad institucional</label><select id="vehicleBookingUnit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select></div>
         <div><label for="vehicleBookingPartySize">Cantidad de personas</label><input id="vehicleBookingPartySize" type="number" min="1" max="60" step="1" value="1" required /></div>
         <div class="field-wide"><label for="vehicleBookingDestination">Destino</label><input id="vehicleBookingDestination" maxlength="160" required /></div>
@@ -455,7 +459,7 @@
         <div><label for="vehicleDriverOne">Chofer adicional 1 (opcional)</label><input id="vehicleDriverOne" maxlength="100" /></div>
         <div><label for="vehicleDriverTwo">Chofer adicional 2 (opcional)</label><input id="vehicleDriverTwo" maxlength="100" /></div>
         <label class="field-wide vehicle-override-option" id="vehicleOverrideOption" hidden><input id="vehiclePolicyOverride" type="checkbox" /> Autorizar una excepción a los límites de uso justo</label>
-        <div class="field-wide" id="vehicleOverrideReasonField" hidden><label for="vehicleOverrideReason">Justificación obligatoria de la excepción</label><textarea id="vehicleOverrideReason" maxlength="500"></textarea></div>
+        <div class="field-wide" id="vehicleOverrideReasonField" hidden><label for="vehicleOverrideReason" data-required-label>Justificación de la excepción</label><textarea id="vehicleOverrideReason" maxlength="500"></textarea></div>
       </div>
       <div class="vehicle-message" id="vehicleBookingMessage" hidden></div>
       <div class="dialog-actions">
@@ -510,6 +514,7 @@
   <script src="password-toggle.js?v=2"></script>
   <script src="reservas.js?v=23"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
-  <script src="vehiculos.js?v=9"></script>
+  <script src="vehiculos.js?v=10"></script>
+  <script src="field-labels.js?v=1"></script>
 </body>
 </html>

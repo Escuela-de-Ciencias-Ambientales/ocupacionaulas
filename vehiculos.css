@@ -253,6 +253,8 @@
 .vehicle-plate { padding: 9px 10px; border-radius: 9px; color: var(--vehicle-ink); background: #eaf1f8; font-weight: 900; }
 .vehicle-reservation-item h4 { margin: 0; color: var(--vehicle-ink); }
 .vehicle-reservation-item p { margin: 3px 0 0; color: var(--vehicle-muted); font-size: 13px; }
+.vehicle-heading-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; }
+.vehicle-heading-actions .secondary-button { width:auto; min-height:40px; margin:0; }
 .vehicle-admin-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .vehicle-admin-actions .secondary-button,
 .vehicle-admin-actions .danger-button { width: auto; min-height: 36px; margin: 0; padding: 7px 10px; }
@@ -385,6 +387,8 @@
   .calendar-controls select { width: 100%; }
   .calendar-nav { justify-content: space-between; width: 100%; }
   .vehicle-reservation-item { grid-template-columns: 1fr; }
+  .vehicle-heading-actions { align-items:stretch; flex-direction:column; }
+  .vehicle-heading-actions .secondary-button { width:100%; text-align:center; }
   .service-metrics { grid-template-columns: 1fr; }
   .vehicle-dialog form { padding: 20px; }
   .vehicle-detail-content { padding: 20px; }

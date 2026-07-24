@@ -27,3 +27,6 @@ verify_jwt = true
 
 [functions.admin-manage-users]
 verify_jwt = true
+
+[functions.scheduled-data-retention-v2]
+verify_jwt = false

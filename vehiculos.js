@@ -245,6 +245,13 @@
       detailField('Observaciones', item.observations || 'Sin observaciones', true),
       detailField('Chofer adicional 1', drivers[0] || 'No indicado'),
       detailField('Chofer adicional 2', drivers[1] || 'No indicado'),
+      detailField('Número de boleta de gira', item.trip_sheet_number || 'No indicado'),
+      detailField('Kilometraje de salida', item.departure_mileage == null ? 'No indicado' : `${item.departure_mileage.toLocaleString('es-CR')} km`),
+      detailField('Kilometraje de llegada', item.arrival_mileage == null ? 'No indicado' : `${item.arrival_mileage.toLocaleString('es-CR')} km`),
+      detailField('Combustible', ({ quarter: '¼', half: '½', three_quarters: '¾', full: 'Lleno' })[item.fuel_level] || 'No indicado'),
+      detailField('Estado del vehículo', ({ clean: 'Limpio', dirty: 'Sucio', other: 'Otro' })[item.vehicle_condition] || 'No indicado'),
+      detailField('Detalle del estado', item.vehicle_condition_detail || 'No indicado', true),
+      detailField('Observaciones de irregularidades', item.irregularity_notes || 'Sin irregularidades registradas', true),
       detailField('Fecha de registro', formatDateTime(item.created_at)),
       detailField('Bitácora fotográfica', item.trip_photo_path ? `Cargada el ${formatDateTime(item.trip_photo_uploaded_at)}` : item.trip_photo_exempted_at ? `Exonerada: ${item.trip_photo_exemption_reason}` : item.photo_required ? 'Pendiente' : 'No requerida'),
       detailField('Aprobación o excepción', item.override_reason || item.approval_reason || 'No requerida', true),
@@ -280,8 +287,9 @@
           <button class="secondary-button compact-button" type="button" data-vehicle-action="reassign" data-id="${item.id}">Reasignar</button>
           <button class="danger-button" type="button" data-vehicle-action="cancel" data-id="${item.id}">Cancelar</button>`}
         </div>`;
-      } else if (!adminControls && ['pending_approval', 'confirmed'].includes(item.status) && new Date(item.starts_at) > new Date()) {
-        controls = `<button class="danger-button" type="button" data-cancel-vehicle="${item.id}">Cancelar</button>`;
+      } else if (!adminControls) {
+        controls = `<div class="vehicle-admin-actions"><a class="secondary-button compact-button" href="mis-giras.html?gira=${encodeURIComponent(item.id)}">Ver detalle</a>
+          ${['pending_approval', 'confirmed'].includes(item.status) && new Date(item.starts_at) > new Date() ? `<button class="danger-button" type="button" data-cancel-vehicle="${item.id}">Cancelar</button>` : ''}</div>`;
       }
       return `<article class="vehicle-reservation-item${suspended ? ' is-suspended' : ''}${pending ? ' is-pending' : ''}">
         <span class="vehicle-plate">${escapeHtml(vehicle?.plate || 'Vehículo')}</span>
@@ -769,6 +777,13 @@
           'Observaciones': item.observations || '',
           'Chofer adicional 1': item.additional_drivers?.[0] || '',
           'Chofer adicional 2': item.additional_drivers?.[1] || '',
+          'Número de boleta de gira': item.trip_sheet_number || '',
+          'Kilometraje de salida': item.departure_mileage ?? '',
+          'Kilometraje de llegada': item.arrival_mileage ?? '',
+          'Combustible': ({ quarter: '¼', half: '½', three_quarters: '¾', full: 'Lleno' })[item.fuel_level] || '',
+          'Estado del vehículo': ({ clean: 'Limpio', dirty: 'Sucio', other: 'Otro' })[item.vehicle_condition] || '',
+          'Detalle del estado': item.vehicle_condition_detail || '',
+          'Observaciones de irregularidades': item.irregularity_notes || '',
           'Fecha de registro': new Date(item.created_at),
           'Fecha de cancelación': item.cancelled_at ? new Date(item.cancelled_at) : '',
           'Aprobación o excepción': item.override_reason || item.approval_reason || '',
@@ -834,4 +849,5 @@
     $('tripPhotoPreview').src = URL.createObjectURL(file);
     $('tripPhotoPreview').hidden = false;
   });
+  if (new URLSearchParams(window.location.search).get('modulo') === 'vehiculos') setModule('vehicles');
 })();

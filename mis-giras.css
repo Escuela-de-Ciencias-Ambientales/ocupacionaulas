@@ -1,0 +1,56 @@
+.trip-history-main { padding: 34px 0 68px; }
+.trip-history-intro { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:24px; }
+.trip-history-intro h1 { margin:4px 0 8px; color:var(--vehicle-ink); font-size:clamp(36px,5vw,54px); line-height:1; }
+.trip-history-intro p:not(.eyebrow) { max-width:760px; margin:0; color:var(--vehicle-muted); font-size:17px; line-height:1.5; }
+.trip-history-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:22px; }
+.trip-history-summary div { padding:17px 18px; border:1px solid var(--vehicle-line); border-radius:14px; background:#fff; }
+.trip-history-summary span { display:block; color:var(--vehicle-muted); font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.trip-history-summary strong { display:block; margin-top:6px; color:var(--vehicle-ink); font-size:27px; }
+.trip-history-panel { padding:24px; border:1px solid var(--vehicle-line); border-radius:18px; background:#fff; }
+.trip-history-heading { display:flex; align-items:center; justify-content:space-between; gap:18px; }
+.trip-history-heading h2 { margin:0; color:var(--vehicle-ink); font-size:27px; }
+.trip-history-heading p { margin:5px 0 0; color:var(--vehicle-muted); }
+.trip-history-heading button { width:auto; margin:0; }
+.trip-history-filters { display:grid; grid-template-columns:minmax(220px,1fr) repeat(3,minmax(140px,.45fr)); gap:14px; margin:22px 0; }
+.trip-history-filters label { display:block; margin:0 0 7px; color:var(--vehicle-ink); font-size:12px; font-weight:800; text-transform:uppercase; }
+.trip-history-filters input,.trip-history-filters select { width:100%; min-height:48px; padding:10px 12px; border:1px solid #cad8d3; border-radius:10px; background:#fff; font:inherit; }
+.trip-history-table-wrap { overflow-x:auto; border:1px solid var(--vehicle-line); border-radius:13px; }
+.trip-history-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.trip-history-table th { padding:12px; color:#52615c; background:#f1f5f3; font-size:11px; text-align:left; text-transform:uppercase; }
+.trip-history-table th:nth-child(1) { width:16%; }.trip-history-table th:nth-child(2) { width:14%; }.trip-history-table th:nth-child(3) { width:25%; }
+.trip-history-table th:nth-child(4) { width:16%; }.trip-history-table th:nth-child(5) { width:16%; }.trip-history-table th:nth-child(6) { width:13%; }
+.trip-history-table td { padding:14px 12px; border-top:1px solid var(--vehicle-line); vertical-align:middle; overflow-wrap:anywhere; }
+.trip-history-table td small { display:block; margin-top:3px; color:var(--vehicle-muted); }
+.trip-history-table button { width:auto; min-height:34px; margin:0; padding:6px 10px; font-size:12px; }
+.trip-history-pagination { display:flex; align-items:center; justify-content:flex-end; gap:14px; margin-top:18px; }
+.trip-history-pagination button { width:auto; margin:0; }.trip-history-pagination span { color:var(--vehicle-muted); font-size:13px; font-weight:700; }
+.trip-history-dialog { width:min(860px,calc(100vw - 28px)); max-height:calc(100vh - 28px); }
+.trip-history-dialog form { max-height:calc(100vh - 28px); overflow-y:auto; }
+.trip-fixed-detail { margin-bottom:22px; }
+.trip-edit-section { margin-top:22px; padding-top:22px; border-top:1px solid var(--vehicle-line); }
+.trip-edit-section h3 { margin:0 0 5px; color:var(--vehicle-ink); font-size:20px; }
+.trip-edit-section > p { margin:0 0 16px; color:var(--vehicle-muted); }
+
+@media (max-width:900px) {
+  .trip-history-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .trip-history-filters { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:700px) {
+  .trip-history-main { padding-top:24px; }
+  .trip-history-intro,.trip-history-heading { align-items:stretch; flex-direction:column; }
+  .trip-history-heading button { width:100%; }
+  .trip-history-filters { grid-template-columns:1fr; }
+  .trip-history-table-wrap { overflow:visible; border:0; }
+  .trip-history-table,.trip-history-table tbody,.trip-history-table tr,.trip-history-table td { display:block; width:100%; }
+  .trip-history-table thead { display:none; }
+  .trip-history-table tbody { display:grid; gap:12px; }
+  .trip-history-table tr { padding:14px; border:1px solid var(--vehicle-line); border-radius:13px; background:#fff; }
+  .trip-history-table td { display:grid; grid-template-columns:100px minmax(0,1fr); gap:10px; padding:7px 0; border:0; }
+  .trip-history-table td::before { content:attr(data-label); color:var(--vehicle-muted); font-size:10px; font-weight:800; text-transform:uppercase; }
+  .trip-history-pagination { justify-content:space-between; }
+}
+@media (max-width:440px) {
+  .trip-history-summary { grid-template-columns:1fr 1fr; }
+  .trip-history-panel { padding:17px; }
+  .trip-history-table td { grid-template-columns:1fr; gap:3px; }
+}

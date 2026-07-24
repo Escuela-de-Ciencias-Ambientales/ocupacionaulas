@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="usuarios.css?v=1" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
 </head>
 <body>
   <header class="private-header">
@@ -86,7 +87,7 @@
         <div class="field-wide"><label for="editedUserName">Nombre completo</label><input id="editedUserName" maxlength="100" required /></div>
         <div class="field-wide"><label for="editedUserEmail">Correo electrónico</label><input id="editedUserEmail" type="email" maxlength="140" required /></div>
         <div><label for="editedUserUnit">Unidad institucional</label><select id="editedUserUnit" required><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select></div>
-        <div><label for="editedUserAccess">Tipo de acceso</label><select id="editedUserAccess"><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="superadmin">Superadministrador</option></select></div>
+        <div><label for="editedUserAccess">Tipo de acceso</label><select id="editedUserAccess" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="superadmin">Superadministrador</option></select></div>
       </div>
       <p class="schedule-dialog-help" id="userRoleHelp">Solo el superadministrador puede cambiar roles de acceso.</p>
       <div class="dialog-actions">
@@ -99,5 +100,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=1"></script>
   <script src="usuarios.js?v=1"></script>
+  <script src="field-labels.js?v=1"></script>
 </body>
 </html>
