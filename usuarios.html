@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Administración de usuarios | EDECA</title>
+  <meta name="description" content="Administración de usuarios registrados en el sistema de reservas de EDECA." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="reservas.css?v=21" />
+  <link rel="stylesheet" href="usuarios.css?v=1" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
+</head>
+<body>
+  <header class="private-header">
+    <div class="page private-header-row">
+      <a class="private-brand" href="index.html">
+        <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
+        <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
+      </a>
+      <div class="header-actions">
+        <a class="back-to-schedule" href="reservas.html">Volver a reservas</a>
+        <div class="header-account" id="usersHeaderAccount" hidden>
+          <div class="header-account-identity">
+            <strong id="usersCurrentName">Administrador</strong>
+            <span id="usersCurrentRole">Administración</span>
+          </div>
+          <button class="text-button" id="usersLogout" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page users-main">
+    <section class="users-intro">
+      <div>
+        <p class="eyebrow">Control de accesos</p>
+        <h1>Administrar usuarios</h1>
+        <p>Edita los datos de las cuentas registradas, bloquea nuevas reservas o elimina el acceso conservando el historial institucional.</p>
+      </div>
+      <span class="connection-status" id="usersConnectionStatus">Comprobando acceso…</span>
+    </section>
+
+    <section class="users-summary" aria-label="Resumen de usuarios">
+      <div><span>Total registrados</span><strong id="usersTotalCount">—</strong></div>
+      <div><span>Accesos activos</span><strong id="usersActiveCount">—</strong></div>
+      <div><span>Reservas bloqueadas</span><strong id="usersBlockedCount">—</strong></div>
+      <div><span>Accesos eliminados</span><strong id="usersInactiveCount">—</strong></div>
+    </section>
+
+    <section class="users-panel" aria-labelledby="usersTableTitle">
+      <div class="users-panel-heading">
+        <div><h2 id="usersTableTitle">Usuarios registrados</h2><p>La tabla muestra 15 usuarios por página.</p></div>
+        <button class="secondary-button compact-button" id="refreshUsersTable" type="button">Actualizar</button>
+      </div>
+
+      <div class="users-filters">
+        <div><label for="usersSearch">Buscar usuario</label><input id="usersSearch" type="search" placeholder="Nombre, correo o unidad" /></div>
+        <div><label for="usersStatusFilter">Estado</label><select id="usersStatusFilter"><option value="all">Todos</option><option value="active">Activos</option><option value="blocked">Reservas bloqueadas</option><option value="inactive">Acceso eliminado</option></select></div>
+      </div>
+
+      <div class="form-message" id="usersPageMessage" role="status" aria-live="polite" hidden></div>
+      <div class="users-table-wrap">
+        <table class="users-table">
+          <thead><tr><th>Usuario</th><th>Unidad</th><th>Tipo de acceso</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="usersTableBody"><tr><td colspan="5">Cargando usuarios…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="users-pagination">
+        <button class="secondary-button compact-button" id="previousUsersPage" type="button">Anterior</button>
+        <span id="usersPageIndicator">Página 1 de 1</span>
+        <button class="secondary-button compact-button" id="nextUsersPage" type="button">Siguiente</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="schedule-dialog user-editor-dialog" id="userEditorDialog">
+    <form id="userEditorForm" method="dialog">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Administración de usuarios</p><h2>Editar cuenta</h2></div>
+        <button class="dialog-close" id="closeUserEditor" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <input id="editedUserId" type="hidden" />
+      <div class="form-message" id="userEditorMessage" role="status" aria-live="polite" hidden></div>
+      <div class="user-editor-grid">
+        <div class="field-wide"><label for="editedUserName">Nombre completo</label><input id="editedUserName" maxlength="100" required /></div>
+        <div class="field-wide"><label for="editedUserEmail">Correo electrónico</label><input id="editedUserEmail" type="email" maxlength="140" required /></div>
+        <div><label for="editedUserUnit">Unidad institucional</label><select id="editedUserUnit" required><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select></div>
+        <div><label for="editedUserAccess">Tipo de acceso</label><select id="editedUserAccess" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="superadmin">Superadministrador</option></select></div>
+      </div>
+      <p class="schedule-dialog-help" id="userRoleHelp">Solo el superadministrador puede cambiar roles de acceso.</p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancelUserEditor" type="button">Cancelar</button>
+        <button class="primary-button compact-button" type="submit">Guardar cambios</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=1"></script>
+  <script src="usuarios.js?v=1"></script>
+  <script src="field-labels.js?v=1"></script>
+</body>
+</html>

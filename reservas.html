@@ -3,22 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reservación de aulas | EDECA</title>
-  <meta name="description" content="Área privada para la reservación de aulas por parte del personal docente de EDECA." />
+  <title>Reservación de aulas y vehículos | EDECA</title>
+  <meta name="description" content="Área privada para la reservación de aulas y vehículos institucionales de EDECA." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="reservas.css?v=17" />
+  <link rel="stylesheet" href="reservas.css?v=21" />
+  <link rel="stylesheet" href="vehiculos.css?v=4" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
 </head>
 <body>
   <header class="private-header">
     <div class="page private-header-row">
       <a class="private-brand" href="index.html">
         <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
-        <span>Escuela de Ciencias Ambientales</span>
+        <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
       </a>
       <div class="header-actions">
-        <a class="back-to-schedule" href="index.html">Ver ocupación pública</a>
+        <a class="back-to-schedule" id="publicOccupationLink" href="index.html">Ver ocupación pública</a>
         <div class="header-account" id="headerAccount" hidden>
           <div class="header-account-identity">
             <strong id="currentUserName">Docente</strong>
@@ -35,14 +37,23 @@
     <section class="private-intro">
       <div>
         <p class="eyebrow">Área docente</p>
-        <h1>Reservación de aulas</h1>
-        <p id="cycleDescription">Consulta la disponibilidad de las aulas y confirma tu reserva cuando el periodo esté habilitado.</p>
+        <h1>Reservación de aulas y vehículos</h1>
+        <p id="cycleDescription">Consulta la disponibilidad y confirma tu reserva cuando el periodo esté habilitado.</p>
       </div>
       <span class="connection-status" id="connectionStatus">Preparando conexión…</span>
     </section>
 
     <div class="system-message" id="systemMessage" role="status" aria-live="polite" hidden></div>
 
+    <div class="module-toolbar">
+      <nav class="module-switch" aria-label="Tipo de reservación">
+        <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
+        <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
+      </nav>
+      <a class="secondary-button compact-button manage-users-link" id="manageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
+    </div>
+
+    <div id="classroomPrivateModule">
     <section class="cycle-banner panel" id="cycleBanner" hidden aria-live="polite">
       <div>
         <p class="eyebrow">Periodo de reservación</p>
@@ -65,7 +76,7 @@
             <div><label for="bookingStart">Hora de inicio</label><input id="bookingStart" name="start" type="time" min="07:00" max="21:00" step="1800" required /></div>
             <div><label for="bookingEnd">Hora de finalización</label><input id="bookingEnd" name="end" type="time" min="07:30" max="21:00" step="1800" required /></div>
           </div>
-          <div id="adminProfessorField" hidden><label for="bookingProfessor">Reservar a nombre de</label><select id="bookingProfessor" name="professor"></select></div>
+          <div id="adminProfessorField" hidden><label for="bookingProfessor" data-required-label>Reservar a nombre de</label><select id="bookingProfessor" name="professor"></select></div>
           <label for="bookingActivity">Actividad</label>
           <input id="bookingActivity" name="activity" type="text" maxlength="120" placeholder="Ej.: Reunión de proyecto" required />
           <div class="availability-check" id="availabilityCheck">Selecciona la fecha y el horario para comprobar disponibilidad.</div>
@@ -99,18 +110,9 @@
     </section>
 
     <section class="admin-panel panel" id="adminPanel" aria-labelledby="adminTitle" hidden>
-      <div class="section-heading"><div><p class="eyebrow" id="adminAccessLabel">Acceso administrativo</p><h2 id="adminTitle">Administración de reservas</h2></div></div>
-      <section class="visit-counter-panel superadmin-only" id="visitCounterPanel" hidden aria-labelledby="visitCounterTitle">
-        <div>
-          <p class="eyebrow">Actividad de la página pública</p>
-          <h3 id="visitCounterTitle">Contador de visitas</h3>
-          <p>Se registra como máximo una visita por navegador cada día, sin recopilar información personal.</p>
-        </div>
-        <div class="visit-counter-stats">
-          <div><span>Visitas de hoy</span><strong id="visitTodayCount">—</strong></div>
-          <div><span>Visitas totales</span><strong id="visitTotalCount">—</strong></div>
-        </div>
-      </section>
+      <div class="section-heading">
+        <div><p class="eyebrow" id="adminAccessLabel">Acceso administrativo</p><h2 id="adminTitle">Administración de reservas</h2></div>
+      </div>
       <section class="cycle-admin" aria-labelledby="cycleAdminTitle">
         <div class="section-heading compact-heading">
           <div><h3 id="cycleAdminTitle">Control del ciclo</h3><p>Primero configura el periodo y carga la ocupación académica. Después podrás abrir las reservas.</p></div>
@@ -145,16 +147,17 @@
           <form class="admin-form" id="createUserForm" novalidate>
             <h3>Crear una cuenta</h3>
             <p class="form-note account-limit-note">Máximo permitido: 50 cuentas docentes activas.</p>
-            <label for="newUserName">Nombre completo</label><input id="newUserName" name="name" maxlength="100" required />
-            <label for="newUserEmail">Correo electrónico</label><input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
-            <label for="newUserPassword">Contraseña temporal</label><input id="newUserPassword" name="password" type="password" minlength="8" title="Mínimo 8 caracteres, una mayúscula y un número" required />
-            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role"><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="admin">Superadministrador</option></select>
+             <label for="newUserName">Nombre completo</label><input id="newUserName" name="name" maxlength="100" required />
+             <label for="newUserEmail">Correo electrónico</label><input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
+             <label for="newUserUnit">Unidad institucional</label><select id="newUserUnit" name="unit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select>
+             <label for="newUserPassword">Contraseña temporal</label><input id="newUserPassword" name="password" type="password" minlength="8" title="Mínimo 8 caracteres, una mayúscula y un número" required />
+            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="admin">Superadministrador</option></select>
             <button class="primary-button" type="submit">Crear cuenta</button>
           </form>
         </div>
         <section class="bulk-users-card superadmin-only" id="bulkUsersCard">
           <h3>Cargar docentes desde Excel</h3>
-          <p>Nombre y correo autorizan el registro personal. Si agregas una contraseña temporal, la cuenta se crea de inmediato.</p>
+          <p>Nombre, correo y unidad autorizan el registro personal. Si agregas una contraseña temporal, la cuenta se crea de inmediato.</p>
           <a class="secondary-button full-button" href="plantillas/plantilla_cuentas_docentes.xlsx" download>Descargar plantilla de cuentas</a>
           <label class="secondary-button file-button full-button" for="usersFile">Seleccionar Excel</label>
           <input id="usersFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
@@ -166,6 +169,170 @@
         <h3>Reservas activas</h3>
         <div class="booking-list" id="adminBookingsList"><p class="empty-state">No hay reservas activas.</p></div>
       </section>
+    </section>
+    </div>
+
+    <section id="vehiclePrivateModule" hidden aria-labelledby="vehiclePrivateTitle">
+      <section class="vehicle-panel vehicle-hero">
+        <div>
+          <p class="eyebrow">Transporte institucional</p>
+          <h2 id="vehiclePrivateTitle">Reservación de vehículos</h2>
+          <p>Selecciona el vehículo y la fecha en el calendario. Los espacios en verde permiten crear una reserva directamente.</p>
+        </div>
+        <span class="connection-status" id="vehicleConnectionStatus">Preparando vehículos…</span>
+      </section>
+
+      <div class="vehicle-card-grid" id="privateVehicleCards"></div>
+
+      <section class="vehicle-panel" aria-labelledby="privateVehicleCalendarTitle">
+        <div class="calendar-toolbar">
+          <div>
+            <p class="eyebrow">Disponibilidad mensual</p>
+            <h2 id="privateVehicleCalendarTitle">Calendario de reservaciones</h2>
+          </div>
+          <div class="calendar-controls">
+            <select id="privateVehicleSelect" aria-label="Seleccionar vehículo"></select>
+            <div class="calendar-nav">
+              <button type="button" id="privateVehiclePrevMonth" aria-label="Mes anterior">‹</button>
+              <span class="calendar-month-label" id="privateVehicleMonthLabel"></span>
+              <button type="button" id="privateVehicleNextMonth" aria-label="Mes siguiente">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="vehicle-calendar-scroll">
+          <div class="vehicle-calendar" id="privateVehicleCalendar" aria-live="polite"></div>
+        </div>
+        <div class="vehicle-legend">
+          <span class="free"><i></i>Disponible para reservar</span>
+          <span><i></i>Reservado</span>
+          <span class="pending"><i></i>Pendiente de aprobación</span>
+          <span class="suspended"><i></i>Suspendido temporalmente</span>
+          <span class="maintenance"><i></i>Mantenimiento</span>
+        </div>
+      </section>
+
+      <section class="vehicle-panel" aria-labelledby="myVehicleReservationsTitle">
+        <div class="section-heading">
+          <div><p class="eyebrow">Tu agenda</p><h2 id="myVehicleReservationsTitle">Mis próximas reservas de vehículos</h2></div>
+          <div class="vehicle-heading-actions">
+            <a class="secondary-button compact-button" href="mis-giras.html">Ver historial de giras</a>
+            <button class="icon-button" id="refreshVehicleReservations" type="button" aria-label="Actualizar">↻</button>
+          </div>
+        </div>
+        <div class="vehicle-reservation-list" id="myVehicleReservations">
+          <p class="empty-state">No tienes reservas de vehículos próximas.</p>
+        </div>
+      </section>
+
+      <section class="vehicle-panel trip-photo-panel" aria-labelledby="pendingTripPhotosTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Bitácora fotográfica</p>
+            <h2 id="pendingTripPhotosTitle">Fotografías de bitácora de tus giras</h2>
+            <p>Puedes cargar una única fotografía desde que se confirma la reserva. Si la gira finaliza sin fotografía, no podrás reservar nuevamente hasta completarla.</p>
+          </div>
+        </div>
+        <div class="vehicle-reservation-list" id="pendingTripPhotos">
+          <p class="empty-state">No tienes reservas pendientes de fotografía.</p>
+        </div>
+        <p class="trip-photo-warning"><strong>Importante:</strong> Cualquier anomalía detectada en el vehículo, por favor documentarla y reportarla a la administración.</p>
+      </section>
+
+      <section class="vehicle-panel" id="vehicleAdminPanel" hidden aria-labelledby="vehicleAdminTitle">
+        <div class="section-heading">
+          <div><p class="eyebrow">Acceso administrativo</p><h2 id="vehicleAdminTitle">Gestión de vehículos</h2></div>
+        </div>
+        <div class="vehicle-admin-grid">
+          <form class="vehicle-admin-card" id="maintenanceForm">
+            <h3>Registrar mantenimiento</h3>
+            <div class="vehicle-form-grid">
+              <div class="field-wide"><label for="maintenanceVehicle">Vehículo</label><select id="maintenanceVehicle" required></select></div>
+              <div><label for="maintenanceStart">Inicio</label><input id="maintenanceStart" type="datetime-local" required /></div>
+              <div><label for="maintenanceEnd">Finalización (opcional)</label><input id="maintenanceEnd" type="datetime-local" /></div>
+              <div class="field-wide"><label for="maintenanceCategory">Tipo</label><select id="maintenanceCategory" required><option value="oil_change">Cambio de aceite</option><option value="minor_repair">Reparación menor</option><option value="major_repair">Reparación mayor</option></select></div>
+              <div class="field-wide"><label for="maintenanceDetails">Detalle interno (opcional)</label><textarea id="maintenanceDetails" maxlength="240" placeholder="Trabajo por realizar, taller o seguimiento"></textarea></div>
+            </div>
+            <div class="form-message" id="maintenanceMessage" hidden></div>
+            <button class="primary-button compact-button" type="submit">Bloquear por mantenimiento</button>
+            <div class="vehicle-reservation-list active-maintenance-list" id="activeMaintenanceList"></div>
+          </form>
+
+          <form class="vehicle-admin-card" id="serviceScheduleForm">
+            <h3>Mantenimiento preventivo y DEKRA</h3>
+            <div class="vehicle-form-grid">
+              <div class="field-wide"><label for="serviceVehicle">Vehículo</label><select id="serviceVehicle" required></select></div>
+              <div><label for="currentMileage">Kilometraje actual</label><input id="currentMileage" type="number" min="0" step="1" /></div>
+              <div><label for="nextOilMileage">Próximo cambio (km)</label><input id="nextOilMileage" type="number" min="0" step="1" /></div>
+              <div><label for="nextOilDate">Próximo cambio (fecha)</label><input id="nextOilDate" type="date" /></div>
+              <div><label for="nextDekraMonth">Próxima DEKRA</label><input id="nextDekraMonth" type="month" /></div>
+              <div class="field-wide"><label for="serviceNotes">Notas internas (opcional)</label><textarea id="serviceNotes" maxlength="240"></textarea></div>
+            </div>
+            <div class="form-message" id="serviceMessage" hidden></div>
+            <button class="primary-button compact-button" type="submit">Guardar programación</button>
+          </form>
+        </div>
+
+        <section class="vehicle-admin-card vehicle-admin-section">
+          <h3>Solicitudes pendientes de aprobación</h3>
+          <p class="form-note">Las giras de más de 3 días requieren aprobación administrativa.</p>
+          <div class="vehicle-reservation-list" id="pendingVehicleApprovals">
+            <p class="empty-state">No hay solicitudes pendientes.</p>
+          </div>
+        </section>
+
+        <section class="vehicle-admin-card vehicle-admin-section">
+          <h3>Bitácoras fotográficas pendientes</h3>
+          <div class="vehicle-reservation-list" id="adminPendingTripPhotos">
+            <p class="empty-state">No hay bitácoras pendientes.</p>
+          </div>
+        </section>
+
+        <section class="vehicle-admin-card vehicle-admin-section">
+          <h3>Reservas suspendidas por mantenimiento</h3>
+          <div class="vehicle-reservation-list" id="suspendedVehicleReservations">
+            <p class="empty-state">No hay reservas suspendidas.</p>
+          </div>
+        </section>
+
+        <section class="vehicle-admin-card vehicle-admin-section">
+          <h3>Reservas activas de vehículos</h3>
+          <div class="vehicle-reservation-list" id="adminVehicleReservations">
+            <p class="empty-state">No hay reservas activas.</p>
+          </div>
+        </section>
+
+        <section class="vehicle-admin-card vehicle-admin-section" aria-labelledby="vehicleHistoryTitle">
+          <div class="section-heading compact-heading">
+            <div>
+              <h3 id="vehicleHistoryTitle">Historial y boletas de salida</h3>
+              <p>Consulta la ficha completa de cualquier reserva o descarga el historial actualizado en Excel.</p>
+            </div>
+            <button class="secondary-button compact-button" id="exportVehicleHistory" type="button">Exportar historial a Excel</button>
+          </div>
+          <div class="vehicle-message" id="vehicleHistoryMessage" hidden></div>
+          <div class="vehicle-reservation-list vehicle-history-list" id="adminVehicleHistoryList">
+            <p class="empty-state">No hay reservas en el historial.</p>
+          </div>
+        </section>
+
+        <section class="vehicle-admin-card vehicle-admin-section">
+          <h3>Próximas obligaciones administrativas</h3>
+          <p class="form-note">Incluye alertas de revisión técnica DEKRA visibles únicamente para administración.</p>
+          <div class="service-public-grid" id="adminServiceAlerts"></div>
+        </section>
+      </section>
+    </section>
+
+    <section class="visit-counter-panel superadmin-only" id="visitCounterPanel" hidden aria-labelledby="visitCounterTitle">
+      <div>
+        <p class="eyebrow">Actividad de la página pública</p>
+        <h3 id="visitCounterTitle">Contador de visitas</h3>
+        <p>Se registra como máximo una visita por navegador cada día, sin recopilar información personal.</p>
+      </div>
+      <div class="visit-counter-stats">
+        <div><span>Visitas de hoy</span><strong id="visitTodayCount">—</strong></div>
+        <div><span>Visitas totales</span><strong id="visitTotalCount">—</strong></div>
+      </div>
     </section>
   </main>
 
@@ -214,7 +381,7 @@
         <div><label for="dialogBookingEnd">Hora de finalización</label><input id="dialogBookingEnd" type="time" min="07:30" max="21:00" step="1800" required /></div>
       </div>
       <div id="dialogAdminProfessorField" hidden>
-        <label for="dialogBookingProfessor">Reservar a nombre de</label>
+        <label for="dialogBookingProfessor" data-required-label>Reservar a nombre de</label>
         <select id="dialogBookingProfessor"></select>
       </div>
       <label for="dialogBookingActivity">Actividad</label>
@@ -271,10 +438,83 @@
     </form>
   </dialog>
 
+  <dialog class="vehicle-dialog" id="vehicleBookingDialog">
+    <form id="vehicleBookingForm" method="dialog">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Reservación de vehículos</p><h2>Nueva reserva</h2></div>
+        <button class="dialog-close" id="closeVehicleBookingDialog" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <p class="vehicle-dialog-note">Indica la salida y el regreso. El responsable y su unidad se asignan desde el perfil. Las giras de más de 3 días quedarán pendientes de aprobación.</p>
+      <div class="vehicle-form-grid">
+        <div class="field-wide"><label for="vehicleBookingVehicle">Vehículo</label><select id="vehicleBookingVehicle" required></select></div>
+        <div><label for="vehicleBookingStart">Fecha y hora de salida</label><input id="vehicleBookingStart" type="datetime-local" required /></div>
+        <div><label for="vehicleBookingEnd">Fecha y hora de regreso</label><input id="vehicleBookingEnd" type="datetime-local" required /></div>
+        <div class="field-wide" id="vehicleResponsibleField" hidden><label for="vehicleBookingResponsible" data-required-label>Reservar a nombre de</label><select id="vehicleBookingResponsible"></select></div>
+        <div class="field-wide"><label for="vehicleBookingUnit">Unidad institucional</label><select id="vehicleBookingUnit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select></div>
+        <div><label for="vehicleBookingPartySize">Cantidad de personas</label><input id="vehicleBookingPartySize" type="number" min="1" max="60" step="1" value="1" required /></div>
+        <div class="field-wide"><label for="vehicleBookingDestination">Destino</label><input id="vehicleBookingDestination" maxlength="160" required /></div>
+        <div class="field-wide"><label for="vehicleBookingObjective">Objetivo de la gira</label><textarea id="vehicleBookingObjective" maxlength="240" required></textarea></div>
+        <div class="field-wide"><label for="vehicleBookingItinerary">Itinerario</label><textarea id="vehicleBookingItinerary" maxlength="600" placeholder="Indica la ruta, lugares y orden de las paradas" required></textarea></div>
+        <div class="field-wide"><label for="vehicleBookingObservations">Observaciones <span class="optional-label">(opcional)</span></label><textarea id="vehicleBookingObservations" maxlength="600" placeholder="Información adicional para la salida"></textarea></div>
+        <div><label for="vehicleDriverOne">Chofer adicional 1 (opcional)</label><input id="vehicleDriverOne" maxlength="100" /></div>
+        <div><label for="vehicleDriverTwo">Chofer adicional 2 (opcional)</label><input id="vehicleDriverTwo" maxlength="100" /></div>
+        <label class="field-wide vehicle-override-option" id="vehicleOverrideOption" hidden><input id="vehiclePolicyOverride" type="checkbox" /> Autorizar una excepción a los límites de uso justo</label>
+        <div class="field-wide" id="vehicleOverrideReasonField" hidden><label for="vehicleOverrideReason" data-required-label>Justificación de la excepción</label><textarea id="vehicleOverrideReason" maxlength="500"></textarea></div>
+      </div>
+      <div class="vehicle-message" id="vehicleBookingMessage" hidden></div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancelVehicleBooking" type="button">Cancelar</button>
+        <button class="primary-button compact-button" type="submit">Confirmar reserva</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="vehicle-dialog" id="tripPhotoDialog">
+    <form id="tripPhotoForm" method="dialog">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Bitácora de la gira</p><h2>Cargar fotografía</h2></div>
+        <button class="dialog-close" id="closeTripPhotoDialog" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <p class="vehicle-dialog-note" id="tripPhotoDescription">Toma o selecciona una fotografía del vehículo al finalizar la gira.</p>
+      <label class="trip-photo-input" for="tripPhotoFile">
+        <span>Seleccionar o tomar fotografía</span>
+        <input id="tripPhotoFile" type="file" accept="image/*" capture="environment" required />
+      </label>
+      <img class="trip-photo-preview" id="tripPhotoPreview" alt="Vista previa de la fotografía" hidden />
+      <p class="form-note">La imagen se comprime automáticamente y se almacena de forma privada. Solo puede cargarse una fotografía por gira.</p>
+      <div class="vehicle-message" id="tripPhotoMessage" hidden></div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancelTripPhoto" type="button">Cancelar</button>
+        <button class="primary-button compact-button" id="uploadTripPhoto" type="submit">Guardar fotografía</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="vehicle-dialog vehicle-detail-dialog" id="vehicleReservationDetailDialog">
+    <div class="vehicle-detail-content">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Boleta de salida</p><h2>Detalle de la reserva</h2></div>
+        <button class="dialog-close" id="closeVehicleDetailDialog" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="vehicle-detail-status" id="vehicleDetailStatus"></div>
+      <dl class="vehicle-detail-grid" id="vehicleDetailGrid"></dl>
+      <div class="trip-photo-detail" id="tripPhotoDetail" hidden>
+        <h3>Fotografía de bitácora</h3>
+        <a id="tripPhotoLink" href="#" target="_blank" rel="noopener"><img id="tripPhotoDetailImage" alt="Fotografía de bitácora de la gira" /></a>
+      </div>
+      <div class="dialog-actions">
+        <button class="primary-button compact-button" id="acceptVehicleDetailDialog" type="button">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="config.js?v=5"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="reservas.js?v=18"></script>
+  <script src="reservas.js?v=23"></script>
+  <script src="vehiculos-imagenes.js?v=1"></script>
+  <script src="vehiculos.js?v=14"></script>
+  <script src="field-labels.js?v=1"></script>
 </body>
 </html>

@@ -57,7 +57,7 @@ Sistema pequeño de consulta y reserva de aulas para la Escuela de Ciencias Ambi
 7. Ejecutar `supabase/bootstrap-admin.sql.example` con el correo real de esa cuenta.
 8. Copiar la URL del proyecto y la clave pública `anon` en `config.js`.
 9. Agregar como URL permitida de autenticación:
-   `https://escuela-de-ciencias-ambientales.github.io/ocupacionaulas/`
+   `https://escuela-de-ciencias-ambientales.github.io/reservas_aulas/`
 
 La clave `anon` de Supabase está diseñada para utilizarse en el navegador. La clave `service_role` nunca debe guardarse en este repositorio ni en `config.js`; la función administrativa la recibe automáticamente en el entorno seguro de Supabase.
 

@@ -71,13 +71,15 @@
     const fullName = String(form.get('name')).trim();
     const email = String(form.get('email')).trim().toLowerCase();
     const password = String(form.get('password'));
+    const unit = String(form.get('unit'));
     if (!emailPattern.test(email)) return showMessage('El correo debe tener el formato nombre.apellido.apellido@una.cr.');
+    if (!['Docencia', 'Administrativo', 'LAA', 'PROCAME'].includes(unit)) return showMessage('Selecciona tu unidad institucional.');
     if (!passwordPattern.test(password)) return showMessage('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.');
     if (password !== String(form.get('passwordConfirm'))) return showMessage('Las contraseñas no coinciden.');
     registerButton.disabled = true;
     registerButton.textContent = 'Creando cuenta…';
     try {
-      const { data, error } = await client.functions.invoke('register-teacher', { body: { fullName, email, password } });
+      const { data, error } = await client.functions.invoke('register-teacher', { body: { fullName, email, password, unit } });
       if (error) throw error;
       if (!data?.ok) throw new Error(data?.error || 'No fue posible crear la cuenta.');
       registerForm.reset();

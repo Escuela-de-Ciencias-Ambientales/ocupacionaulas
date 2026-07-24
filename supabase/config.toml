@@ -18,9 +18,15 @@ port = 54323
 [auth]
 enabled = true
 site_url = "http://127.0.0.1:8781"
-additional_redirect_urls = ["https://escuela-de-ciencias-ambientales.github.io/ocupacionaulas/"]
+additional_redirect_urls = ["https://escuela-de-ciencias-ambientales.github.io/reservas_aulas/"]
 jwt_expiry = 3600
 enable_signup = false
 
 [functions.admin-create-user]
 verify_jwt = true
+
+[functions.admin-manage-users]
+verify_jwt = true
+
+[functions.scheduled-data-retention-v2]
+verify_jwt = false

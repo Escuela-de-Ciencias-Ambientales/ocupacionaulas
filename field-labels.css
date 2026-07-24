@@ -1,0 +1,12 @@
+.required-indicator {
+  margin-left: 4px;
+  color: #c91524;
+  font-weight: 900;
+}
+.optional-indicator {
+  margin-left: 5px;
+  color: #71807b;
+  font-size: .9em;
+  font-weight: 600;
+  text-transform: none;
+}

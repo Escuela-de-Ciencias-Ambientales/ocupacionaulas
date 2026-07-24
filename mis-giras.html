@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mis giras | EDECA</title>
+  <meta name="description" content="Historial personal de giras y reservas de vehículos institucionales." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="reservas.css?v=21" />
+  <link rel="stylesheet" href="vehiculos.css?v=4" />
+  <link rel="stylesheet" href="mis-giras.css?v=2" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
+</head>
+<body>
+  <header class="private-header">
+    <div class="page private-header-row">
+      <a class="private-brand" href="index.html">
+        <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
+        <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
+      </a>
+      <div class="header-actions">
+        <a class="back-to-schedule" href="reservas.html?modulo=vehiculos">Volver a vehículos</a>
+        <div class="header-account" id="tripHeaderAccount" hidden>
+          <div class="header-account-identity"><strong id="tripCurrentName">Usuario</strong><span id="tripCurrentRole">Docente</span></div>
+          <button class="text-button" id="tripLogout" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page trip-history-main">
+    <section class="trip-history-intro">
+      <div><p class="eyebrow">Control personal</p><h1>Mis giras</h1><p>Consulta tus reservas, completa la información operativa y descarga tu historial cuando lo necesites.</p></div>
+      <span class="connection-status" id="tripHistoryStatus">Comprobando acceso…</span>
+    </section>
+
+    <section class="trip-history-summary" aria-label="Resumen de giras">
+      <div><span>Total de giras</span><strong id="tripTotalCount">—</strong></div>
+      <div><span>Realizadas</span><strong id="tripCompletedCount">—</strong></div>
+      <div><span>Próximas</span><strong id="tripUpcomingCount">—</strong></div>
+      <div><span>Bitácoras pendientes</span><strong id="tripPhotoPendingCount">—</strong></div>
+    </section>
+
+    <section class="trip-history-panel">
+      <div class="trip-history-heading">
+        <div><h2>Historial de reservas vehiculares</h2><p>Se muestran 12 registros por página para mantener la consulta compacta.</p></div>
+        <button class="secondary-button compact-button" id="exportMyTrips" type="button">Exportar a Excel</button>
+      </div>
+      <div class="trip-history-filters">
+        <div><label for="tripHistorySearch">Buscar</label><input id="tripHistorySearch" type="search" placeholder="Destino, objetivo o boleta" /></div>
+        <div><label for="tripHistoryState">Estado</label><select id="tripHistoryState"><option value="completed">Realizadas</option><option value="upcoming">Próximas</option><option value="all">Todas</option><option value="cancelled">Canceladas o rechazadas</option></select></div>
+        <div><label for="tripHistoryYear">Año</label><select id="tripHistoryYear"><option value="all">Todos</option></select></div>
+        <div><label for="tripHistoryVehicle">Vehículo</label><select id="tripHistoryVehicle"><option value="all">Todos</option></select></div>
+      </div>
+      <div class="form-message" id="tripHistoryMessage" role="status" aria-live="polite" hidden></div>
+      <div class="trip-history-table-wrap">
+        <table class="trip-history-table">
+          <thead><tr><th>Fecha</th><th>Vehículo</th><th>Destino</th><th>Estado</th><th>Bitácora</th><th>Acciones</th></tr></thead>
+          <tbody id="tripHistoryBody"><tr><td colspan="6">Cargando historial…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="trip-history-pagination">
+        <button class="secondary-button compact-button" id="previousTripPage" type="button">Anterior</button>
+        <span id="tripPageIndicator">Página 1 de 1</span>
+        <button class="secondary-button compact-button" id="nextTripPage" type="button">Siguiente</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="vehicle-dialog trip-history-dialog" id="tripHistoryDialog">
+    <form id="tripHistoryForm" method="dialog">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">Detalle y control de la gira</p><h2 id="tripHistoryDialogTitle">Detalle de la gira</h2></div>
+        <button class="dialog-close" id="closeTripHistoryDialog" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="vehicle-detail-status" id="myTripDetailStatus"></div>
+      <dl class="vehicle-detail-grid trip-fixed-detail" id="myTripFixedDetail"></dl>
+      <div class="form-message" id="tripEditMessage" role="status" aria-live="polite" hidden></div>
+
+      <section class="trip-edit-section">
+        <h3>Información de la gira</h3>
+        <div class="vehicle-form-grid">
+          <div><label for="myTripPartySize">Cantidad de personas</label><input id="myTripPartySize" type="number" min="1" max="60" required /></div>
+          <div class="field-wide"><label for="myTripDestination">Destino</label><input id="myTripDestination" maxlength="160" required /></div>
+          <div class="field-wide"><label for="myTripObjective">Objetivo</label><textarea id="myTripObjective" maxlength="240" required></textarea></div>
+          <div class="field-wide"><label for="myTripItinerary">Itinerario</label><textarea id="myTripItinerary" maxlength="600" required></textarea></div>
+          <div><label for="myTripDriverOne">Chofer adicional 1</label><input id="myTripDriverOne" maxlength="100" /></div>
+          <div><label for="myTripDriverTwo">Chofer adicional 2</label><input id="myTripDriverTwo" maxlength="100" /></div>
+          <div class="field-wide"><label for="myTripObservations">Observaciones de la reserva</label><textarea id="myTripObservations" maxlength="600"></textarea></div>
+        </div>
+      </section>
+
+      <section class="trip-edit-section">
+        <h3>Control posterior de la gira</h3>
+        <p>Esta información es opcional y puede completarse durante o después de la gira.</p>
+        <div class="vehicle-form-grid">
+          <div><label for="myTripSheetNumber">Número de boleta de gira</label><input id="myTripSheetNumber" maxlength="60" /></div>
+          <div><label for="myTripVehicleCondition">Estado del vehículo</label><select id="myTripVehicleCondition"><option value="">No indicado</option><option value="clean">Limpio</option><option value="dirty">Sucio</option><option value="other">Otro (detallar en observaciones)</option></select></div>
+          <div><label for="myTripDepartureMileage">Kilometraje de salida</label><input id="myTripDepartureMileage" type="number" min="0" step="1" /></div>
+          <div><label for="myTripArrivalMileage">Kilometraje de llegada</label><input id="myTripArrivalMileage" type="number" min="0" step="1" /></div>
+          <div><label for="myTripDepartureFuelLevel">Combustible de salida</label><select id="myTripDepartureFuelLevel"><option value="">No indicado</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
+          <div><label for="myTripArrivalFuelLevel">Combustible de llegada</label><select id="myTripArrivalFuelLevel"><option value="">No indicado</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
+          <div><label for="myTripFuelingMileage">Kilometraje de abastecimiento de combustible</label><input id="myTripFuelingMileage" type="number" min="0" step="1" /></div>
+          <div><label for="myTripServiceStation">Ubicación estación de servicio o gasolinera</label><input id="myTripServiceStation" maxlength="200" /></div>
+          <div><label for="myTripFuelLiters">Cantidad de litros de combustible</label><input id="myTripFuelLiters" type="number" min="0" step="0.01" /></div>
+          <div><label for="myTripFuelType">Tipo de combustible</label><select id="myTripFuelType"><option value="">No indicado</option><option value="diesel">Diésel</option><option value="regular">Gasolina regular</option><option value="super">Gasolina súper</option><option value="other">Otro</option></select></div>
+          <div><label for="myTripInvoiceAmount">Monto de factura</label><input id="myTripInvoiceAmount" type="number" min="0" step="0.01" /></div>
+          <div><label for="myTripInvoiceDate">Fecha de factura</label><input id="myTripInvoiceDate" type="date" /></div>
+          <div><label for="myTripInvoiceNumber">Número de factura</label><input id="myTripInvoiceNumber" maxlength="80" /></div>
+          <div><label for="myTripVoucherAuthorization">Número de autorización del voucher</label><input id="myTripVoucherAuthorization" maxlength="80" /></div>
+          <div class="field-wide"><label for="myTripIrregularities">Observaciones</label><textarea id="myTripIrregularities" maxlength="1000" placeholder="Detalla el estado “Otro”, anomalías o cualquier información adicional"></textarea></div>
+        </div>
+      </section>
+
+      <p class="trip-photo-warning"><strong>Importante:</strong> Cualquier anomalía detectada en el vehículo, por favor documentarla y reportarla a la administración.</p>
+      <div class="trip-photo-detail" id="myTripPhotoDetail" hidden><h3>Fotografía de bitácora</h3><a id="myTripPhotoLink" href="#" target="_blank" rel="noopener"><img id="myTripPhotoImage" alt="Fotografía de bitácora de la gira" /></a></div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancelTripHistoryEdit" type="button">Cerrar</button>
+        <button class="primary-button compact-button" id="saveTripHistoryEdit" type="submit">Guardar cambios</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="config.js?v=5"></script>
+  <script src="mis-giras.js?v=3"></script>
+  <script src="field-labels.js?v=1"></script>
+</body>
+</html>

@@ -178,6 +178,7 @@
       .legend { gap: 8px; }
     }
   </style>
+  <link rel="stylesheet" href="vehiculos.css?v=2" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -233,7 +234,7 @@
     .logo-una img { width:100%; height:100%; object-fit:contain; }
     .brand-divider { width:1px; height:68px; background:var(--line); }
     .identity-copy { min-width:0; }
-    .identity-copy span { display:block; color:var(--ink); font-size:clamp(18px,1.8vw,24px); font-weight:700; line-height:1.15; letter-spacing:-.015em; }
+    .identity-copy span { display:block; color:var(--ink); font-size:clamp(20px,2vw,27px); font-weight:800; line-height:1.08; letter-spacing:.015em; }
     .identity-copy strong { display:block; margin-top:2px; color:var(--ink); font-size:clamp(25px,3.2vw,38px); line-height:1; letter-spacing:-.025em; }
     .report-meta { color:var(--una-gray); font-size:13px; line-height:1.5; text-align:right; }
     .report-meta strong { display:block; color:var(--una-red-dark); font-size:14px; }
@@ -329,7 +330,7 @@
           <img src="logo-edeca.png" alt="Logo de la Escuela de Ciencias Ambientales" />
         </a>
         <div class="identity-copy">
-          <span>Escuela de Ciencias Ambientales</span>
+          <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
         </div>
       </div>
       <div class="institutional-lockup">
@@ -344,6 +345,12 @@
   </header>
 
   <main class="page">
+    <nav class="module-switch" aria-label="Tipo de disponibilidad">
+      <button type="button" id="showPublicClassrooms" aria-selected="true">Aulas</button>
+      <button type="button" id="showPublicVehicles" aria-selected="false">Vehículos</button>
+    </nav>
+
+    <div id="classroomPublicView">
     <section class="intro" aria-labelledby="title">
       <div class="panel lead">
         <h1 id="title">Disponibilidad de aulas</h1>
@@ -519,6 +526,59 @@
           <table class="data-table" id="dataTable"></table>
         </div>
       </details>
+    </section>
+    </div>
+
+    <section id="vehiclePublicView" hidden aria-labelledby="vehiclePublicTitle">
+      <div class="vehicle-panel vehicle-hero">
+        <div>
+          <p class="eyebrow">Transporte institucional</p>
+          <h1 id="vehiclePublicTitle">Disponibilidad de vehículos</h1>
+          <p>Consulta la programación mensual de los vehículos institucionales, su estado operativo y las próximas obligaciones de mantenimiento.</p>
+        </div>
+        <div class="vehicle-summary" aria-label="Resumen de vehículos">
+          <div><strong id="publicVehicleCount">2</strong><span>Vehículos</span></div>
+          <div><strong id="publicAvailableCount">—</strong><span>Disponibles hoy</span></div>
+        </div>
+      </div>
+
+      <div class="vehicle-card-grid" id="publicVehicleCards" aria-live="polite"></div>
+
+      <section class="vehicle-panel" aria-labelledby="publicVehicleCalendarTitle">
+        <div class="calendar-toolbar">
+          <div>
+            <p class="eyebrow">Calendario mensual</p>
+            <h2 id="publicVehicleCalendarTitle">Ocupación y disponibilidad</h2>
+          </div>
+          <div class="calendar-controls">
+            <select id="publicVehicleSelect" aria-label="Seleccionar vehículo"></select>
+            <div class="calendar-nav">
+              <button type="button" id="publicVehiclePrevMonth" aria-label="Mes anterior">‹</button>
+              <span class="calendar-month-label" id="publicVehicleMonthLabel"></span>
+              <button type="button" id="publicVehicleNextMonth" aria-label="Mes siguiente">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="vehicle-calendar-scroll">
+          <div class="vehicle-calendar" id="publicVehicleCalendar" aria-live="polite"></div>
+        </div>
+        <div class="vehicle-legend" aria-label="Leyenda del calendario">
+          <span class="free"><i></i>Disponible</span>
+          <span><i></i>Reservado</span>
+          <span class="suspended"><i></i>Suspendido temporalmente</span>
+          <span class="maintenance"><i></i>Mantenimiento</span>
+        </div>
+      </section>
+
+      <section class="vehicle-panel" aria-labelledby="publicServiceTitle">
+        <div class="calendar-toolbar">
+          <div>
+            <p class="eyebrow">Programación preventiva</p>
+            <h2 id="publicServiceTitle">Próximos cambios de aceite</h2>
+          </div>
+        </div>
+        <div class="service-public-grid" id="publicServiceSchedule"></div>
+      </section>
     </section>
   </main>
 
@@ -1473,6 +1533,8 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=5"></script>
+  <script src="vehiculos-imagenes.js?v=1"></script>
+  <script src="vehiculos-publicos.js?v=6"></script>
   <script src="visit-counter.js?v=1"></script>
 </body>
 </html>

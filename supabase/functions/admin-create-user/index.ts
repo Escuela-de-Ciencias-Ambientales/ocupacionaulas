@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 const emailPattern = /^[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr$/;
 const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+const allowedUnits = new Set(['Docencia', 'Administrativo', 'LAA', 'PROCAME']);
 
 function response(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -15,13 +16,20 @@ function response(body: Record<string, unknown>, status = 200) {
   });
 }
 
-type RequestedUser = { fullName: string; email: string; password: string; role: 'teacher' | 'reservation_admin' | 'admin' };
+type RequestedUser = {
+  fullName: string;
+  email: string;
+  password: string;
+  unit: string;
+  role: 'teacher' | 'reservation_admin' | 'admin';
+};
 
 function normalizeUser(source: Record<string, unknown>): RequestedUser {
   return {
     fullName: String(source.fullName || '').trim(),
     email: String(source.email || '').trim().toLowerCase(),
     password: String(source.password || ''),
+    unit: String(source.unit || '').trim(),
     role: source.role === 'admin' ? 'admin' : source.role === 'reservation_admin' ? 'reservation_admin' : 'teacher'
   };
 }
@@ -32,6 +40,7 @@ function validateUser(user: RequestedUser, allowEmptyPassword: boolean) {
   if ((!allowEmptyPassword || user.password) && !passwordPattern.test(user.password)) {
     return 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.';
   }
+  if (!allowedUnits.has(user.unit)) return 'Selecciona una unidad institucional válida.';
   return '';
 }
 
@@ -103,6 +112,7 @@ Deno.serve(async (request) => {
         const { error: registryError } = await adminClient.from('teacher_registry').upsert({
           email: user.email,
           full_name: user.fullName,
+          unit: user.unit,
           active: true
         }, { onConflict: 'email' });
         if (registryError) {
@@ -124,7 +134,8 @@ Deno.serve(async (request) => {
         user_metadata: {
           full_name: user.fullName,
           role: user.role === 'teacher' ? 'teacher' : 'admin',
-          admin_scope: user.role === 'admin' ? 'superadmin' : user.role === 'reservation_admin' ? 'reservations' : null
+          admin_scope: user.role === 'admin' ? 'superadmin' : user.role === 'reservation_admin' ? 'reservations' : null,
+          unit: user.unit
         }
       });
       if (createError) results.push({ email: user.email, ok: false, error: createError.message });

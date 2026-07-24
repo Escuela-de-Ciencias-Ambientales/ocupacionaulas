@@ -2,7 +2,7 @@
 * { box-sizing:border-box; }
 body { min-height:100vh; margin:0; color:var(--ink); background:linear-gradient(120deg,#f8faf9 0 58%,#eef6f2 58% 100%); font-family:"Source Sans 3",Arial,sans-serif; }
 .access-header { display:flex; align-items:center; justify-content:space-between; width:min(1120px,calc(100% - 32px)); margin:0 auto; padding:24px 0; }
-.brand { display:flex; align-items:center; gap:14px; color:var(--ink); font-size:20px; font-weight:800; text-decoration:none; }
+.brand { display:flex; align-items:center; gap:14px; color:var(--ink); font-size:23px; font-weight:800; line-height:1.08; letter-spacing:.015em; text-decoration:none; }
 .brand img { width:76px; height:76px; object-fit:contain; }
 .una-logo { width:84px; height:72px; object-fit:contain; }
 .access-main { display:grid; grid-template-columns:minmax(0,1fr) minmax(350px,440px); gap:70px; align-items:center; width:min(1040px,calc(100% - 32px)); min-height:calc(100vh - 150px); margin:0 auto; padding:36px 0 70px; }
@@ -16,8 +16,8 @@ body { min-height:100vh; margin:0; color:var(--ink); background:linear-gradient(
 .login-panel h2 { margin:22px 0 4px; font-size:29px; }
 .login-panel > p { margin:0 0 22px; color:var(--muted); }
 label { display:block; margin:15px 0 6px; font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
-input { width:100%; min-height:50px; padding:11px 13px; border:1px solid #cdd8d4; border-radius:11px; color:var(--ink); background:#fff; font:inherit; }
-input:focus { border-color:var(--green); outline:3px solid rgba(8,122,85,.13); }
+input,select { width:100%; min-height:50px; padding:11px 13px; border:1px solid #cdd8d4; border-radius:11px; color:var(--ink); background:#fff; font:inherit; }
+input:focus,select:focus { border-color:var(--green); outline:3px solid rgba(8,122,85,.13); }
 button { width:100%; min-height:50px; margin-top:20px; border:0; border-radius:11px; color:#fff; background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
 button:hover,button:focus-visible { background:var(--red-dark); }
 button:disabled { cursor:not-allowed; opacity:.55; }
@@ -26,10 +26,11 @@ button:disabled { cursor:not-allowed; opacity:.55; }
 .tab-button:hover,.tab-button:focus-visible { color:var(--ink); background:#fff; }
 .tab-button.is-active { color:#fff; background:var(--green); box-shadow:0 4px 12px rgba(8,122,85,.18); }
 .password-help { margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.4; }
+.password-recommendation { margin:7px 0 16px; color:#087a55; font-weight:700; }
 .login-panel small { display:block; margin-top:18px; color:var(--muted); line-height:1.45; }
 .message { margin:0 0 16px; padding:11px 12px; border-radius:10px; color:#8f1c27; background:#fff0f1; font-size:14px; }
 .message.is-success { color:#075c40; background:#eff9f4; }
-@media (max-width:760px) { body { background:#f8faf9; } .access-header { padding:16px 0; } .brand { font-size:17px; } .brand img { width:62px;height:62px; } .una-logo { width:70px;height:60px; } .access-main { grid-template-columns:1fr; gap:30px; padding:24px 0 52px; } .access-copy h1 { font-size:46px; } .access-copy > p:not(.eyebrow) { font-size:16px; } .login-panel { padding:24px; } }
+@media (max-width:760px) { body { background:#f8faf9; } .access-header { padding:16px 0; } .brand { font-size:18px; } .brand img { width:62px;height:62px; } .una-logo { width:70px;height:60px; } .access-main { grid-template-columns:1fr; gap:30px; padding:24px 0 52px; } .access-copy h1 { font-size:46px; } .access-copy > p:not(.eyebrow) { font-size:16px; } .login-panel { padding:24px; } }
 @media (max-width:430px) { .brand span { max-width:155px; line-height:1.1; } .access-copy h1 { font-size:39px; } }
 .password-input { position:relative; width:100%; }
 .password-input input { padding-right:52px; }

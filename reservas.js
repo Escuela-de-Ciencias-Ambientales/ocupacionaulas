@@ -16,10 +16,12 @@
   const dayMap = { DOMINGO: 0, LUNES: 1, MARTES: 2, MIERCOLES: 3, MIÉRCOLES: 3, JUEVES: 4, VIERNES: 5, SABADO: 6, SÁBADO: 6 };
   const teacherEmailPattern = /^[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr$/;
   const strongPasswordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+  const allowedUnits = ['Docencia', 'Administrativo', 'LAA', 'PROCAME'];
 
   const byId = (id) => document.getElementById(id);
   const elements = {
     connectionStatus: byId('connectionStatus'), systemMessage: byId('systemMessage'), userView: byId('userView'),
+    manageUsersLink: byId('manageUsersLink'),
     headerAccount: byId('headerAccount'),
     logoutButton: byId('logoutButton'), currentUserName: byId('currentUserName'), currentUserRole: byId('currentUserRole'), bookingForm: byId('bookingForm'),
     bookingDate: byId('bookingDate'), bookingRoom: byId('bookingRoom'), bookingStart: byId('bookingStart'),
@@ -181,6 +183,9 @@
   function validateSlot({ room, date, start, end }) {
     if (!state.cycle) return { ok: false, message: 'La administración aún no ha configurado el ciclo.' };
     if (!cycleIsOpen()) return { ok: false, message: 'Las reservas están cerradas por la administración.' };
+    if (!isAdmin() && state.profile?.reservations_blocked) {
+      return { ok: false, message: state.profile.reservations_block_reason || 'Tu cuenta no tiene habilitada la creación de reservas.' };
+    }
     if (!room || !date || !start || !end) return { ok: false, message: 'Completa la fecha, el aula y las dos horas.' };
     if (date < state.cycle.reservation_start_date || date > state.cycle.reservation_end_date) return { ok: false, message: `La fecha debe estar entre ${formatDate(state.cycle.reservation_start_date)} y ${formatDate(state.cycle.reservation_end_date)}.` };
     if (date < localDateString()) return { ok: false, message: 'No se permiten reservas en fechas pasadas.' };
@@ -257,6 +262,7 @@
     const loggedIn = Boolean(state.session && state.profile);
     elements.headerAccount.hidden = !loggedIn;
     elements.userView.hidden = !loggedIn; elements.scheduleBrowser.hidden = !loggedIn; elements.adminPanel.hidden = !loggedIn || !isAdmin();
+    elements.manageUsersLink.hidden = !loggedIn || !isAdmin();
     if (!loggedIn) return;
     elements.currentUserName.textContent = state.profile.full_name;
     elements.currentUserRole.textContent = isSuperadmin() ? 'Superadministrador' : isAdmin() ? 'Administrador de reservas' : 'Docente';
@@ -268,11 +274,16 @@
       ? 'Selecciona una semana y un aula. Puedes reservar espacios libres y gestionar directamente la ocupación académica.'
       : 'Selecciona una semana y un aula. Pulsa “Reservar” directamente en el espacio que necesitas.';
     document.querySelectorAll('.superadmin-only').forEach((element) => { element.hidden = !isSuperadmin(); });
-    renderCycle(); renderMyReservations(); renderAdminReservations();
+    renderCycle();
+    if (!isAdmin() && state.profile.reservations_blocked) {
+      elements.cycleDescription.textContent = state.profile.reservations_block_reason || 'La administración bloqueó temporalmente la creación de reservas para esta cuenta.';
+      elements.saveBookingButton.disabled = true;
+    }
+    renderMyReservations(); renderAdminReservations();
   }
   function populateTeacherSelect() {
     const options = state.teachers.length
-      ? state.teachers.map((teacher) => `<option value="${escapeHtml(teacher.id)}">${escapeHtml(teacher.full_name)}</option>`).join('')
+      ? state.teachers.map((teacher) => `<option value="${escapeHtml(teacher.id)}">${escapeHtml(teacher.full_name)}${teacher.reservations_blocked ? ' · Reservas bloqueadas' : ''}</option>`).join('')
       : '<option value="">No hay docentes activos</option>';
     elements.bookingProfessor.innerHTML = options;
     elements.dialogBookingProfessor.innerHTML = options;
@@ -437,7 +448,7 @@
   }
   async function loadTeachers() {
     if (!isAdmin()) { state.teachers = []; populateTeacherSelect(); return; }
-    const { data, error } = await state.client.from('profiles').select('id,full_name').eq('role', 'teacher').eq('active', true).order('full_name');
+    const { data, error } = await state.client.from('profiles').select('id,full_name,reservations_blocked,reservations_block_reason').eq('role', 'teacher').eq('active', true).order('full_name');
     if (error) throw error;
     state.teachers = data || [];
     populateTeacherSelect();
@@ -449,7 +460,7 @@
   }
   async function loadProfile() {
     if (!state.session) { state.profile = null; renderSession(); return; }
-    const { data, error } = await state.client.from('profiles').select('id,full_name,email,role,admin_scope,active').eq('id', state.session.user.id).single();
+    const { data, error } = await state.client.from('profiles').select('id,full_name,email,unit,role,admin_scope,active,reservations_blocked,reservations_block_reason').eq('id', state.session.user.id).single();
     if (error) throw error;
     if (!data.active) { await state.client.auth.signOut(); throw new Error('Esta cuenta está desactivada. Contacta a la administración.'); }
     state.profile = data; renderSession();
@@ -475,6 +486,11 @@
     const validation = validateSlot(slot); if (!validation.ok) { showMessage(validation.message, 'error'); return; }
     const room = state.rooms.find((item) => item.code === slot.room); if (!room?.id) { showMessage('No se encontró el aula seleccionada.', 'error'); return; }
     if (isAdmin() && !elements.bookingProfessor.value) { showMessage('Selecciona el profesor para quien se realizará la reserva.', 'error'); return; }
+    const selectedTeacher = isAdmin() ? state.teachers.find((item) => item.id === elements.bookingProfessor.value) : null;
+    if (selectedTeacher?.reservations_blocked) {
+      showMessage(selectedTeacher.reservations_block_reason || 'La cuenta seleccionada no tiene habilitada la creación de reservas.', 'error');
+      return;
+    }
     setBusy(elements.saveBookingButton, true, 'Guardando…');
     try {
       const request = isAdmin()
@@ -518,6 +534,12 @@
     }
     if (isAdmin() && !elements.dialogBookingProfessor.value) {
       elements.dialogAvailabilityCheck.textContent = 'Selecciona el profesor para quien se realizará la reserva.';
+      elements.dialogAvailabilityCheck.classList.add('is-conflict');
+      return;
+    }
+    const selectedTeacher = isAdmin() ? state.teachers.find((item) => item.id === elements.dialogBookingProfessor.value) : null;
+    if (selectedTeacher?.reservations_blocked) {
+      elements.dialogAvailabilityCheck.textContent = selectedTeacher.reservations_block_reason || 'La cuenta seleccionada no tiene habilitada la creación de reservas.';
       elements.dialogAvailabilityCheck.classList.add('is-conflict');
       return;
     }
@@ -600,12 +622,14 @@
     const fullName = String(form.get('name')).trim();
     const email = String(form.get('email')).trim().toLowerCase();
     const password = String(form.get('password'));
+    const unit = String(form.get('unit'));
     if (fullName.length < 3) return showCreateUserMessage('Ingresa el nombre completo del usuario.', 'error');
     if (!teacherEmailPattern.test(email)) return showCreateUserMessage('El correo debe tener el formato nombre.apellido.apellido@una.cr.', 'error');
     if (!strongPasswordPattern.test(password)) return showCreateUserMessage('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.', 'error');
+    if (!allowedUnits.includes(unit)) return showCreateUserMessage('Selecciona la unidad institucional.', 'error');
     setBusy(button, true, 'Creando…');
     try {
-      const { data, error } = await state.client.functions.invoke('admin-create-user', { body: { fullName, email, password, role: String(form.get('role')) } });
+      const { data, error } = await state.client.functions.invoke('admin-create-user', { body: { fullName, email, password, unit, role: String(form.get('role')) } });
       if (error) throw error;
       if (!data?.ok) throw new Error(data?.error || 'No fue posible crear la cuenta.');
       elements.createUserForm.reset();
@@ -632,12 +656,14 @@
       const fullName = row.nombre_completo || row.nombre || '';
       const email = (row.correo_electronico || row.correo || row.email || '').toLowerCase();
       const password = row.contrasena_temporal || row.contrasena || '';
+      const unit = row.unidad || row.unidad_institucional || '';
       if (fullName.length < 3) throw new Error(`Revisa el nombre completo en la fila ${index + 2}.`);
       if (!teacherEmailPattern.test(email)) throw new Error(`Revisa el correo institucional en la fila ${index + 2}.`);
       if (password && !strongPasswordPattern.test(password)) throw new Error(`La contraseña de la fila ${index + 2} debe tener 8 caracteres, una mayúscula y un número.`);
+      if (!allowedUnits.includes(unit)) throw new Error(`Selecciona una unidad válida en la fila ${index + 2}.`);
       if (seen.has(email)) throw new Error(`El correo ${email} está repetido en el archivo.`);
       seen.add(email);
-      return { fullName, email, password, role: 'teacher' };
+      return { fullName, email, password, unit, role: 'teacher' };
     });
   }
 
@@ -766,7 +792,8 @@
     elements.bookingStart.value = '08:00'; elements.bookingEnd.value = '09:00'; elements.bookingDate.value = localDateString(); elements.editorWeek.value = localDateString(); populateRoomSelects(); bindEvents();
     if (!isConfigured || !window.supabase?.createClient) { elements.connectionStatus.textContent = 'Configuración pendiente'; elements.connectionStatus.classList.add('is-offline'); showMessage('El sistema está instalado. Falta conectar el proyecto de Supabase.', 'error'); return; }
     try {
-      state.client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+      state.client = window.RESERVAS_SUPABASE_CLIENT || window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+      window.RESERVAS_SUPABASE_CLIENT = state.client;
       elements.connectionStatus.textContent = 'Sistema disponible'; const { data } = await state.client.auth.getSession(); state.session = data.session;
       if (!state.session) { window.location.replace('ingreso.html?v=7'); return; }
       await loadProfile(); await loadRooms(); await reloadAll();

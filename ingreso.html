@@ -8,13 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="ingreso.css?v=3" />
+  <link rel="stylesheet" href="ingreso.css?v=5" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
 </head>
 <body>
   <header class="access-header">
     <a class="brand" href="index.html" aria-label="Volver al horario de ocupación">
       <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
-      <span>Escuela de Ciencias Ambientales</span>
+      <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
     </a>
     <img class="una-logo" src="logo-una.png" alt="Universidad Nacional, Costa Rica" />
   </header>
@@ -48,8 +49,17 @@
         <input id="registerName" name="name" type="text" autocomplete="name" minlength="3" maxlength="100" required />
         <label for="registerEmail">Correo electrónico</label>
         <input id="registerEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido.apellido@una.cr" pattern="[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr" required />
+        <label for="registerUnit">Unidad institucional</label>
+        <select id="registerUnit" name="unit" required>
+          <option value="">Selecciona tu unidad</option>
+          <option value="Docencia">Docencia</option>
+          <option value="Administrativo">Administrativo</option>
+          <option value="LAA">LAA</option>
+          <option value="PROCAME">PROCAME</option>
+        </select>
         <label for="registerPassword">Crea tu contraseña</label>
         <input id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="8" pattern="(?=.*[A-Z])(?=.*[0-9]).{8,}" title="Mínimo 8 caracteres, una mayúscula y un número" required />
+        <p class="password-help password-recommendation">Recomendación: usar clave unificada.</p>
         <label for="registerPasswordConfirm">Confirma tu contraseña</label>
         <input id="registerPasswordConfirm" name="passwordConfirm" type="password" autocomplete="new-password" minlength="8" required />
         <p class="password-help">Mínimo 8 caracteres, una letra mayúscula y un número.</p>
@@ -62,6 +72,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=3"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="ingreso.js?v=7"></script>
+  <script src="ingreso.js?v=8"></script>
+  <script src="field-labels.js?v=1"></script>
 </body>
 </html>
