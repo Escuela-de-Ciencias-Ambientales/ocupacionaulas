@@ -44,11 +44,28 @@
     return now >= new Date(state.cycle.booking_opens_at) && now <= new Date(state.cycle.booking_closes_at);
   }
 
+  function reservationBlockReason() {
+    if (!state.cycle) return 'La administración todavía no ha configurado el periodo de reservación.';
+    if (!state.cycle.reservations_enabled) return 'Las reservas están cerradas por la administración.';
+    const now = new Date();
+    if (now < new Date(state.cycle.booking_opens_at)) return `Las reservas abrirán el ${formatDateTime(state.cycle.booking_opens_at)}.`;
+    if (now > new Date(state.cycle.booking_closes_at)) return 'El periodo de reservación ya finalizó.';
+    if (!isAdmin() && state.profile?.reservations_blocked) {
+      return state.profile.reservations_block_reason || 'Tu cuenta no tiene habilitada la creación de reservas.';
+    }
+    if (!isAdmin() && pendingPhotosFor().length > 0) {
+      return 'Debes cargar la fotografía de bitácora pendiente antes de realizar otra reserva.';
+    }
+    return '';
+  }
+
   function updateVehicleConnectionStatus() {
-    const blockedByPhoto = !isAdmin() && pendingPhotosFor().length > 0;
+    const reason = reservationBlockReason();
+    const blockedByPhoto = reason.includes('bitácora');
     const blockedByAdmin = !isAdmin() && state.profile?.reservations_blocked;
-    $('vehicleConnectionStatus').textContent = blockedByAdmin ? 'Reservas bloqueadas' : blockedByPhoto ? 'Bitácora pendiente' : reservationsOpen() ? 'Reservas abiertas' : 'Reservas cerradas';
-    $('vehicleConnectionStatus').classList.toggle('is-offline', !reservationsOpen() || blockedByPhoto || blockedByAdmin);
+    $('vehicleConnectionStatus').textContent = blockedByAdmin ? 'Reservas bloqueadas' : blockedByPhoto ? 'Bitácora pendiente' : reason ? 'Reservas cerradas' : 'Reservas abiertas';
+    $('vehicleConnectionStatus').classList.toggle('is-offline', Boolean(reason));
+    setMessage($('vehicleReservationNotice'), reason);
   }
 
   function setModule(module) {
@@ -171,7 +188,7 @@
       }).join('');
       const reserve = canReserveDay(day, events) && !outside
         ? `<button class="vehicle-free-button" type="button" data-reserve-date="${localDate(day)}">Reservar</button>`
-        : (!items ? '<span class="vehicle-day-empty">Disponible</span>' : '');
+        : (!items ? `<span class="vehicle-day-empty">${outside ? 'Fuera del mes' : reservationBlockReason() || (new Date(day).setHours(23, 59, 59, 999) < Date.now() ? 'Fecha pasada' : 'No disponible')}</span>` : '');
       html += `<div class="vehicle-day${outside ? ' is-outside' : ''}${localDate(day) === today ? ' is-today' : ''}">
         <span class="vehicle-day-number">${day.getDate()}</span>${items}${reserve}
       </div>`;

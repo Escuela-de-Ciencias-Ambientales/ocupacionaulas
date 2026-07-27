@@ -165,6 +165,7 @@
 .calendar-month-label { min-width: 170px; color: var(--vehicle-ink); font-size: 17px; font-weight: 900; text-align: center; text-transform: capitalize; }
 
 .vehicle-calendar-scroll { overflow-x: auto; border: 1px solid var(--vehicle-line); border-radius: 14px; }
+.vehicle-calendar-notice { margin: 0 0 18px; }
 .vehicle-calendar { display: grid; min-width: 820px; grid-template-columns: repeat(7, minmax(110px, 1fr)); background: var(--vehicle-line); gap: 1px; }
 .vehicle-weekday { padding: 11px 10px; color: var(--vehicle-muted); background: #f0f5f3; font-size: 12px; font-weight: 900; text-transform: uppercase; }
 .vehicle-day {
@@ -203,7 +204,7 @@
   text-align: center;
 }
 .vehicle-free-button:hover { border-color: var(--vehicle-green); background: #d9efe7; }
-.vehicle-day-empty { color: #8b9793; font-size: 11px; }
+.vehicle-day-empty { display: block; margin-top: 6px; color: #7a8682; font-size: 11px; line-height: 1.35; }
 
 .vehicle-legend { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 15px; color: var(--vehicle-muted); font-size: 13px; font-weight: 700; }
 .vehicle-legend span { display: inline-flex; align-items: center; gap: 7px; }
