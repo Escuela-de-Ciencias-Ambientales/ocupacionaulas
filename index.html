@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Horario de ocupación de aulas | EDECA</title>
   <meta name="description" content="Horario de ocupación de aulas por jornada, día y aula. II Ciclo 2026." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#003C71" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Reservas EDECA" />
   <style>
     :root {
       --una-blue: #003C71;
@@ -243,6 +250,12 @@
     .session-button:hover, .session-button:focus-visible { color:#fff; background:linear-gradient(135deg,var(--una-red-dark),#8f0c1b); box-shadow:0 10px 24px rgba(188,18,35,.26); transform:translateY(-1px); }
     .session-button:hover::after, .session-button:focus-visible::after { transform:translateX(3px); }
 
+    .install-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:11px 19px; border:1px solid var(--una-blue); border-radius:999px; color:var(--una-blue); background:#fff; box-shadow:0 8px 20px rgba(0,60,113,.10); font-size:13px; font-weight:850; letter-spacing:.01em; text-decoration:none; cursor:pointer; transition:transform .18s ease,box-shadow .18s ease,background .18s ease,color .18s ease; }
+    .install-button svg { width:16px; height:16px; flex:0 0 auto; }
+    .install-button:hover, .install-button:focus-visible { color:#fff; background:linear-gradient(135deg,var(--una-blue),var(--una-blue-2)); box-shadow:0 10px 24px rgba(0,60,113,.22); transform:translateY(-1px); }
+    .install-button[hidden] { display:none; }
+    @media (max-width: 640px) { .install-button { padding:11px 14px; } }
+
     .intro { grid-template-columns:minmax(0,1fr) auto; gap:24px; padding:36px 0 24px; }
     .lead { padding:4px 0; border:0; background:transparent; box-shadow:none; }
     .lead h1 { max-width:790px; margin-bottom:10px; color:var(--ink); font-size:clamp(31px,4.5vw,54px); letter-spacing:-.045em; }
@@ -335,6 +348,10 @@
         </div>
       </div>
       <div class="institutional-lockup">
+        <button type="button" class="install-button" data-pwa-install hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          <span class="install-label-long">Instalar App</span>
+        </button>
         <a class="session-button" href="ingreso.html?v=7">Ingreso a reservas</a>
         <div class="report-meta"><strong>Periodo: II Ciclo 2026</strong>Reporte base 10/07/2026</div>
         <span class="brand-divider" aria-hidden="true"></span>
@@ -1552,5 +1569,6 @@
   <script src="vehiculos-imagenes.js?v=1"></script>
   <script src="vehiculos-publicos.js?v=6"></script>
   <script src="visit-counter.js?v=1"></script>
+  <script src="pwa-install.js?v=1"></script>
 </body>
 </html>

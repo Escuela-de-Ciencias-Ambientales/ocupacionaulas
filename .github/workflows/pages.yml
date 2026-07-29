@@ -28,8 +28,9 @@ jobs:
       - name: Preparar archivos públicos
         run: |
           mkdir _site
-          find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.ico' \) -exec cp {} _site/ \;
+          find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.ico' -o -name '*.webmanifest' \) -exec cp {} _site/ \;
           cp -r plantillas _site/
+          cp -r icons _site/
       - name: Empaquetar sitio
         uses: actions/upload-pages-artifact@v3
         with:
