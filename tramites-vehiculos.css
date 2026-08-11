@@ -1,5 +1,27 @@
 .processing-main { display: grid; gap: 24px; }
 .institutional-form-list { display: grid; gap: 18px; }
+.processing-filter-bar {
+  display: grid;
+  grid-template-columns: 180px minmax(240px, 420px);
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 18px;
+}
+.processing-filter-bar label {
+  color: var(--vehicle-ink);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.processing-filter-bar select {
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid #cad8d3;
+  border-radius: 10px;
+  color: var(--vehicle-ink);
+  background: #fff;
+  font: inherit;
+}
 .institutional-card {
   width: min(920px, 100%);
   margin-inline: auto;
@@ -89,6 +111,7 @@
 }
 @media (max-width: 720px) {
   .institutional-row { grid-template-columns: 1fr; }
+  .processing-filter-bar { grid-template-columns: 1fr; }
   .institutional-card { width: 100%; }
   .institutional-row .copy-field-button { width: fit-content; }
   .institutional-actions { grid-template-columns: 1fr; }

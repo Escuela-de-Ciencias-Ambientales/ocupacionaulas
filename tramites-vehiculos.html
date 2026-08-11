@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=15" />
-  <link rel="stylesheet" href="tramites-vehiculos.css?v=2" />
+  <link rel="stylesheet" href="tramites-vehiculos.css?v=3" />
 </head>
 <body>
   <header class="private-header">
@@ -47,6 +47,12 @@
         <button type="button" data-processing-tab="processed" aria-selected="false">Tramitadas</button>
         <button type="button" data-processing-tab="stats" aria-selected="false">Estadísticas</button>
       </div>
+      <div class="processing-filter-bar">
+        <label for="processingTeacherFilter">Filtrar por profesor</label>
+        <select id="processingTeacherFilter">
+          <option value="">Todos los profesores</option>
+        </select>
+      </div>
       <div class="vehicle-message" id="processingMessage" hidden></div>
       <div id="processingContent"><p class="empty-state">Cargando reservas...</p></div>
     </section>
@@ -54,6 +60,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=5"></script>
-  <script src="tramites-vehiculos.js?v=3"></script>
+  <script src="tramites-vehiculos.js?v=4"></script>
 </body>
 </html>

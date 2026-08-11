@@ -3,7 +3,7 @@
 
   const $ = (id) => document.getElementById(id);
   const config = window.RESERVAS_CONFIG || {};
-  const state = { client: null, session: null, profile: null, reservations: [], vehicles: [], profiles: [], tab: 'pending' };
+  const state = { client: null, session: null, profile: null, reservations: [], vehicles: [], profiles: [], tab: 'pending', teacherFilter: '' };
   const canProcess = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
@@ -85,8 +85,32 @@
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
   }
 
+  function filteredByTeacher(items) {
+    if (!state.teacherFilter) return items;
+    return items.filter((item) => item.user_id === state.teacherFilter);
+  }
+
+  function teacherLabel(item) {
+    return item.responsible_name || state.profiles.find((profile) => profile.id === item.user_id)?.full_name || 'Sin responsable';
+  }
+
+  function renderTeacherFilter() {
+    const select = $('processingTeacherFilter');
+    if (!select) return;
+    const current = state.teacherFilter;
+    const teachers = new Map();
+    state.reservations.forEach((item) => {
+      if (item.user_id) teachers.set(item.user_id, teacherLabel(item));
+    });
+    const options = [...teachers.entries()].sort((a, b) => a[1].localeCompare(b[1], 'es'))
+      .map(([id, name]) => `<option value="${escapeHtml(id)}"${id === current ? ' selected' : ''}>${escapeHtml(name)}</option>`).join('');
+    select.innerHTML = `<option value="">Todos los profesores</option>${options}`;
+    select.value = current && teachers.has(current) ? current : '';
+    state.teacherFilter = select.value;
+  }
+
   function renderStats() {
-    const processed = state.reservations.filter((item) => ['processed', 'rejected'].includes(processingStatus(item)));
+    const processed = filteredByTeacher(state.reservations).filter((item) => ['processed', 'rejected'].includes(processingStatus(item)));
     const scoped = isSuperadmin() ? processed : processed.filter((item) => item.processed_by === state.session.user.id);
     const requester = countBy(scoped, (item) => item.responsible_name)[0];
     const vehicle = countBy(scoped, vehicleLabel)[0];
@@ -103,8 +127,9 @@
     document.querySelectorAll('[data-processing-tab]').forEach((button) => {
       button.setAttribute('aria-selected', String(button.dataset.processingTab === state.tab));
     });
+    renderTeacherFilter();
     if (state.tab === 'stats') { renderStats(); return; }
-    const items = state.reservations.filter((item) => !['cancelled', 'rejected'].includes(item.status)
+    const items = filteredByTeacher(state.reservations).filter((item) => !['cancelled', 'rejected'].includes(item.status)
       && (state.tab === 'processed' ? ['processed', 'rejected'].includes(processingStatus(item)) : !['processed', 'rejected'].includes(processingStatus(item))));
     $('processingContent').innerHTML = items.length
       ? `<div class="institutional-form-list">${items.map(card).join('')}</div>`
@@ -164,6 +189,7 @@
   document.querySelectorAll('[data-processing-tab]').forEach((button) => {
     button.addEventListener('click', () => { state.tab = button.dataset.processingTab; render(); });
   });
+  $('processingTeacherFilter')?.addEventListener('change', (event) => { state.teacherFilter = event.target.value; render(); });
   $('processingLogout')?.addEventListener('click', async () => { await state.client.auth.signOut(); window.location.replace('ingreso.html?v=7'); });
   init();
 })();
