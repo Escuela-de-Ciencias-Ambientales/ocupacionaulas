@@ -22,7 +22,10 @@
   background: #f2f6f4;
 }
 
-.module-switch button {
+.module-switch button,
+.module-switch a {
+  display: inline-grid;
+  place-items: center;
   min-width: 132px;
   min-height: 44px;
   padding: 10px 20px;
@@ -33,9 +36,11 @@
   font: inherit;
   font-weight: 800;
   cursor: pointer;
+  text-decoration: none;
 }
 
-.module-switch button[aria-selected="true"] {
+.module-switch button[aria-selected="true"],
+.module-switch a[aria-current="page"] {
   color: #fff;
   background: var(--vehicle-green);
   box-shadow: 0 5px 14px rgba(8, 122, 85, .17);

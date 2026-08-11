@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trámite de reservas vehiculares | EDECA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="reservas.css?v=21" />
+  <link rel="stylesheet" href="vehiculos.css?v=15" />
+  <link rel="stylesheet" href="tramites-vehiculos.css?v=1" />
+</head>
+<body>
+  <header class="private-header">
+    <div class="page private-header-row">
+      <a class="private-brand" href="reservas.html">
+        <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
+        <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
+      </a>
+      <div class="header-actions">
+        <a class="back-to-schedule" href="reservas.html?modulo=vehiculos">Volver a vehículos</a>
+        <div class="header-account" id="processingHeaderAccount" hidden>
+          <div class="header-account-identity">
+            <strong id="processingUserName">Administración</strong>
+            <span id="processingUserRole">Trámite vehicular</span>
+          </div>
+          <button class="text-button" id="processingLogout" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page processing-main">
+    <section class="vehicle-panel vehicle-hero">
+      <div>
+        <p class="eyebrow">Boletas de gira</p>
+        <h1>Trámite de reservas vehiculares</h1>
+        <p>Copie la información hacia el sistema institucional UNA y marque cada reserva como tramitada cuando termine.</p>
+      </div>
+      <span class="connection-status" id="processingStatus">Conectando...</span>
+    </section>
+
+    <section class="vehicle-panel">
+      <div class="vehicle-processing-tabs" role="tablist" aria-label="Trámite de reservas vehiculares">
+        <button type="button" data-processing-tab="pending" aria-selected="true">Por procesar</button>
+        <button type="button" data-processing-tab="processed" aria-selected="false">Tramitadas</button>
+        <button type="button" data-processing-tab="stats" aria-selected="false">Estadísticas</button>
+      </div>
+      <div class="vehicle-message" id="processingMessage" hidden></div>
+      <div id="processingContent"><p class="empty-state">Cargando reservas...</p></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=5"></script>
+  <script src="tramites-vehiculos.js?v=1"></script>
+</body>
+</html>

@@ -57,6 +57,7 @@
         <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
         <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
         <button type="button" id="showConserjeriaAdmin" aria-selected="false" hidden>Conserjería</button>
+        <a href="tramites-vehiculos.html" id="vehicleProcessingNav" hidden>Trámite de reservas</a>
       </nav>
       <a class="secondary-button compact-button manage-users-link" id="manageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
     </div>
@@ -191,25 +192,6 @@
       </section>
 
       <div class="vehicle-card-grid" id="privateVehicleCards"></div>
-
-      <section class="vehicle-panel vehicle-processing-panel" id="vehicleProcessingPanel" aria-labelledby="vehicleProcessingTitle">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Boletas de gira</p>
-            <h2 id="vehicleProcessingTitle">Bandeja de trámite institucional</h2>
-            <p>Reservas listas para trasladar al sistema UNA, con botones de copiado por campo y seguimiento de estado.</p>
-          </div>
-          <span class="status-chip" id="vehicleProcessingBadge">0 por procesar</span>
-        </div>
-        <div class="vehicle-processing-tabs" role="tablist" aria-label="Estados de trámite de reservas vehiculares">
-          <button type="button" data-processing-tab="pending" aria-selected="true">Por procesar</button>
-          <button type="button" data-processing-tab="needs_info" aria-selected="false">Pendientes</button>
-          <button type="button" data-processing-tab="processed" aria-selected="false">Tramitadas</button>
-          <button type="button" data-processing-tab="stats" aria-selected="false">Estadísticas</button>
-        </div>
-        <div class="vehicle-message" id="vehicleProcessingMessage" hidden></div>
-        <div id="vehicleProcessingContent"><p class="empty-state">Cargando bandeja de trámite...</p></div>
-      </section>
 
       <section class="vehicle-panel" aria-labelledby="privateVehicleCalendarTitle">
         <div class="calendar-toolbar">

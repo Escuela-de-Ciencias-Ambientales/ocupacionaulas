@@ -71,7 +71,8 @@
     scheduleEntryCourseName: byId('scheduleEntryCourseName'), scheduleEntryNrc: byId('scheduleEntryNrc'),
     scheduleEntryGroup: byId('scheduleEntryGroup'), scheduleProfessorOptions: byId('scheduleProfessorOptions'),
     closeScheduleDialog: byId('closeScheduleDialog'), cancelScheduleDialog: byId('cancelScheduleDialog'),
-    saveScheduleEntryButton: byId('saveScheduleEntryButton')
+    saveScheduleEntryButton: byId('saveScheduleEntryButton'),
+    showConserjeriaAdmin: byId('showConserjeriaAdmin'), vehicleProcessingNav: byId('vehicleProcessingNav')
   };
 
   const state = {
@@ -287,6 +288,8 @@
         : isConserjeriaAdmin() ? 'Administrador de conserjería' : 'Docente';
     elements.adminProfessorField.hidden = !isAdmin();
     elements.dialogAdminProfessorField.hidden = !isAdmin();
+    if (elements.showConserjeriaAdmin) elements.showConserjeriaAdmin.hidden = !(isConserjeriaAdmin() || isSuperadmin());
+    if (elements.vehicleProcessingNav) elements.vehicleProcessingNav.hidden = !(state.profile?.role === 'admin' && ['superadmin', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope));
     elements.adminAccessLabel.textContent = isSuperadmin() ? 'Acceso de superadministrador' : 'Acceso de administración de reservas';
     elements.scheduleEditorTitle.textContent = isAdmin() ? 'Horario, reservas y ocupación académica' : 'Disponibilidad semanal por aula';
     elements.scheduleEditorDescription.textContent = isAdmin()

@@ -34,7 +34,7 @@
     cancelled: 'Cancelada',
     rejected: 'Rechazada'
   };
-  const processingNames = { pending: 'Por procesar', needs_info: 'Pendiente', processed: 'Tramitada' };
+  const processingNames = { pending: 'Por procesar', processed: 'Tramitada' };
   const vehicleImage = (value = '') => {
     const path = String(value);
     if (/mitsubishi/i.test(path) && window.VEHICLE_IMAGES?.mitsubishi) return window.VEHICLE_IMAGES.mitsubishi;
@@ -427,7 +427,6 @@
       <label class="processing-note-label" for="processingNote-${item.id}">Nota interna de trámite</label>
       <textarea id="processingNote-${item.id}" class="processing-note" maxlength="800" placeholder="Ej.: Falta dato, llamada realizada, tramitada en sistema UNA">${escapeHtml(item.processing_notes || '')}</textarea>
       <div class="vehicle-admin-actions">
-        <button class="secondary-button compact-button" type="button" data-processing-action="needs_info" data-id="${item.id}">Marcar pendiente</button>
         <button class="secondary-button compact-button" type="button" data-processing-action="pending" data-id="${item.id}">Volver a por procesar</button>
         <button class="primary-button compact-button" type="button" data-processing-action="processed" data-id="${item.id}">Marcar tramitada</button>
         <button class="secondary-button compact-button" type="button" data-detail-vehicle="${item.id}">Ver detalle completo</button>
@@ -695,7 +694,7 @@
       if (error) throw error;
       state.profile = profile;
       $('vehicleAdminPanel').hidden = !isAdmin();
-      $('vehicleProcessingPanel').hidden = !canProcessVehicles();
+      if ($('vehicleProcessingPanel')) $('vehicleProcessingPanel').hidden = !canProcessVehicles();
       await loadCore();
       await reloadData();
       state.loaded = true;

@@ -1,0 +1,68 @@
+.processing-main { display: grid; gap: 24px; }
+.institutional-form-list { display: grid; gap: 18px; }
+.institutional-card {
+  padding: 20px;
+  border: 1px solid var(--vehicle-line);
+  border-radius: 16px;
+  background: #fbfdfc;
+}
+.institutional-card header { margin-bottom: 16px; }
+.institutional-card h2 { margin: 4px 0; color: var(--vehicle-ink); }
+.institutional-card header p { margin: 0; color: var(--vehicle-muted); }
+.institutional-grid {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--vehicle-line);
+  border-radius: 12px;
+  background: #fff;
+}
+.institutional-row {
+  display: grid;
+  grid-template-columns: 145px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+}
+.institutional-row label {
+  color: var(--vehicle-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+.institutional-value {
+  min-height: 29px;
+  padding: 6px 9px;
+  border: 1px solid #bac8c3;
+  border-radius: 4px;
+  color: #03182b;
+  background: #fff;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+.institutional-value.is-textarea { min-height: 44px; }
+.institutional-destination {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 6px 9px;
+  align-items: center;
+}
+.institutional-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.institutional-note {
+  width: 100%;
+  min-height: 70px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #cad8d3;
+  border-radius: 10px;
+  font: inherit;
+}
+@media (max-width: 720px) {
+  .institutional-row { grid-template-columns: 1fr; }
+  .institutional-row .copy-field-button { width: fit-content; }
+}
