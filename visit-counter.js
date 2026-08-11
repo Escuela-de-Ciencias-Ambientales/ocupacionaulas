@@ -29,9 +29,11 @@
       // El contador puede funcionar aunque el navegador bloquee el almacenamiento local.
     }
 
-    const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-    });
+    const client = window.RESERVAS_PUBLIC_SUPABASE_CLIENT
+      || window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      });
+    window.RESERVAS_PUBLIC_SUPABASE_CLIENT = client;
     const { error } = await client.rpc('record_page_visit', { p_page_key: 'ocupacionaulas' });
     if (error) return;
 

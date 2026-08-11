@@ -10,7 +10,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=4" />
+  <link rel="stylesheet" href="conserjeria-admin.css?v=3" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#003C71" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Reservas EDECA" />
 </head>
 <body>
   <header class="private-header">
@@ -49,6 +56,7 @@
       <nav class="module-switch" aria-label="Tipo de reservación">
         <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
         <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
+        <button type="button" id="showConserjeriaAdmin" aria-selected="false" hidden>Conserjería</button>
       </nav>
       <a class="secondary-button compact-button manage-users-link" id="manageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
     </div>
@@ -151,7 +159,7 @@
              <label for="newUserEmail">Correo electrónico</label><input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
              <label for="newUserUnit">Unidad institucional</label><select id="newUserUnit" name="unit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select>
              <label for="newUserPassword">Contraseña temporal</label><input id="newUserPassword" name="password" type="password" minlength="8" title="Mínimo 8 caracteres, una mayúscula y un número" required />
-            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="admin">Superadministrador</option></select>
+            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="conserjeria_admin">Administrador de conserjería</option><option value="admin">Superadministrador</option></select>
             <button class="primary-button" type="submit">Crear cuenta</button>
           </form>
         </div>
@@ -341,6 +349,86 @@
           <div class="service-public-grid" id="adminServiceAlerts"></div>
         </section>
       </section>
+    </section>
+
+    <section id="conserjeriaAdminModule" hidden aria-labelledby="conserjeriaAdminTitle">
+      <section class="cycle-banner panel" aria-live="polite">
+        <div>
+          <p class="eyebrow">Panel administrativo</p>
+          <h2 id="conserjeriaAdminTitle">Reportes de limpieza por conserje</h2>
+          <p>Datos en tiempo real enviados desde el formulario de Conserjería.</p>
+        </div>
+        <div class="conserjeria-admin-actions">
+          <button class="secondary-button compact-button" id="refreshConserjeriaAdmin" type="button">↻ Actualizar</button>
+          <button class="secondary-button compact-button" id="exportConserjeriaExcel" type="button">Exportar todo a Excel</button>
+        </div>
+      </section>
+
+      <div class="conserjeria-admin-kpis">
+        <div class="panel conserjeria-kpi"><strong id="conserjeriaKpiTotal">0</strong><span>Reportes totales</span></div>
+        <div class="panel conserjeria-kpi"><strong id="conserjeriaKpiHoy">0</strong><span>Reportes hoy</span></div>
+        <div class="panel conserjeria-kpi"><strong id="conserjeriaKpiSemana">0</strong><span>Últimos 7 días</span></div>
+      </div>
+
+      <section class="panel conserjeria-control-panel" aria-labelledby="conserjeriaControlTitle">
+        <div class="conserjeria-section-heading">
+          <div>
+            <p class="eyebrow">Control diario</p>
+            <h3 id="conserjeriaControlTitle">Cumplimiento por conserje y aposento</h3>
+            <p>Consulta cuántos reportes realizó cada conserje, desde cuáles aposentos y cuáles asignaciones quedaron pendientes.</p>
+          </div>
+          <label class="conserjeria-date-field" for="conserjeriaControlFecha">Fecha
+            <input id="conserjeriaControlFecha" type="date" />
+          </label>
+        </div>
+        <div class="conserjeria-daily-grid" id="conserjeriaControlResumen"></div>
+        <p class="conserjeria-schedule-notice" id="conserjeriaControlNotice" hidden></p>
+      </section>
+
+      <details class="panel conserjeria-schedule-panel">
+        <summary>
+          <span><strong>Programación semanal de limpieza</strong><small>Configure las asignaciones cuando el horario esté definido.</small></span>
+        </summary>
+        <form class="conserjeria-schedule-form" id="conserjeriaScheduleForm">
+          <label>Conserje<select id="conserjeriaScheduleConserje" required></select></label>
+          <label>Aposento<select id="conserjeriaScheduleAposento" required></select></label>
+          <label>Día<select id="conserjeriaScheduleDia" required>
+            <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
+            <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option>
+          </select></label>
+          <label>Vigente desde<input id="conserjeriaScheduleDesde" type="date" required /></label>
+          <label>Vigente hasta <span class="conserjeria-optional">(opcional)</span><input id="conserjeriaScheduleHasta" type="date" /></label>
+          <button class="primary-button compact-button" type="submit">Guardar asignación</button>
+        </form>
+        <div class="conserjeria-schedule-list" id="conserjeriaScheduleList"></div>
+      </details>
+
+      <div class="panel conserjeria-chart-panel">
+        <h3>Reportes por día (últimos 14 días)</h3>
+        <canvas id="conserjeriaChartDias" height="90"></canvas>
+      </div>
+
+      <div class="conserjeria-admin-grid">
+        <section class="panel conserjeria-conserje-panel" id="conserjeriaPanelHenry" aria-labelledby="conserjeriaPanelHenryTitle">
+          <div class="conserjeria-conserje-heading">
+            <h3 id="conserjeriaPanelHenryTitle">Henry Leiton</h3>
+            <span class="conserjeria-conserje-count" id="conserjeriaCountHenry">0 reportes</span>
+          </div>
+          <canvas id="conserjeriaChartHenry" height="120"></canvas>
+          <div class="conserjeria-report-list" id="conserjeriaListHenry"></div>
+        </section>
+
+        <section class="panel conserjeria-conserje-panel" id="conserjeriaPanelRocio" aria-labelledby="conserjeriaPanelRocioTitle">
+          <div class="conserjeria-conserje-heading">
+            <h3 id="conserjeriaPanelRocioTitle">Rocío Román</h3>
+            <span class="conserjeria-conserje-count" id="conserjeriaCountRocio">0 reportes</span>
+          </div>
+          <canvas id="conserjeriaChartRocio" height="120"></canvas>
+          <div class="conserjeria-report-list" id="conserjeriaListRocio"></div>
+        </section>
+      </div>
+
+      <p class="conserjeria-admin-message" id="conserjeriaAdminMessage" hidden></p>
     </section>
 
     <section class="visit-counter-panel superadmin-only" id="visitCounterPanel" hidden aria-labelledby="visitCounterTitle">
@@ -540,11 +628,14 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
   <script src="config.js?v=5"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="reservas.js?v=24"></script>
+  <script src="reservas.js?v=25"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
-  <script src="vehiculos.js?v=18"></script>
+  <script src="vehiculos.js?v=19"></script>
+  <script src="conserjeria-admin.js?v=3"></script>
   <script src="field-labels.js?v=1"></script>
+  <script src="pwa-install.js?v=1"></script>
 </body>
 </html>

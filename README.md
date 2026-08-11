@@ -24,6 +24,8 @@ Sistema pequeño de consulta y reserva de aulas para la Escuela de Ciencias Ambi
 - Editor semanal visual para crear, modificar o eliminar cursos directamente en cada bloque del aula, incluyendo profesor, código, nombre del curso, grupo y NRC.
 - Creación individual de cuentas y carga masiva de docentes autorizados mediante Excel.
 - Diseño adaptable para computadora, tableta y teléfono.
+- Registro público de labores de conserjería mediante contraseña y códigos QR por aposento.
+- Panel privado de conserjería con indicadores, gráficos y exportación a Excel, restringido al alcance administrativo correspondiente.
 - Registro de cancelaciones y reglas de seguridad en la base de datos.
 - Ciclos configurables por la administración, incluidas las fechas reservables y la ventana de apertura del sistema.
 - Reservas cerradas por defecto: solo pueden abrirse después de cargar la ocupación académica prioritaria.
@@ -44,6 +46,7 @@ Sistema pequeño de consulta y reserva de aulas para la Escuela de Ciencias Ambi
 - `plantillas/plantilla_cuentas_docentes.xlsx`: plantilla para autorizar o crear docentes en lote.
 - `supabase/functions/admin-create-user/`: función segura para autorizar o crear cuentas.
 - `supabase/functions/register-teacher/`: registro inicial restringido a la lista administrativa.
+- `qr_codes_v2/`: códigos QR imprimibles de los aposentos configurados para conserjería.
 - `.github/workflows/pages.yml`: publicación automática en GitHub Pages.
 
 ## Configuración de Supabase

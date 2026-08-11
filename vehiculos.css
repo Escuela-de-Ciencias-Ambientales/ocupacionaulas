@@ -499,6 +499,8 @@
   :root { --module-gap: 24px; }
   .module-switch { display: grid; width: 100%; grid-template-columns: 1fr 1fr; }
   .module-switch button { min-width: 0; padding-inline: 10px; }
+  #conserjeriaOpenBtn,
+  #showConserjeriaAdmin { grid-column: 1 / -1; }
   .module-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
   .manage-users-link { width: 100%; text-align: center; }
   .vehicle-panel { padding: 18px; border-radius: 16px; }

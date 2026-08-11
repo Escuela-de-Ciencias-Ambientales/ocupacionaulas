@@ -147,7 +147,13 @@
       $('publicVehicleCards').innerHTML = '<p class="vehicle-message">La conexión de vehículos todavía no está configurada.</p>';
       return;
     }
-    if (!state.client) state.client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    if (!state.client) {
+      state.client = window.RESERVAS_PUBLIC_SUPABASE_CLIENT
+        || window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+          auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+        });
+      window.RESERVAS_PUBLIC_SUPABASE_CLIENT = state.client;
+    }
     const { data, error } = await state.client.rpc('get_public_vehicle_overview');
     if (error) {
       $('publicVehicleCards').innerHTML = `<p class="vehicle-message">No fue posible cargar los vehículos: ${escapeHtml(error.message)}</p>`;
