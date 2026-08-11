@@ -406,7 +406,8 @@
       <div class="vehicle-boleta-heading">
         <div>
           <span class="vehicle-plate">${escapeHtml(vehicleLabel(item))}</span>
-          <h3>${escapeHtml(item.destination || 'Destino no indicado')}</h3>
+          <p class="eyebrow">Formulario homologado UNA</p>
+          <h3>Boleta de gira · ${escapeHtml(item.destination || 'Destino no indicado')}</h3>
           <p>${escapeHtml(item.responsible_name)} · ${formatDateTime(item.starts_at)} → ${formatDateTime(item.ends_at)}</p>
           ${processedInfo}
         </div>
