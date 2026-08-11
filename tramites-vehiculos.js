@@ -71,7 +71,7 @@
       <label class="processing-note-label" for="processingNote-${item.id}">Nota interna de trámite</label>
       <textarea id="processingNote-${item.id}" class="institutional-note" maxlength="800">${escapeHtml(item.processing_notes || '')}</textarea>
       <div class="institutional-actions">
-        ${finalStatus ? '<button class="secondary-button compact-button" type="button" data-processing-action="pending" data-id="' + item.id + '">Volver a por procesar</button>' : '<button class="primary-button compact-button" type="button" data-processing-action="processed" data-id="' + item.id + '">Tramitada</button><button class="danger-button compact-button" type="button" data-processing-action="rejected" data-id="' + item.id + '">Rechazada</button>'}
+        ${finalStatus ? '<button class="processing-action-button is-neutral" type="button" data-processing-action="pending" data-id="' + item.id + '">Volver a por procesar</button>' : '<button class="processing-action-button is-approved" type="button" data-processing-action="processed" data-id="' + item.id + '">Tramitada</button><button class="processing-action-button is-rejected" type="button" data-processing-action="rejected" data-id="' + item.id + '">Rechazada</button>'}
       </div>
     </article>`;
   }
