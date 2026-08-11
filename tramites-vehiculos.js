@@ -39,7 +39,7 @@
       <a href="reservas.html?modulo=aulas" id="processingClassroomsNav">Aulas</a>
       <a href="reservas.html?modulo=vehiculos" id="processingVehiclesNav">Vehículos</a>
       <a href="reservas.html?modulo=conserjeria" id="processingConserjeriaNav" hidden>Conserjería</a>
-      <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-current="page">Trámite giras</a>
+      <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-current="page">Trámite de giras</a>
     </nav>
     <a class="secondary-button compact-button manage-users-link" id="processingManageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>`;
     navigation.appendChild(toolbar);
