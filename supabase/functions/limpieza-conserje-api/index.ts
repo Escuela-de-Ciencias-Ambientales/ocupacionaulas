@@ -1,5 +1,5 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.112.3';
 
 const allowedOrigins = new Set([
   'https://escuela-de-ciencias-ambientales.github.io',
@@ -32,8 +32,23 @@ function validPassword(value: unknown) {
   return typeof value === 'string' && value.length >= 4 && value.length <= 128;
 }
 
+function validSessionToken(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{43,128}$/.test(value);
+}
+
 function validSlug(value: unknown) {
   return typeof value === 'string' && /^[a-z0-9-]{2,80}$/.test(value);
+}
+
+function newSessionToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return btoa(String.fromCharCode(...bytes))
+    .replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+}
+
+async function sha256(value: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 function decodePhoto(base64: unknown) {
@@ -67,38 +82,73 @@ Deno.serve(async (request) => {
   try {
     const payload = await request.json();
     const action = String(payload.action || '');
-    const password = payload.password;
-    if (!validPassword(password)) return response(origin, { ok: false, error: 'Credenciales inválidas.' }, 401);
-
     const admin = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false }
     });
 
     if (action === 'login') {
-      const { data, error } = await admin.rpc('limpieza_api_login', { p_password: password });
+      if (!validPassword(payload.password)) return response(origin, { ok: false, error: 'Credenciales inválidas.' }, 401);
+      const sessionToken = newSessionToken();
+      const tokenHash = await sha256(sessionToken);
+      const { data, error } = await admin.rpc('limpieza_api_crear_sesion', {
+        p_password: payload.password,
+        p_token_hash: tokenHash
+      });
       if (error || !data?.length) return response(origin, { ok: false, error: 'Contraseña incorrecta.' }, 401);
-      return response(origin, { ok: true, conserje: data[0] });
+      return response(origin, { ok: true, conserje: data[0], sessionToken });
     }
 
-    if (action === 'summary') {
+    const hasSession = validSessionToken(payload.sessionToken);
+    const hasLegacyPassword = validPassword(payload.password);
+    if (!hasSession && !hasLegacyPassword) {
+      return response(origin, { ok: false, error: 'La sesión no es válida.', sessionExpired: true }, 401);
+    }
+    const tokenHash = hasSession ? await sha256(payload.sessionToken) : null;
+
+    if (action === 'logout') {
+      if (tokenHash) await admin.rpc('limpieza_api_cerrar_sesion', { p_token_hash: tokenHash });
+      return response(origin, { ok: true });
+    }
+
+    if (action === 'summary' || action === 'reports') {
       const date = String(payload.date || '');
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return response(origin, { ok: false, error: 'Fecha inválida.' }, 400);
-      const { data, error } = await admin.rpc('limpieza_api_resumen', { p_password: password, p_fecha: date });
-      if (error) return response(origin, { ok: false, error: 'No fue posible cargar el resumen.' }, 400);
-      return response(origin, { ok: true, items: data || [] });
+      if (action === 'reports' && !tokenHash) {
+        return response(origin, { ok: false, error: 'Actualiza la sesión para consultar los reportes.' }, 401);
+      }
+      const rpcName = action === 'reports'
+        ? 'limpieza_api_reportes_v3'
+        : tokenHash ? 'limpieza_api_resumen_v3' : 'limpieza_api_resumen';
+      const rpcParams = action === 'reports' || tokenHash
+        ? { p_token_hash: tokenHash, p_fecha: date }
+        : { p_password: payload.password, p_fecha: date };
+      const { data, error } = await admin.rpc(rpcName, rpcParams);
+      if (error) {
+        const sessionExpired = Boolean(tokenHash && error.message.includes('Sesion invalida'));
+        return response(origin, {
+          ok: false,
+          error: sessionExpired ? 'La sesión venció. Ingresa nuevamente.' : 'No fue posible cargar la información.',
+          sessionExpired
+        }, sessionExpired ? 401 : 400);
+      }
+      return response(origin, { ok: true, [action === 'reports' ? 'reports' : 'items']: data || [] });
     }
 
     const slug = payload.slug;
     if (!validSlug(slug)) return response(origin, { ok: false, error: 'Código QR no reconocido.' }, 400);
-    const { data: contextData, error: contextError } = await admin.rpc('limpieza_api_contexto', {
-      p_password: password,
-      p_slug: slug
-    });
+    const contextRpc = tokenHash ? 'limpieza_api_contexto_v3' : 'limpieza_api_contexto';
+    const contextParams = tokenHash
+      ? { p_token_hash: tokenHash, p_slug: slug }
+      : { p_password: payload.password, p_slug: slug };
+    const { data: contextData, error: contextError } = await admin.rpc(contextRpc, contextParams);
     if (contextError || !contextData?.length) {
-      const message = contextError?.message?.includes('asignado a otro')
-        ? 'Este aposento está asignado a otro conserje para hoy.'
-        : 'No fue posible abrir el formulario de este aposento.';
-      return response(origin, { ok: false, error: message }, 400);
+      const sessionExpired = Boolean(tokenHash && contextError?.message?.includes('Sesion invalida'));
+      const message = sessionExpired
+        ? 'La sesión venció. Ingresa nuevamente.'
+        : contextError?.message?.includes('asignado a otro')
+          ? 'Este aposento está asignado a otro conserje para hoy.'
+          : 'No fue posible abrir el formulario de este aposento.';
+      return response(origin, { ok: false, error: message, sessionExpired }, sessionExpired ? 401 : 400);
     }
     const context = contextData[0];
 
@@ -132,19 +182,35 @@ Deno.serve(async (request) => {
       if (uploadError) return response(origin, { ok: false, error: 'No fue posible guardar la fotografía.' }, 500);
     }
 
-    const { data, error } = await admin.rpc('limpieza_api_crear_reporte', {
+    const reportRpc = tokenHash ? 'limpieza_api_crear_reporte_v3' : 'limpieza_api_crear_reporte';
+    const reportParams = tokenHash ? {
       p_report_id: reportId,
       p_aposento_slug: slug,
-      p_conserje_password: password,
+      p_token_hash: tokenHash,
       p_checklist: checklist,
       p_observaciones: observations || null,
       p_foto_path: photoPath,
       p_foto_mime: photoPath ? 'image/jpeg' : null,
       p_foto_bytes: photoBytes?.length || null
-    });
+    } : {
+      p_report_id: reportId,
+      p_aposento_slug: slug,
+      p_conserje_password: payload.password,
+      p_checklist: checklist,
+      p_observaciones: observations || null,
+      p_foto_path: photoPath,
+      p_foto_mime: photoPath ? 'image/jpeg' : null,
+      p_foto_bytes: photoBytes?.length || null
+    };
+    const { data, error } = await admin.rpc(reportRpc, reportParams);
     if (error || !data?.[0]?.ok) {
       if (photoPath) await admin.storage.from('limpieza-reportes').remove([photoPath]);
-      return response(origin, { ok: false, error: error?.message || 'No fue posible enviar el reporte.' }, 400);
+      const sessionExpired = Boolean(tokenHash && error?.message?.includes('Sesion invalida'));
+      return response(origin, {
+        ok: false,
+        error: sessionExpired ? 'La sesión venció. Ingresa nuevamente.' : error?.message || 'No fue posible enviar el reporte.',
+        sessionExpired
+      }, sessionExpired ? 401 : 400);
     }
 
     return response(origin, { ok: true, result: data[0] });
