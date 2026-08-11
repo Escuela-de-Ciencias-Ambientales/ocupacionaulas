@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
-  <link rel="stylesheet" href="vehiculos.css?v=4" />
+  <link rel="stylesheet" href="vehiculos.css?v=16" />
   <link rel="stylesheet" href="conserjeria-admin.css?v=3" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -40,6 +40,18 @@
     </div>
   </header>
 
+  <div class="global-module-navigation">
+    <div class="page module-toolbar">
+      <nav class="module-switch" aria-label="Tipo de reservación">
+        <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
+        <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
+        <button type="button" id="showConserjeriaAdmin" aria-selected="false" hidden>Conserjería</button>
+        <a href="tramites-vehiculos.html" id="vehicleProcessingNav" hidden>Trámite de reservas</a>
+      </nav>
+      <a class="secondary-button compact-button manage-users-link" id="manageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
+    </div>
+  </div>
+
   <main class="page private-main">
     <section class="private-intro">
       <div>
@@ -51,16 +63,6 @@
     </section>
 
     <div class="system-message" id="systemMessage" role="status" aria-live="polite" hidden></div>
-
-    <div class="module-toolbar">
-      <nav class="module-switch" aria-label="Tipo de reservación">
-        <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
-        <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
-        <button type="button" id="showConserjeriaAdmin" aria-selected="false" hidden>Conserjería</button>
-        <a href="tramites-vehiculos.html" id="vehicleProcessingNav" hidden>Trámite de reservas</a>
-      </nav>
-      <a class="secondary-button compact-button manage-users-link" id="manageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
-    </div>
 
     <div id="classroomPrivateModule">
     <section class="cycle-banner panel" id="cycleBanner" hidden aria-live="polite">

@@ -27,20 +27,23 @@
 
   function ensureModuleNavigation() {
     if ($('processingModuleToolbar')) return;
-    const main = document.querySelector('.processing-main');
-    const hero = document.querySelector('.vehicle-hero');
-    if (!main || !hero) return;
+    const header = document.querySelector('.private-header');
+    if (!header) return;
+    const navigation = document.createElement('div');
+    navigation.className = 'global-module-navigation';
+    navigation.id = 'processingModuleNavigation';
     const toolbar = document.createElement('div');
-    toolbar.className = 'module-toolbar processing-module-toolbar';
+    toolbar.className = 'page module-toolbar processing-module-toolbar';
     toolbar.id = 'processingModuleToolbar';
     toolbar.innerHTML = `<nav class="module-switch" aria-label="Tipo de reservación">
       <a href="reservas.html?modulo=aulas" id="processingClassroomsNav">Aulas</a>
       <a href="reservas.html?modulo=vehiculos" id="processingVehiclesNav">Vehículos</a>
       <a href="reservas.html?modulo=conserjeria" id="processingConserjeriaNav" hidden>Conserjería</a>
-      <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-selected="true">Trámite de reservas</a>
+      <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-current="page">Trámite de reservas</a>
     </nav>
     <a class="secondary-button compact-button manage-users-link" id="processingManageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>`;
-    main.insertBefore(toolbar, hero);
+    navigation.appendChild(toolbar);
+    header.insertAdjacentElement('afterend', navigation);
   }
 
   async function copyValue(value, button) {

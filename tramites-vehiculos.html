@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
-  <link rel="stylesheet" href="vehiculos.css?v=15" />
-  <link rel="stylesheet" href="tramites-vehiculos.css?v=5" />
+  <link rel="stylesheet" href="vehiculos.css?v=16" />
+  <link rel="stylesheet" href="tramites-vehiculos.css?v=6" />
 </head>
 <body>
   <header class="private-header">
@@ -31,17 +31,19 @@
     </div>
   </header>
 
-  <main class="page processing-main">
-    <div class="module-toolbar processing-module-toolbar" id="processingModuleToolbar">
+  <div class="global-module-navigation" id="processingModuleNavigation">
+    <div class="page module-toolbar processing-module-toolbar" id="processingModuleToolbar">
       <nav class="module-switch" aria-label="Tipo de reservación">
         <a href="reservas.html?modulo=aulas" id="processingClassroomsNav">Aulas</a>
         <a href="reservas.html?modulo=vehiculos" id="processingVehiclesNav">Vehículos</a>
         <a href="reservas.html?modulo=conserjeria" id="processingConserjeriaNav" hidden>Conserjería</a>
-        <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-selected="true">Trámite de reservas</a>
+        <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-current="page">Trámite de reservas</a>
       </nav>
       <a class="secondary-button compact-button manage-users-link" id="processingManageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
     </div>
+  </div>
 
+  <main class="page processing-main">
     <section class="vehicle-panel vehicle-hero">
       <div>
         <p class="eyebrow">Boletas de gira</p>
@@ -70,6 +72,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=5"></script>
-  <script src="tramites-vehiculos.js?v=7"></script>
+  <script src="tramites-vehiculos.js?v=8"></script>
 </body>
 </html>

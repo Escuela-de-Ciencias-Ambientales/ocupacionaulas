@@ -52,6 +52,24 @@
   justify-content: space-between;
   gap: 24px;
 }
+
+.global-module-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--vehicle-line);
+  background: rgba(245, 250, 248, .96);
+  backdrop-filter: blur(8px);
+}
+
+.global-module-navigation .module-toolbar {
+  padding: 6px 10px;
+  border: 1px solid var(--vehicle-line);
+  border-radius: 16px;
+  background: #f7faf9;
+}
+
 .manage-users-link {
   width: auto;
   min-height: 44px;
@@ -503,7 +521,8 @@
 @media (max-width: 640px) {
   :root { --module-gap: 24px; }
   .module-switch { display: grid; width: 100%; grid-template-columns: 1fr 1fr; }
-  .module-switch button { min-width: 0; padding-inline: 10px; }
+  .module-switch button,
+  .module-switch a { min-width: 0; padding-inline: 10px; }
   #conserjeriaOpenBtn,
   #showConserjeriaAdmin { grid-column: 1 / -1; }
   .module-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
