@@ -25,6 +25,24 @@
     el.classList.toggle('is-success', success);
   }
 
+  function ensureModuleNavigation() {
+    if ($('processingModuleToolbar')) return;
+    const main = document.querySelector('.processing-main');
+    const hero = document.querySelector('.vehicle-hero');
+    if (!main || !hero) return;
+    const toolbar = document.createElement('div');
+    toolbar.className = 'module-toolbar processing-module-toolbar';
+    toolbar.id = 'processingModuleToolbar';
+    toolbar.innerHTML = `<nav class="module-switch" aria-label="Tipo de reservación">
+      <a href="reservas.html?modulo=aulas" id="processingClassroomsNav">Aulas</a>
+      <a href="reservas.html?modulo=vehiculos" id="processingVehiclesNav">Vehículos</a>
+      <a href="reservas.html?modulo=conserjeria" id="processingConserjeriaNav" hidden>Conserjería</a>
+      <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-selected="true">Trámite de reservas</a>
+    </nav>
+    <a class="secondary-button compact-button manage-users-link" id="processingManageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>`;
+    main.insertBefore(toolbar, hero);
+  }
+
   async function copyValue(value, button) {
     const text = String(value || 'No indicado');
     if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
@@ -178,10 +196,11 @@
       if (error) throw error;
       state.profile = profile;
       if (!canProcess()) { window.location.replace('reservas.html?modulo=vehiculos'); return; }
+      ensureModuleNavigation();
       $('processingHeaderAccount').hidden = false;
       $('processingUserName').textContent = profile.full_name;
-      $('processingConserjeriaNav').hidden = !canOpenConserjeria();
-      $('processingManageUsersLink').hidden = !isSuperadmin();
+      if ($('processingConserjeriaNav')) $('processingConserjeriaNav').hidden = !canOpenConserjeria();
+      if ($('processingManageUsersLink')) $('processingManageUsersLink').hidden = !isSuperadmin();
       $('processingStatus').textContent = 'Conectado';
       await loadData();
     } catch (error) {
