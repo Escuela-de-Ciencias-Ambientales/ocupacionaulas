@@ -186,7 +186,7 @@
     }
   </style>
   <link rel="stylesheet" href="vehiculos.css?v=2" />
-  <link rel="stylesheet" href="conserjeria.css?v=2" />
+  <link rel="stylesheet" href="conserjeria.css?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -1592,17 +1592,29 @@
           <button type="button" id="conserjeriaLogoutBtn">Cerrar sesión</button>
         </div>
 
+        <section class="conserjeria-jornada" aria-labelledby="conserjeriaJornadaTitle">
+          <div class="conserjeria-jornada-head">
+            <div><span>Mi jornada</span><h3 id="conserjeriaJornadaTitle">Resumen de limpieza</h3></div>
+            <button type="button" id="conserjeriaRefreshSummary" aria-label="Actualizar resumen">↻</button>
+          </div>
+          <div class="conserjeria-summary-filters">
+            <label for="conserjeriaSummaryDate">Día</label>
+            <input type="date" id="conserjeriaSummaryDate" />
+            <label for="conserjeriaSummaryRoom">Recinto</label>
+            <select id="conserjeriaSummaryRoom"><option value="">Todos</option></select>
+          </div>
+          <div class="conserjeria-summary-counts" id="conserjeriaSummaryCounts"></div>
+          <div class="conserjeria-summary-list" id="conserjeriaSummaryList">
+            <p class="conserjeria-tip">Cargando la jornada…</p>
+          </div>
+        </section>
+
         <div id="conserjeriaScanIdle">
           <button type="button" class="conserjeria-scan-btn" id="conserjeriaScanBtn">
             <span class="emoji">📷</span>Escanear QR
           </button>
           <p class="conserjeria-tip">Apunta la cámara al código QR del aposento que acabas de limpiar</p>
-          <button type="button" class="conserjeria-manual-toggle" id="conserjeriaManualToggle">Ingresar código manualmente</button>
-          <div id="conserjeriaManualBox" hidden>
-            <label for="conserjeriaManualSlug">Código del aposento</label>
-            <input type="text" id="conserjeriaManualSlug" placeholder="ej: aula-1" />
-            <button type="button" class="conserjeria-btn-secondary" id="conserjeriaManualBtn">Buscar aposento</button>
-          </div>
+          <p class="conserjeria-qr-required">Por seguridad, el formulario solo se abre escaneando el QR físico del recinto.</p>
         </div>
 
         <div id="conserjeriaScanActivo" hidden>
@@ -1625,8 +1637,22 @@
           <input type="text" id="conserjeriaFuncionario" disabled />
           <label for="conserjeriaAposento">Aposento</label>
           <input type="text" id="conserjeriaAposento" disabled />
+          <fieldset class="conserjeria-checklist-fieldset">
+            <legend>Labores realizadas</legend>
+            <p>Marca únicamente las labores que completaste en este recinto.</p>
+            <div class="conserjeria-checklist" id="conserjeriaChecklist"></div>
+          </fieldset>
           <label for="conserjeriaObservaciones">Observaciones</label>
           <textarea id="conserjeriaObservaciones" placeholder="Opcional"></textarea>
+          <div class="conserjeria-photo-block">
+            <label for="conserjeriaFoto">Evidencia fotográfica <span id="conserjeriaFotoRequired"></span></label>
+            <p>La imagen se comprime antes de enviarse para ahorrar datos y almacenamiento.</p>
+            <input type="file" id="conserjeriaFoto" accept="image/*" capture="environment" />
+            <div class="conserjeria-photo-preview" id="conserjeriaFotoPreview" hidden>
+              <img id="conserjeriaFotoImage" alt="Vista previa de la evidencia" />
+              <div><strong id="conserjeriaFotoSize"></strong><button type="button" id="conserjeriaFotoRemove">Quitar foto</button></div>
+            </div>
+          </div>
           <button type="submit" class="conserjeria-btn-primary" id="conserjeriaEnviarBtn">Enviar</button>
           <button type="button" class="conserjeria-btn-secondary" id="conserjeriaVolverScanBtn">📷 Volver a escanear</button>
         </form>
@@ -1651,7 +1677,7 @@
   <script src="config.js?v=5"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
   <script src="vehiculos-publicos.js?v=7"></script>
-  <script src="conserjeria-publico.js?v=2"></script>
+  <script src="conserjeria-publico.js?v=3"></script>
   <script src="visit-counter.js?v=2"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>
