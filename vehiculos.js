@@ -6,17 +6,25 @@
   const state = {
     client: null, session: null, profile: null, cycle: null, vehicles: [], events: [],
     reservations: [], calendarEvents: [], history: [], maintenance: [], services: [], teachers: [], profiles: [], vehicleId: null,
+    processingTab: 'pending',
     month: new Date(new Date().getFullYear(), new Date().getMonth(), 1), loaded: false
   };
   const categories = { oil_change: 'Cambio de aceite', minor_repair: 'Reparación menor', major_repair: 'Reparación mayor' };
   const weekdays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   const isAdmin = () => state.profile?.role === 'admin';
+  const isSuperadmin = () => isAdmin() && state.profile?.admin_scope === 'superadmin';
+  const canProcessVehicles = () => isAdmin();
   const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const pad = (value) => String(value).padStart(2, '0');
   const localDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   const localDateTime = (date) => `${localDate(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   const formatDateTime = (value) => new Intl.DateTimeFormat('es-CR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   const formatTime = (value) => new Intl.DateTimeFormat('es-CR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value));
+  const copyValue = async (value) => {
+    const text = String(value || 'No indicado');
+    if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+    else window.prompt('Copia este valor:', text);
+  };
   const statusNames = {
     pending_approval: 'Pendiente de aprobación',
     confirmed: 'Confirmada',
@@ -24,6 +32,7 @@
     cancelled: 'Cancelada',
     rejected: 'Rechazada'
   };
+  const processingNames = { pending: 'Por procesar', needs_info: 'Pendiente', processed: 'Tramitada' };
   const vehicleImage = (value = '') => {
     const path = String(value);
     if (/mitsubishi/i.test(path) && window.VEHICLE_IMAGES?.mitsubishi) return window.VEHICLE_IMAGES.mitsubishi;
@@ -218,11 +227,19 @@
     $('vehicleBookingVehicle').value = item?.vehicle_id || state.vehicleId;
     $('vehicleBookingStart').value = localDateTime(start);
     $('vehicleBookingEnd').value = localDateTime(end);
+    $('vehicleResponsibleIdNumber').value = item?.responsible_id_number || '';
+    $('vehicleBookingDeparturePlace').value = item?.departure_place || '';
+    $('vehicleBookingCourse').value = item?.course || '';
+    $('vehicleBookingDestinationProvince').value = item?.destination_province || '';
+    $('vehicleBookingDestinationCanton').value = item?.destination_canton || '';
+    $('vehicleBookingDestinationDistrict').value = item?.destination_district || '';
     $('vehicleBookingDestination').value = item?.destination || '';
     $('vehicleBookingObjective').value = item?.objective || '';
     $('vehicleBookingPartySize').value = item?.party_size || 1;
     $('vehicleBookingItinerary').value = item?.itinerary === 'No indicado' ? '' : (item?.itinerary || '');
     $('vehicleBookingObservations').value = item?.observations || '';
+    $('vehicleDriverName').value = item?.driver_name || '';
+    $('vehicleDriverIdNumber').value = item?.driver_id_number || '';
     $('vehicleDriverOne').value = item?.additional_drivers?.[0] || '';
     $('vehicleDriverTwo').value = item?.additional_drivers?.[1] || '';
     if (item && isAdmin()) $('vehicleBookingResponsible').value = item.user_id;
@@ -251,15 +268,22 @@
     $('vehicleDetailGrid').innerHTML = [
       detailField('Vehículo', `${vehicle?.plate || ''} · ${vehicle?.display_name || ''}`),
       detailField('Profesor responsable', item.responsible_name),
+      detailField('Cédula del responsable', item.responsible_id_number || 'No indicada'),
       detailField('Correo institucional', profile?.email || 'No indicado'),
       detailField('Unidad institucional', item.unit || profile?.unit || 'No indicada'),
       detailField('Salida', formatDateTime(item.starts_at)),
       detailField('Regreso', formatDateTime(item.ends_at)),
       detailField('Cantidad de personas', String(item.party_size || 1)),
-      detailField('Destino', item.destination),
+      detailField('Lugar de salida', item.departure_place || 'No indicado'),
+      detailField('Provincia', item.destination_province || 'No indicada'),
+      detailField('Cantón', item.destination_canton || 'No indicado'),
+      detailField('Distrito', item.destination_district || 'No indicado'),
+      detailField('Destino específico', item.destination),
       detailField('Objetivo de la gira', item.objective, true),
       detailField('Itinerario', item.itinerary, true),
       detailField('Observaciones', item.observations || 'Sin observaciones', true),
+      detailField('Chofer', [item.driver_id_number, item.driver_name].filter(Boolean).join(' · ') || 'No indicado'),
+      detailField('Curso o actividad', item.course || 'No indicado'),
       detailField('Chofer adicional 1', drivers[0] || 'No indicado'),
       detailField('Chofer adicional 2', drivers[1] || 'No indicado'),
       detailField('Número de boleta de gira', item.trip_sheet_number || 'No indicado'),
@@ -335,6 +359,149 @@
     target.querySelectorAll('[data-detail-vehicle]').forEach((button) => button.addEventListener('click', () => openReservationDetail(button.dataset.detailVehicle)));
   }
 
+  function vehicleLabel(item) {
+    const vehicle = state.vehicles.find((entry) => String(entry.id) === String(item.vehicle_id));
+    return [vehicle?.plate, vehicle?.display_name].filter(Boolean).join(' · ') || 'Pickup';
+  }
+
+  function processorName(id) {
+    if (!id) return 'Sin registrar';
+    const profile = state.profiles.find((entry) => entry.id === id);
+    return profile?.full_name || (id === state.session?.user?.id ? state.profile?.full_name : 'Usuario no encontrado');
+  }
+
+  function boletaFields(item) {
+    const destinationParts = [
+      item.destination_province ? `Provincia: ${item.destination_province}` : '',
+      item.destination_canton ? `Cantón: ${item.destination_canton}` : '',
+      item.destination_district ? `Distrito: ${item.destination_district}` : '',
+      item.destination ? `Destino: ${item.destination}` : ''
+    ].filter(Boolean).join('\n');
+    return [
+      ['Objetivo', item.objective],
+      ['Número de personas', item.party_size || 1],
+      ['Fecha y hora de salida', formatDateTime(item.starts_at)],
+      ['Fecha y hora de regreso', formatDateTime(item.ends_at)],
+      ['Responsable de la gira', [item.responsible_id_number, item.responsible_name].filter(Boolean).join(' · ')],
+      ['Lugar de salida', item.departure_place],
+      ['Destinos', destinationParts],
+      ['Itinerario', item.itinerary],
+      ['Vehículo', vehicleLabel(item)],
+      ['Chofer', [item.driver_id_number, item.driver_name].filter(Boolean).join(' · ')],
+      ['Curso', item.course],
+      ['Observaciones', item.observations || 'Sin observaciones']
+    ];
+  }
+
+  function processingBucket(item) {
+    return item.processing_status || 'pending';
+  }
+
+  function renderBoletaCard(item) {
+    const fields = boletaFields(item);
+    const processedInfo = processingBucket(item) === 'processed'
+      ? `<p>Tramitada por ${escapeHtml(processorName(item.processed_by))}${item.processed_at ? ` · ${formatDateTime(item.processed_at)}` : ''}</p>`
+      : '';
+    return `<article class="vehicle-boleta-card" data-processing-card="${item.id}">
+      <div class="vehicle-boleta-heading">
+        <div>
+          <span class="vehicle-plate">${escapeHtml(vehicleLabel(item))}</span>
+          <h3>${escapeHtml(item.destination || 'Destino no indicado')}</h3>
+          <p>${escapeHtml(item.responsible_name)} · ${formatDateTime(item.starts_at)} → ${formatDateTime(item.ends_at)}</p>
+          ${processedInfo}
+        </div>
+        <span class="status-chip">${escapeHtml(processingNames[processingBucket(item)] || 'Por procesar')}</span>
+      </div>
+      <div class="vehicle-boleta-grid">
+        ${fields.map(([label, value]) => `<div class="${String(value || '').length > 80 ? 'field-wide' : ''}">
+          <dt>${escapeHtml(label)}</dt>
+          <dd>${escapeHtml(value || 'No indicado')}</dd>
+          <button class="copy-field-button" type="button" data-copy-value="${escapeHtml(value || 'No indicado')}">Copiar</button>
+        </div>`).join('')}
+      </div>
+      <label class="processing-note-label" for="processingNote-${item.id}">Nota interna de trámite</label>
+      <textarea id="processingNote-${item.id}" class="processing-note" maxlength="800" placeholder="Ej.: Falta dato, llamada realizada, tramitada en sistema UNA">${escapeHtml(item.processing_notes || '')}</textarea>
+      <div class="vehicle-admin-actions">
+        <button class="secondary-button compact-button" type="button" data-processing-action="needs_info" data-id="${item.id}">Marcar pendiente</button>
+        <button class="secondary-button compact-button" type="button" data-processing-action="pending" data-id="${item.id}">Volver a por procesar</button>
+        <button class="primary-button compact-button" type="button" data-processing-action="processed" data-id="${item.id}">Marcar tramitada</button>
+        <button class="secondary-button compact-button" type="button" data-detail-vehicle="${item.id}">Ver detalle completo</button>
+      </div>
+    </article>`;
+  }
+
+  function countBy(items, labeler) {
+    const counts = new Map();
+    items.forEach((item) => {
+      const label = labeler(item) || 'No indicado';
+      counts.set(label, (counts.get(label) || 0) + 1);
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'));
+  }
+
+  function sameOrAfter(value, start) {
+    return new Date(value).getTime() >= start.getTime();
+  }
+
+  function renderProcessingStats(items) {
+    const processed = items.filter((item) => processingBucket(item) === 'processed');
+    const now = new Date();
+    const weekStart = new Date(now); weekStart.setDate(now.getDate() - ((now.getDay() + 6) % 7)); weekStart.setHours(0, 0, 0, 0);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+    const topRequester = countBy(processed, (item) => item.responsible_name)[0];
+    const topVehicle = countBy(processed, vehicleLabel)[0];
+    const topDestination = countBy(processed, (item) => item.destination)[0];
+    const processorRows = isSuperadmin()
+      ? countBy(processed, (item) => processorName(item.processed_by)).map(([label, count]) => `<tr><td>${escapeHtml(label)}</td><td>${count}</td></tr>`).join('')
+      : '';
+    return `<div class="vehicle-stats-grid">
+      <div><span>Esta semana</span><strong>${processed.filter((item) => item.processed_at && sameOrAfter(item.processed_at, weekStart)).length}</strong></div>
+      <div><span>Este mes</span><strong>${processed.filter((item) => item.processed_at && sameOrAfter(item.processed_at, monthStart)).length}</strong></div>
+      <div><span>Este año</span><strong>${processed.filter((item) => item.processed_at && sameOrAfter(item.processed_at, yearStart)).length}</strong></div>
+      <div><span>Total tramitadas</span><strong>${processed.length}</strong></div>
+    </div>
+    <div class="vehicle-stats-insights">
+      <p><strong>Funcionario con más reservas:</strong> ${escapeHtml(topRequester ? `${topRequester[0]} (${topRequester[1]})` : 'Sin datos')}</p>
+      <p><strong>Vehículo con más reservas:</strong> ${escapeHtml(topVehicle ? `${topVehicle[0]} (${topVehicle[1]})` : 'Sin datos')}</p>
+      <p><strong>Destino más frecuente:</strong> ${escapeHtml(topDestination ? `${topDestination[0]} (${topDestination[1]})` : 'Sin datos')}</p>
+    </div>
+    ${isSuperadmin() ? `<table class="vehicle-processing-table"><thead><tr><th>Tramitadora</th><th>Reservas</th></tr></thead><tbody>${processorRows || '<tr><td colspan="2">Sin datos</td></tr>'}</tbody></table>` : ''}`;
+  }
+
+  function renderProcessingTray() {
+    const panel = $('vehicleProcessingPanel');
+    if (!panel) return;
+    panel.hidden = !canProcessVehicles();
+    if (!canProcessVehicles()) return;
+    const activeReservations = state.history.filter((item) => !['cancelled', 'rejected'].includes(item.status));
+    const pendingCount = activeReservations.filter((item) => processingBucket(item) === 'pending').length;
+    $('vehicleProcessingBadge').textContent = `${pendingCount} por procesar`;
+    document.querySelectorAll('[data-processing-tab]').forEach((button) => {
+      button.setAttribute('aria-selected', String(button.dataset.processingTab === state.processingTab));
+    });
+    const visible = state.processingTab === 'stats'
+      ? []
+      : activeReservations.filter((item) => processingBucket(item) === state.processingTab);
+    const scopedStats = isSuperadmin()
+      ? activeReservations
+      : activeReservations.filter((item) => item.processed_by === state.session?.user?.id);
+    $('vehicleProcessingContent').innerHTML = state.processingTab === 'stats'
+      ? renderProcessingStats(scopedStats)
+      : `<div class="vehicle-processing-list">${visible.length ? visible.map(renderBoletaCard).join('') : '<p class="empty-state">No hay reservas en este estado.</p>'}</div>`;
+    $('vehicleProcessingContent').querySelectorAll('[data-copy-value]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await copyValue(button.dataset.copyValue);
+        button.textContent = 'Copiado';
+        setTimeout(() => { button.textContent = 'Copiar'; }, 1200);
+      });
+    });
+    $('vehicleProcessingContent').querySelectorAll('[data-processing-action]').forEach((button) => {
+      button.addEventListener('click', () => updateProcessingStatus(button.dataset.id, button.dataset.processingAction));
+    });
+    $('vehicleProcessingContent').querySelectorAll('[data-detail-vehicle]').forEach((button) => button.addEventListener('click', () => openReservationDetail(button.dataset.detailVehicle)));
+  }
+
   function renderLists() {
     const upcoming = state.reservations.filter((item) => item.user_id === state.session?.user?.id
       && !['cancelled', 'rejected'].includes(item.status) && new Date(item.ends_at) >= new Date());
@@ -347,6 +514,7 @@
       renderReservationList($('adminVehicleHistoryList'), state.history, true);
       renderAdminPendingPhotos();
     }
+    renderProcessingTray();
   }
 
   function renderPendingPhotos() {
@@ -470,9 +638,9 @@
     if (vehicleError) throw vehicleError;
     state.vehicles = vehicleData || []; state.cycle = cycleData || null;
     if (isAdmin()) {
-      const { data } = await state.client.from('profiles').select('id,full_name,email,unit,active,reservations_blocked,reservations_block_reason').eq('role', 'teacher').order('full_name');
+      const { data } = await state.client.from('profiles').select('id,full_name,email,unit,role,admin_scope,active,reservations_blocked,reservations_block_reason').order('full_name');
       state.profiles = data || [];
-      state.teachers = state.profiles.filter((profile) => profile.active);
+      state.teachers = state.profiles.filter((profile) => profile.active && profile.role === 'teacher');
     }
     renderVehicleOptions();
   }
@@ -522,6 +690,7 @@
       if (error) throw error;
       state.profile = profile;
       $('vehicleAdminPanel').hidden = !isAdmin();
+      $('vehicleProcessingPanel').hidden = !canProcessVehicles();
       await loadCore();
       await reloadData();
       state.loaded = true;
@@ -556,13 +725,21 @@
     const payload = {
       vehicle_id: Number($('vehicleBookingVehicle').value), user_id: userId,
       responsible_name: state.profile.full_name,
+      responsible_id_number: $('vehicleResponsibleIdNumber').value.trim(),
       starts_at: new Date($('vehicleBookingStart').value).toISOString(),
       ends_at: new Date($('vehicleBookingEnd').value).toISOString(),
+      departure_place: $('vehicleBookingDeparturePlace').value.trim(),
+      destination_province: $('vehicleBookingDestinationProvince').value.trim(),
+      destination_canton: $('vehicleBookingDestinationCanton').value.trim(),
+      destination_district: $('vehicleBookingDestinationDistrict').value.trim(),
       destination: $('vehicleBookingDestination').value.trim(),
       objective: $('vehicleBookingObjective').value.trim(),
       party_size: Number($('vehicleBookingPartySize').value),
       itinerary: $('vehicleBookingItinerary').value.trim(),
       observations: $('vehicleBookingObservations').value.trim() || null,
+      driver_name: $('vehicleDriverName').value.trim(),
+      driver_id_number: $('vehicleDriverIdNumber').value.trim(),
+      course: $('vehicleBookingCourse').value.trim() || null,
       additional_drivers: drivers,
       unit: selectedUnit || responsible?.unit,
       policy_override: isAdmin() && $('vehiclePolicyOverride').checked,
@@ -585,6 +762,32 @@
     if (data?.status === 'pending_approval') {
       window.alert('La solicitud fue registrada y quedó pendiente de aprobación porque supera los 3 días.');
     }
+  }
+
+  async function updateProcessingStatus(id, status) {
+    const note = $(`processingNote-${id}`)?.value.trim() || null;
+    const { error } = await state.client.rpc('admin_update_vehicle_reservation_processing', {
+      p_id: id,
+      p_processing_status: status,
+      p_processing_notes: note
+    });
+    if (error) {
+      const payload = {
+        processing_status: status,
+        processing_notes: note,
+        processing_updated_by: state.session.user.id,
+        processing_updated_at: new Date().toISOString(),
+        processed_by: status === 'processed' ? state.session.user.id : null,
+        processed_at: status === 'processed' ? new Date().toISOString() : null
+      };
+      const fallback = await state.client.from('vehicle_reservations').update(payload).eq('id', id);
+      if (fallback.error) {
+        setMessage($('vehicleProcessingMessage'), fallback.error.message || error.message);
+        return;
+      }
+    }
+    setMessage($('vehicleProcessingMessage'), `Reserva marcada como ${processingNames[status] || status}.`, true);
+    await reloadData();
   }
 
   async function cancelReservation(id) {
@@ -870,6 +1073,12 @@
   $('refreshVehicleReservations')?.addEventListener('click', reloadData);
   $('vehicleBookingForm')?.addEventListener('submit', saveReservation);
   $('vehicleBookingResponsible')?.addEventListener('change', syncBookingUnit);
+  document.querySelectorAll('[data-processing-tab]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.processingTab = button.dataset.processingTab;
+      renderProcessingTray();
+    });
+  });
   $('vehiclePolicyOverride')?.addEventListener('change', () => {
     $('vehicleOverrideReasonField').hidden = !$('vehiclePolicyOverride').checked;
     if (!$('vehiclePolicyOverride').checked) $('vehicleOverrideReason').value = '';

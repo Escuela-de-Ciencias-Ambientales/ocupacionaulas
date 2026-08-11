@@ -239,6 +239,25 @@
         <p class="trip-photo-warning"><strong>Importante:</strong> Cualquier anomalía detectada en el vehículo, por favor documentarla y reportarla a la administración.</p>
       </section>
 
+      <section class="vehicle-panel vehicle-processing-panel" id="vehicleProcessingPanel" hidden aria-labelledby="vehicleProcessingTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Boletas de gira</p>
+            <h2 id="vehicleProcessingTitle">Bandeja de trámite institucional</h2>
+            <p>Reservas listas para trasladar al sistema UNA, con botones de copiado por campo y seguimiento de estado.</p>
+          </div>
+          <span class="status-chip" id="vehicleProcessingBadge">0 por procesar</span>
+        </div>
+        <div class="vehicle-processing-tabs" role="tablist" aria-label="Estados de trámite de reservas vehiculares">
+          <button type="button" data-processing-tab="pending" aria-selected="true">Por procesar</button>
+          <button type="button" data-processing-tab="needs_info" aria-selected="false">Pendientes</button>
+          <button type="button" data-processing-tab="processed" aria-selected="false">Tramitadas</button>
+          <button type="button" data-processing-tab="stats" aria-selected="false">Estadísticas</button>
+        </div>
+        <div class="vehicle-message" id="vehicleProcessingMessage" hidden></div>
+        <div id="vehicleProcessingContent"></div>
+      </section>
+
       <section class="vehicle-panel" id="vehicleAdminPanel" hidden aria-labelledby="vehicleAdminTitle">
         <div class="section-heading">
           <div><p class="eyebrow">Acceso administrativo</p><h2 id="vehicleAdminTitle">Gestión de vehículos</h2></div>
@@ -451,14 +470,24 @@
         <div><label for="vehicleBookingStart">Fecha y hora de salida</label><input id="vehicleBookingStart" type="datetime-local" required /></div>
         <div><label for="vehicleBookingEnd">Fecha y hora de regreso</label><input id="vehicleBookingEnd" type="datetime-local" required /></div>
         <div class="field-wide" id="vehicleResponsibleField" hidden><label for="vehicleBookingResponsible" data-required-label>Reservar a nombre de</label><select id="vehicleBookingResponsible"></select></div>
+        <div><label for="vehicleResponsibleIdNumber">Cédula del responsable</label><input id="vehicleResponsibleIdNumber" maxlength="40" required /></div>
         <div class="field-wide"><label for="vehicleBookingUnit">Unidad institucional</label><select id="vehicleBookingUnit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select></div>
         <div><label for="vehicleBookingPartySize">Cantidad de personas</label><input id="vehicleBookingPartySize" type="number" min="1" max="60" step="1" value="1" required /></div>
-        <div class="field-wide"><label for="vehicleBookingDestination">Destino</label><input id="vehicleBookingDestination" maxlength="160" required /></div>
+        <div><label for="vehicleBookingDeparturePlace">Lugar de salida</label><input id="vehicleBookingDeparturePlace" maxlength="160" placeholder="Ej.: Campus Omar Dengo" required /></div>
+        <div><label for="vehicleBookingCourse">Curso o actividad</label><input id="vehicleBookingCourse" maxlength="160" placeholder="Ej.: Manejo de Recursos Naturales" required /></div>
+        <div><label for="vehicleBookingDestinationProvince">Provincia</label><select id="vehicleBookingDestinationProvince" required><option value="">Selecciona provincia</option><option>SAN JOSE</option><option>ALAJUELA</option><option>CARTAGO</option><option>HEREDIA</option><option>GUANACASTE</option><option>PUNTARENAS</option><option>LIMON</option></select></div>
+        <div><label for="vehicleBookingDestinationCanton">Cantón</label><input id="vehicleBookingDestinationCanton" maxlength="80" list="vehicleCantonOptions" required /></div>
+        <div><label for="vehicleBookingDestinationDistrict">Distrito</label><input id="vehicleBookingDestinationDistrict" maxlength="80" list="vehicleDistrictOptions" required /></div>
+        <div class="field-wide"><label for="vehicleBookingDestination">Destino específico</label><input id="vehicleBookingDestination" maxlength="160" placeholder="Lugar, finca, institución o ruta principal" required /></div>
         <div class="field-wide"><label for="vehicleBookingObjective">Objetivo de la gira</label><textarea id="vehicleBookingObjective" maxlength="240" required></textarea></div>
         <div class="field-wide"><label for="vehicleBookingItinerary">Itinerario</label><textarea id="vehicleBookingItinerary" maxlength="600" placeholder="Indica la ruta, lugares y orden de las paradas" required></textarea></div>
         <div class="field-wide"><label for="vehicleBookingObservations">Observaciones <span class="optional-label">(opcional)</span></label><textarea id="vehicleBookingObservations" maxlength="600" placeholder="Información adicional para la salida"></textarea></div>
+        <div><label for="vehicleDriverName">Chofer</label><input id="vehicleDriverName" maxlength="100" placeholder="Nombre completo" required /></div>
+        <div><label for="vehicleDriverIdNumber">Cédula del chofer</label><input id="vehicleDriverIdNumber" maxlength="40" required /></div>
         <div><label for="vehicleDriverOne">Chofer adicional 1 (opcional)</label><input id="vehicleDriverOne" maxlength="100" /></div>
         <div><label for="vehicleDriverTwo">Chofer adicional 2 (opcional)</label><input id="vehicleDriverTwo" maxlength="100" /></div>
+        <datalist id="vehicleCantonOptions"><option>SAN JOSE</option><option>ALAJUELA</option><option>CARTAGO</option><option>HEREDIA</option><option>LIBERIA</option><option>PUNTARENAS</option><option>LIMON</option></datalist>
+        <datalist id="vehicleDistrictOptions"><option>CARMEN</option><option>MERCED</option><option>HOSPITAL</option><option>CATEDRAL</option><option>HEREDIA</option><option>LIBERIA</option><option>PUNTARENAS</option><option>LIMON</option></datalist>
         <label class="field-wide vehicle-override-option" id="vehicleOverrideOption" hidden><input id="vehiclePolicyOverride" type="checkbox" /> Autorizar una excepción a los límites de uso justo</label>
         <div class="field-wide" id="vehicleOverrideReasonField" hidden><label for="vehicleOverrideReason" data-required-label>Justificación de la excepción</label><textarea id="vehicleOverrideReason" maxlength="500"></textarea></div>
       </div>
@@ -515,7 +544,7 @@
   <script src="password-toggle.js?v=2"></script>
   <script src="reservas.js?v=24"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
-  <script src="vehiculos.js?v=14"></script>
+  <script src="vehiculos.js?v=15"></script>
   <script src="field-labels.js?v=1"></script>
 </body>
 </html>
