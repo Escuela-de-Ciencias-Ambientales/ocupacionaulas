@@ -8,6 +8,45 @@
 .conserjeria-chart-panel { margin-bottom: 18px; padding: 18px; }
 .conserjeria-chart-panel h3 { margin: 0 0 12px; font-size: 14px; color: var(--reserve-muted, #65716e); }
 
+.conserjeria-control-panel { margin-bottom: 18px; padding: 20px; }
+.conserjeria-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.conserjeria-section-heading h3 { margin: 2px 0 4px; color: var(--reserve-ink, #202827); }
+.conserjeria-section-heading p:last-child { max-width: 68ch; margin: 0; color: var(--reserve-muted, #65716e); }
+.conserjeria-date-field { min-width: 170px; color: var(--reserve-ink, #202827); font-size: 13px; font-weight: 800; }
+.conserjeria-date-field input { width: 100%; margin-top: 5px; }
+.conserjeria-date-field input, .conserjeria-schedule-form input, .conserjeria-schedule-form select { min-height: 43px; padding: 9px 11px; border: 1px solid #cfd9d5; border-radius: 10px; color: var(--reserve-ink, #202827); background: #fff; font: inherit; }
+.conserjeria-date-field input:focus, .conserjeria-schedule-form input:focus, .conserjeria-schedule-form select:focus { border-color: var(--reserve-green, #087a55); outline: 3px solid rgba(8,122,85,.13); }
+.conserjeria-daily-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 18px; }
+.conserjeria-daily-card { border: 1px solid var(--reserve-line, #dfe6e3); border-radius: 14px; padding: 16px; background: #fbfdfc; }
+.conserjeria-daily-card header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--reserve-line, #dfe6e3); }
+.conserjeria-daily-card h4 { margin: 0; color: var(--reserve-green, #087a55); font-size: 16px; }
+.conserjeria-daily-total { font-weight: 800; color: var(--reserve-ink, #202827); }
+.conserjeria-room-group { margin-top: 12px; }
+.conserjeria-room-group strong { display: block; margin-bottom: 7px; color: var(--reserve-muted, #65716e); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.conserjeria-room-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.conserjeria-room-chip { display: inline-flex; gap: 5px; align-items: center; padding: 6px 9px; border-radius: 999px; border: 1px solid #b9d9cc; background: #eef8f4; color: #086846; font-size: 12.5px; font-weight: 700; }
+.conserjeria-room-chip small { font-weight: 500; opacity: .8; }
+.conserjeria-room-chip.is-missing { border-color: #efb5ba; background: #fff0f1; color: #9b202c; }
+.conserjeria-room-chip.is-extra { border-color: #cbd7e4; background: #f4f7fa; color: #486174; }
+.conserjeria-schedule-notice { margin: 14px 0 0; padding: 11px 12px; border-radius: 10px; background: #fff8e7; color: #785c12; font-size: 13.5px; }
+
+.conserjeria-schedule-panel { margin-bottom: 18px; padding: 0; overflow: hidden; }
+.conserjeria-schedule-panel summary { cursor: pointer; list-style: none; padding: 18px 20px; color: var(--reserve-green, #087a55); }
+.conserjeria-schedule-panel summary::-webkit-details-marker { display: none; }
+.conserjeria-schedule-panel summary::after { content: '+'; float: right; font-size: 22px; line-height: 1; }
+.conserjeria-schedule-panel[open] summary::after { content: '−'; }
+.conserjeria-schedule-panel summary span { display: inline-flex; flex-direction: column; gap: 2px; }
+.conserjeria-schedule-panel summary small { color: var(--reserve-muted, #65716e); font-weight: 400; }
+.conserjeria-schedule-form { display: grid; grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 12px; align-items: end; padding: 0 20px 18px; border-top: 1px solid var(--reserve-line, #dfe6e3); padding-top: 18px; }
+.conserjeria-schedule-form label { color: var(--reserve-ink, #202827); font-size: 13px; font-weight: 800; }
+.conserjeria-schedule-form input, .conserjeria-schedule-form select { width: 100%; margin-top: 5px; }
+.conserjeria-schedule-form button { min-height: 43px; margin-top: 0; }
+.conserjeria-optional { color: var(--reserve-muted, #65716e); font-weight: 400; }
+.conserjeria-schedule-list { display: flex; flex-direction: column; gap: 8px; padding: 0 20px 20px; }
+.conserjeria-schedule-row { display: grid; grid-template-columns: 1.1fr 1.2fr .8fr 1.2fr auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--reserve-line, #dfe6e3); border-radius: 10px; font-size: 13px; }
+.conserjeria-schedule-row strong { color: var(--reserve-green, #087a55); }
+.conserjeria-schedule-row button { border: 0; background: transparent; color: #9b202c; font-weight: 800; cursor: pointer; }
+
 .conserjeria-admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .conserjeria-conserje-panel { padding: 18px; }
 .conserjeria-conserje-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
@@ -26,4 +65,13 @@
 
 @media (max-width: 860px) {
   .conserjeria-admin-grid { grid-template-columns: 1fr; }
+  .conserjeria-section-heading { align-items: stretch; flex-direction: column; }
+  .conserjeria-schedule-form { grid-template-columns: 1fr 1fr; }
+  .conserjeria-schedule-row { grid-template-columns: 1fr 1fr; }
+  .conserjeria-schedule-row button { justify-self: start; }
+}
+
+@media (max-width: 560px) {
+  .conserjeria-schedule-form { grid-template-columns: 1fr; }
+  .conserjeria-schedule-row { grid-template-columns: 1fr; }
 }
