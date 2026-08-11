@@ -148,7 +148,7 @@
       p_id: id, p_processing_status: status, p_processing_notes: note
     });
     if (error) { setMessage(error.message); return; }
-    setMessage(status === 'processed' ? 'Reserva marcada como tramitada.' : status === 'rejected' ? 'Reserva marcada como rechazada.' : 'Reserva devuelta a por procesar.', true);
+    setMessage(status === 'processed' ? 'Reserva marcada como tramitada.' : status === 'rejected' ? 'Reserva rechazada y retirada de la bandeja.' : 'Reserva devuelta a por procesar.', true);
     await loadData();
   }
 
