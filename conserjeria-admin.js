@@ -36,6 +36,8 @@
     $('showPrivateClassrooms').setAttribute('aria-selected', 'false');
     $('showPrivateVehicles').setAttribute('aria-selected', 'false');
     $('showConserjeriaAdmin').setAttribute('aria-selected', 'true');
+    if ($('modulePageTitle')) $('modulePageTitle').textContent = 'Control de conserjería';
+    document.title = 'Control de conserjería | EDECA';
     const url = new URL(window.location.href);
     url.searchParams.set('modulo', 'conserjeria');
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);

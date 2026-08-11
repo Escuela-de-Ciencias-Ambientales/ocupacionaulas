@@ -81,13 +81,19 @@
 
   function setModule(module) {
     const vehicles = module === 'vehicles';
+    const pageTitle = vehicles ? 'Reservación de vehículos' : 'Reservación de aulas';
     $('classroomPrivateModule').hidden = vehicles;
     $('vehiclePrivateModule').hidden = !vehicles;
     if ($('conserjeriaAdminModule')) $('conserjeriaAdminModule').hidden = true;
     $('showPrivateClassrooms').setAttribute('aria-selected', String(!vehicles));
     $('showPrivateVehicles').setAttribute('aria-selected', String(vehicles));
     if ($('showConserjeriaAdmin')) $('showConserjeriaAdmin').setAttribute('aria-selected', 'false');
+    if ($('modulePageTitle')) $('modulePageTitle').textContent = pageTitle;
+    document.title = `${pageTitle} | EDECA`;
     $('publicOccupationLink').href = vehicles ? 'index.html?vista=vehiculos' : 'index.html';
+    const url = new URL(window.location.href);
+    url.searchParams.set('modulo', vehicles ? 'vehiculos' : 'aulas');
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
     if (vehicles && !state.loaded) loadVehicleModule();
   }
 
@@ -1136,5 +1142,7 @@
     $('tripPhotoPreview').src = URL.createObjectURL(file);
     $('tripPhotoPreview').hidden = false;
   });
-  if (new URLSearchParams(window.location.search).get('modulo') === 'vehiculos') setModule('vehicles');
+  const requestedModule = new URLSearchParams(window.location.search).get('modulo');
+  if (requestedModule === 'vehiculos') setModule('vehicles');
+  else if (requestedModule !== 'conserjeria') setModule('classrooms');
 })();
