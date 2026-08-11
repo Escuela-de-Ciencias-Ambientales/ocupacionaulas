@@ -9,6 +9,8 @@
   const registerTab = document.getElementById('registerTab');
   const loginButton = document.getElementById('loginButton');
   const registerButton = document.getElementById('registerButton');
+  const loginTitle = document.getElementById('loginTitle');
+  const accessModeDescription = document.getElementById('accessModeDescription');
   const message = document.getElementById('loginMessage');
 
   function showMessage(text, success = false) {
@@ -25,6 +27,11 @@
     registerTab.classList.toggle('is-active', registering);
     loginTab.setAttribute('aria-selected', String(!registering));
     registerTab.setAttribute('aria-selected', String(registering));
+    loginTitle.textContent = registering ? 'Registro' : 'Acceso';
+    accessModeDescription.textContent = registering
+      ? 'Crea tu acceso con el correo institucional autorizado.'
+      : 'Tu usuario es el correo institucional.';
+    document.title = `${registering ? 'Registro' : 'Acceso'} | Reservaciones EDECA`;
     message.hidden = true;
   }
 
