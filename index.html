@@ -186,7 +186,7 @@
     }
   </style>
   <link rel="stylesheet" href="vehiculos.css?v=2" />
-  <link rel="stylesheet" href="conserjeria.css?v=3" />
+  <link rel="stylesheet" href="conserjeria.css?v=4" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -1592,10 +1592,34 @@
           <button type="button" id="conserjeriaLogoutBtn">Cerrar sesión</button>
         </div>
 
-        <section class="conserjeria-jornada" aria-labelledby="conserjeriaJornadaTitle">
+        <nav class="conserjeria-tabs" aria-label="Opciones de conserjería">
+          <button type="button" class="is-active" data-conserjeria-tab="scan" aria-selected="true">📷 Escanear</button>
+          <button type="button" data-conserjeria-tab="agenda" aria-selected="false">📋 Agenda diaria</button>
+          <button type="button" data-conserjeria-tab="reports" aria-selected="false">✓ Reportes</button>
+        </nav>
+
+        <section class="conserjeria-tab-panel is-active" data-conserjeria-panel="scan">
+          <div id="conserjeriaScanIdle">
+            <button type="button" class="conserjeria-scan-btn" id="conserjeriaScanBtn">
+              <span class="emoji">📷</span><span><b>Escanear código QR</b><small>Abrir formulario del recinto</small></span>
+            </button>
+          </div>
+          <div id="conserjeriaScanActivo" hidden>
+            <div id="conserjeriaQrReader"></div>
+            <button type="button" class="conserjeria-btn-secondary" id="conserjeriaCancelScanBtn">Cancelar escaneo</button>
+          </div>
+          <p class="conserjeria-msg" id="conserjeriaScanMsg"></p>
+          <div class="conserjeria-scan-help">
+            <span>1</span><p>Ubica el QR físico del recinto.</p>
+            <span>2</span><p>Escanéalo para abrir las labores correspondientes.</p>
+            <span>3</span><p>Marca lo realizado y envía el reporte.</p>
+          </div>
+        </section>
+
+        <section class="conserjeria-tab-panel" data-conserjeria-panel="agenda" hidden aria-labelledby="conserjeriaJornadaTitle">
           <div class="conserjeria-jornada-head">
-            <div><span>Mi jornada</span><h3 id="conserjeriaJornadaTitle">Resumen de limpieza</h3></div>
-            <button type="button" id="conserjeriaRefreshSummary" aria-label="Actualizar resumen">↻</button>
+            <div><span>Mi jornada</span><h3 id="conserjeriaJornadaTitle">Agenda diaria</h3></div>
+            <button type="button" id="conserjeriaRefreshSummary" aria-label="Actualizar agenda">↻</button>
           </div>
           <div class="conserjeria-summary-filters">
             <label for="conserjeriaSummaryDate">Día</label>
@@ -1605,24 +1629,23 @@
           </div>
           <div class="conserjeria-summary-counts" id="conserjeriaSummaryCounts"></div>
           <div class="conserjeria-summary-list" id="conserjeriaSummaryList">
-            <p class="conserjeria-tip">Cargando la jornada…</p>
+            <p class="conserjeria-tip">Cargando la agenda…</p>
           </div>
         </section>
 
-        <div id="conserjeriaScanIdle">
-          <button type="button" class="conserjeria-scan-btn" id="conserjeriaScanBtn">
-            <span class="emoji">📷</span>Escanear QR
-          </button>
-          <p class="conserjeria-tip">Apunta la cámara al código QR del aposento que acabas de limpiar</p>
-          <p class="conserjeria-qr-required">Por seguridad, el formulario solo se abre escaneando el QR físico del recinto.</p>
-        </div>
-
-        <div id="conserjeriaScanActivo" hidden>
-          <div id="conserjeriaQrReader"></div>
-          <button type="button" class="conserjeria-btn-secondary" id="conserjeriaCancelScanBtn">Cancelar</button>
-        </div>
-
-        <p class="conserjeria-msg" id="conserjeriaScanMsg"></p>
+        <section class="conserjeria-tab-panel" data-conserjeria-panel="reports" hidden aria-labelledby="conserjeriaReportsTitle">
+          <div class="conserjeria-jornada-head">
+            <div><span>Mi trabajo</span><h3 id="conserjeriaReportsTitle">Reportes realizados</h3></div>
+            <button type="button" id="conserjeriaRefreshReports" aria-label="Actualizar reportes">↻</button>
+          </div>
+          <div class="conserjeria-reports-filter">
+            <label for="conserjeriaReportsDate">Día</label>
+            <input type="date" id="conserjeriaReportsDate" />
+          </div>
+          <div class="conserjeria-reports-list" id="conserjeriaReportsList">
+            <p class="conserjeria-tip">Selecciona esta pestaña para consultar tus reportes.</p>
+          </div>
+        </section>
       </div>
 
       <div class="conserjeria-step" data-step="form">
@@ -1677,7 +1700,7 @@
   <script src="config.js?v=5"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
   <script src="vehiculos-publicos.js?v=7"></script>
-  <script src="conserjeria-publico.js?v=3"></script>
+  <script src="conserjeria-publico.js?v=4"></script>
   <script src="visit-counter.js?v=2"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>
