@@ -184,6 +184,25 @@
 
       <div class="vehicle-card-grid" id="privateVehicleCards"></div>
 
+      <section class="vehicle-panel vehicle-processing-panel" id="vehicleProcessingPanel" hidden aria-labelledby="vehicleProcessingTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Boletas de gira</p>
+            <h2 id="vehicleProcessingTitle">Bandeja de trámite institucional</h2>
+            <p>Reservas listas para trasladar al sistema UNA, con botones de copiado por campo y seguimiento de estado.</p>
+          </div>
+          <span class="status-chip" id="vehicleProcessingBadge">0 por procesar</span>
+        </div>
+        <div class="vehicle-processing-tabs" role="tablist" aria-label="Estados de trámite de reservas vehiculares">
+          <button type="button" data-processing-tab="pending" aria-selected="true">Por procesar</button>
+          <button type="button" data-processing-tab="needs_info" aria-selected="false">Pendientes</button>
+          <button type="button" data-processing-tab="processed" aria-selected="false">Tramitadas</button>
+          <button type="button" data-processing-tab="stats" aria-selected="false">Estadísticas</button>
+        </div>
+        <div class="vehicle-message" id="vehicleProcessingMessage" hidden></div>
+        <div id="vehicleProcessingContent"></div>
+      </section>
+
       <section class="vehicle-panel" aria-labelledby="privateVehicleCalendarTitle">
         <div class="calendar-toolbar">
           <div>
@@ -237,25 +256,6 @@
           <p class="empty-state">No tienes reservas pendientes de fotografía.</p>
         </div>
         <p class="trip-photo-warning"><strong>Importante:</strong> Cualquier anomalía detectada en el vehículo, por favor documentarla y reportarla a la administración.</p>
-      </section>
-
-      <section class="vehicle-panel vehicle-processing-panel" id="vehicleProcessingPanel" hidden aria-labelledby="vehicleProcessingTitle">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Boletas de gira</p>
-            <h2 id="vehicleProcessingTitle">Bandeja de trámite institucional</h2>
-            <p>Reservas listas para trasladar al sistema UNA, con botones de copiado por campo y seguimiento de estado.</p>
-          </div>
-          <span class="status-chip" id="vehicleProcessingBadge">0 por procesar</span>
-        </div>
-        <div class="vehicle-processing-tabs" role="tablist" aria-label="Estados de trámite de reservas vehiculares">
-          <button type="button" data-processing-tab="pending" aria-selected="true">Por procesar</button>
-          <button type="button" data-processing-tab="needs_info" aria-selected="false">Pendientes</button>
-          <button type="button" data-processing-tab="processed" aria-selected="false">Tramitadas</button>
-          <button type="button" data-processing-tab="stats" aria-selected="false">Estadísticas</button>
-        </div>
-        <div class="vehicle-message" id="vehicleProcessingMessage" hidden></div>
-        <div id="vehicleProcessingContent"></div>
       </section>
 
       <section class="vehicle-panel" id="vehicleAdminPanel" hidden aria-labelledby="vehicleAdminTitle">
@@ -544,7 +544,7 @@
   <script src="password-toggle.js?v=2"></script>
   <script src="reservas.js?v=24"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
-  <script src="vehiculos.js?v=15"></script>
+  <script src="vehiculos.js?v=16"></script>
   <script src="field-labels.js?v=1"></script>
 </body>
 </html>

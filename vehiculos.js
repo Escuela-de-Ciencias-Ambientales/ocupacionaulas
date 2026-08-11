@@ -13,7 +13,8 @@
   const weekdays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   const isAdmin = () => state.profile?.role === 'admin';
   const isSuperadmin = () => isAdmin() && state.profile?.admin_scope === 'superadmin';
-  const canProcessVehicles = () => isAdmin();
+  const canProcessVehicles = () => isAdmin()
+    && ['superadmin', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
   const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const pad = (value) => String(value).padStart(2, '0');
   const localDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
