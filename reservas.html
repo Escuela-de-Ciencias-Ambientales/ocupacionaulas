@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=4" />
-  <link rel="stylesheet" href="conserjeria-admin.css?v=2" />
+  <link rel="stylesheet" href="conserjeria-admin.css?v=3" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
@@ -351,6 +351,39 @@
         <div class="panel conserjeria-kpi"><strong id="conserjeriaKpiSemana">0</strong><span>Últimos 7 días</span></div>
       </div>
 
+      <section class="panel conserjeria-control-panel" aria-labelledby="conserjeriaControlTitle">
+        <div class="conserjeria-section-heading">
+          <div>
+            <p class="eyebrow">Control diario</p>
+            <h3 id="conserjeriaControlTitle">Cumplimiento por conserje y aposento</h3>
+            <p>Consulta cuántos reportes realizó cada conserje, desde cuáles aposentos y cuáles asignaciones quedaron pendientes.</p>
+          </div>
+          <label class="conserjeria-date-field" for="conserjeriaControlFecha">Fecha
+            <input id="conserjeriaControlFecha" type="date" />
+          </label>
+        </div>
+        <div class="conserjeria-daily-grid" id="conserjeriaControlResumen"></div>
+        <p class="conserjeria-schedule-notice" id="conserjeriaControlNotice" hidden></p>
+      </section>
+
+      <details class="panel conserjeria-schedule-panel">
+        <summary>
+          <span><strong>Programación semanal de limpieza</strong><small>Configure las asignaciones cuando el horario esté definido.</small></span>
+        </summary>
+        <form class="conserjeria-schedule-form" id="conserjeriaScheduleForm">
+          <label>Conserje<select id="conserjeriaScheduleConserje" required></select></label>
+          <label>Aposento<select id="conserjeriaScheduleAposento" required></select></label>
+          <label>Día<select id="conserjeriaScheduleDia" required>
+            <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
+            <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option>
+          </select></label>
+          <label>Vigente desde<input id="conserjeriaScheduleDesde" type="date" required /></label>
+          <label>Vigente hasta <span class="conserjeria-optional">(opcional)</span><input id="conserjeriaScheduleHasta" type="date" /></label>
+          <button class="primary-button compact-button" type="submit">Guardar asignación</button>
+        </form>
+        <div class="conserjeria-schedule-list" id="conserjeriaScheduleList"></div>
+      </details>
+
       <div class="panel conserjeria-chart-panel">
         <h3>Reportes por día (últimos 14 días)</h3>
         <canvas id="conserjeriaChartDias" height="90"></canvas>
@@ -572,7 +605,7 @@
   <script src="reservas.js?v=25"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
   <script src="vehiculos.js?v=15"></script>
-  <script src="conserjeria-admin.js?v=2"></script>
+  <script src="conserjeria-admin.js?v=3"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>
