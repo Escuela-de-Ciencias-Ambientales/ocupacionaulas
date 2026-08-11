@@ -7,6 +7,8 @@
   const canProcess = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
+  const canOpenConserjeria = () => state.profile?.role === 'admin'
+    && ['superadmin', 'operations', 'conserjeria'].includes(state.profile?.admin_scope);
   const escapeHtml = (value = '') => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const formatDateTime = (value) => new Intl.DateTimeFormat('es-CR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   const processingStatus = (item) => item.processing_status || 'pending';
@@ -178,6 +180,8 @@
       if (!canProcess()) { window.location.replace('reservas.html?modulo=vehiculos'); return; }
       $('processingHeaderAccount').hidden = false;
       $('processingUserName').textContent = profile.full_name;
+      $('processingConserjeriaNav').hidden = !canOpenConserjeria();
+      $('processingManageUsersLink').hidden = !isSuperadmin();
       $('processingStatus').textContent = 'Conectado';
       await loadData();
     } catch (error) {

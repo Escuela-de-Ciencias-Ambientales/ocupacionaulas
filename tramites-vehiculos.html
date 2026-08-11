@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=15" />
-  <link rel="stylesheet" href="tramites-vehiculos.css?v=3" />
+  <link rel="stylesheet" href="tramites-vehiculos.css?v=4" />
 </head>
 <body>
   <header class="private-header">
@@ -19,7 +19,7 @@
         <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
       </a>
       <div class="header-actions">
-        <a class="back-to-schedule" href="reservas.html?modulo=vehiculos">Volver a vehículos</a>
+        <a class="back-to-schedule" href="index.html">Ver ocupación pública</a>
         <div class="header-account" id="processingHeaderAccount" hidden>
           <div class="header-account-identity">
             <strong id="processingUserName">Administración</strong>
@@ -32,6 +32,16 @@
   </header>
 
   <main class="page processing-main">
+    <div class="module-toolbar">
+      <nav class="module-switch" aria-label="Tipo de reservación">
+        <a href="reservas.html?modulo=aulas" id="processingClassroomsNav">Aulas</a>
+        <a href="reservas.html?modulo=vehiculos" id="processingVehiclesNav">Vehículos</a>
+        <a href="reservas.html?modulo=conserjeria" id="processingConserjeriaNav" hidden>Conserjería</a>
+        <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-selected="true">Trámite de reservas</a>
+      </nav>
+      <a class="secondary-button compact-button manage-users-link" id="processingManageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>
+    </div>
+
     <section class="vehicle-panel vehicle-hero">
       <div>
         <p class="eyebrow">Boletas de gira</p>
@@ -60,6 +70,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=5"></script>
-  <script src="tramites-vehiculos.js?v=5"></script>
+  <script src="tramites-vehiculos.js?v=6"></script>
 </body>
 </html>
