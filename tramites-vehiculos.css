@@ -1,6 +1,8 @@
 .processing-main { display: grid; gap: 24px; }
 .institutional-form-list { display: grid; gap: 18px; }
 .institutional-card {
+  width: min(920px, 100%);
+  margin-inline: auto;
   padding: 20px;
   border: 1px solid var(--vehicle-line);
   border-radius: 16px;
@@ -64,5 +66,6 @@
 }
 @media (max-width: 720px) {
   .institutional-row { grid-template-columns: 1fr; }
+  .institutional-card { width: 100%; }
   .institutional-row .copy-field-button { width: fit-content; }
 }

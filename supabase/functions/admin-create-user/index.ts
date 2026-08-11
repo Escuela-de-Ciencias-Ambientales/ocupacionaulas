@@ -21,7 +21,7 @@ type RequestedUser = {
   email: string;
   password: string;
   unit: string;
-  role: 'teacher' | 'reservation_admin' | 'conserjeria_admin' | 'admin';
+  role: 'teacher' | 'reservation_admin' | 'operations_admin' | 'conserjeria_admin' | 'admin';
 };
 
 function normalizeUser(source: Record<string, unknown>): RequestedUser {
@@ -32,7 +32,8 @@ function normalizeUser(source: Record<string, unknown>): RequestedUser {
     unit: String(source.unit || '').trim(),
     role: source.role === 'admin' ? 'admin'
       : source.role === 'reservation_admin' ? 'reservation_admin'
-        : source.role === 'conserjeria_admin' ? 'conserjeria_admin' : 'teacher'
+        : source.role === 'operations_admin' ? 'operations_admin'
+          : source.role === 'conserjeria_admin' ? 'conserjeria_admin' : 'teacher'
   };
 }
 
@@ -70,7 +71,7 @@ Deno.serve(async (request) => {
     const { data: callerProfile, error: profileError } = await adminClient
       .from('profiles').select('role,admin_scope,active').eq('id', userData.user.id).single();
     if (profileError || callerProfile?.role !== 'admin'
-      || !['superadmin', 'reservations'].includes(callerProfile.admin_scope)
+      || !['superadmin', 'operations', 'reservations'].includes(callerProfile.admin_scope)
       || !callerProfile.active) {
       return response({ ok: false, error: 'Se requiere acceso de administrador.' }, 403);
     }
@@ -140,7 +141,8 @@ Deno.serve(async (request) => {
           role: user.role === 'teacher' ? 'teacher' : 'admin',
           admin_scope: user.role === 'admin' ? 'superadmin'
             : user.role === 'reservation_admin' ? 'reservations'
-              : user.role === 'conserjeria_admin' ? 'conserjeria' : null,
+              : user.role === 'operations_admin' ? 'operations'
+                : user.role === 'conserjeria_admin' ? 'conserjeria' : null,
           unit: user.unit
         }
       });

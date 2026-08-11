@@ -12,10 +12,10 @@
   const categories = { oil_change: 'Cambio de aceite', minor_repair: 'Reparación menor', major_repair: 'Reparación mayor' };
   const weekdays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   const isAdmin = () => state.profile?.role === 'admin'
-    && ['superadmin', 'reservations'].includes(state.profile?.admin_scope);
+    && ['superadmin', 'operations', 'reservations'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
   const canProcessVehicles = () => state.profile?.role === 'admin'
-    && ['superadmin', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
+    && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
   const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const pad = (value) => String(value).padStart(2, '0');
   const localDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -114,6 +114,7 @@
     $('vehicleBookingResponsible').innerHTML = teacherOptions;
     $('vehicleResponsibleField').hidden = !isAdmin();
     $('vehicleOverrideOption').hidden = !isAdmin();
+    syncLocationSelects();
     syncBookingUnit();
   }
 
@@ -126,6 +127,33 @@
     const profile = selectedResponsibleProfile();
     $('vehicleBookingUnit').value = profile?.unit || '';
     $('vehicleBookingUnit').disabled = Boolean(profile?.unit) || isAdmin();
+  }
+
+  function locationCatalog() {
+    return window.VEHICLE_LOCATIONS || {};
+  }
+
+  function fillSelect(select, values, placeholder, selected = '') {
+    select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>${values.map((value) =>
+      `<option value="${escapeHtml(value)}"${value === selected ? ' selected' : ''}>${escapeHtml(value)}</option>`
+    ).join('')}`;
+    if (selected && !values.includes(selected)) {
+      select.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(selected)}" selected>${escapeHtml(selected)}</option>`);
+    }
+  }
+
+  function syncLocationSelects(selected = {}) {
+    const catalog = locationCatalog();
+    const provinceSelect = $('vehicleBookingDestinationProvince');
+    const cantonSelect = $('vehicleBookingDestinationCanton');
+    const districtSelect = $('vehicleBookingDestinationDistrict');
+    if (!provinceSelect || !cantonSelect || !districtSelect) return;
+    const province = selected.province ?? provinceSelect.value;
+    fillSelect(provinceSelect, Object.keys(catalog), 'Selecciona provincia', province);
+    const canton = selected.canton ?? cantonSelect.value;
+    fillSelect(cantonSelect, province && catalog[province] ? Object.keys(catalog[province]) : [], 'Selecciona cantón', canton);
+    const district = selected.district ?? districtSelect.value;
+    fillSelect(districtSelect, province && canton && catalog[province]?.[canton] ? catalog[province][canton] : [], 'Selecciona distrito', district);
   }
 
   function pendingPhotosFor(userId = state.session?.user?.id, source = state.reservations) {
@@ -234,9 +262,11 @@
     $('vehicleResponsibleIdNumber').value = item?.responsible_id_number || '';
     $('vehicleBookingDeparturePlace').value = item?.departure_place || '';
     $('vehicleBookingCourse').value = item?.course || '';
-    $('vehicleBookingDestinationProvince').value = item?.destination_province || '';
-    $('vehicleBookingDestinationCanton').value = item?.destination_canton || '';
-    $('vehicleBookingDestinationDistrict').value = item?.destination_district || '';
+    syncLocationSelects({
+      province: item?.destination_province || '',
+      canton: item?.destination_canton || '',
+      district: item?.destination_district || ''
+    });
     $('vehicleBookingDestination').value = item?.destination || '';
     $('vehicleBookingObjective').value = item?.objective || '';
     $('vehicleBookingPartySize').value = item?.party_size || 1;
@@ -1077,6 +1107,8 @@
   $('refreshVehicleReservations')?.addEventListener('click', reloadData);
   $('vehicleBookingForm')?.addEventListener('submit', saveReservation);
   $('vehicleBookingResponsible')?.addEventListener('change', syncBookingUnit);
+  $('vehicleBookingDestinationProvince')?.addEventListener('change', () => syncLocationSelects({ province: $('vehicleBookingDestinationProvince').value, canton: '', district: '' }));
+  $('vehicleBookingDestinationCanton')?.addEventListener('change', () => syncLocationSelects({ province: $('vehicleBookingDestinationProvince').value, canton: $('vehicleBookingDestinationCanton').value, district: '' }));
   document.querySelectorAll('[data-processing-tab]').forEach((button) => {
     button.addEventListener('click', () => {
       state.processingTab = button.dataset.processingTab;

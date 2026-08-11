@@ -5,7 +5,7 @@
   const config = window.RESERVAS_CONFIG || {};
   const state = { client: null, session: null, profile: null, reservations: [], vehicles: [], profiles: [], tab: 'pending' };
   const canProcess = () => state.profile?.role === 'admin'
-    && ['superadmin', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
+    && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
   const escapeHtml = (value = '') => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const formatDateTime = (value) => new Intl.DateTimeFormat('es-CR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
@@ -42,36 +42,14 @@
     </div>`;
   }
 
-  function destinationValue(item) {
-    return `<div class="institutional-destination">
-      <span>Provincia:</span><strong>${escapeHtml(item.destination_province || 'No indicado')}</strong>
-      <span>Cantón:</span><strong>${escapeHtml(item.destination_canton || 'No indicado')}</strong>
-      <span>Distrito:</span><strong>${escapeHtml(item.destination_district || 'No indicado')}</strong>
-      <span>Destino:</span><strong>${escapeHtml(item.destination || 'No indicado')}</strong>
-    </div>`;
-  }
-
-  function destinationRow(item) {
-    const plain = [
-      `Provincia: ${item.destination_province || 'No indicado'}`,
-      `Cantón: ${item.destination_canton || 'No indicado'}`,
-      `Distrito: ${item.destination_district || 'No indicado'}`,
-      `Destino: ${item.destination || 'No indicado'}`
-    ].join('\n');
-    return `<div class="institutional-row">
-      <label>Destinos:</label>
-      <div class="institutional-value is-textarea">${destinationValue(item)}</div>
-      <button class="copy-field-button" type="button" data-copy-value="${escapeHtml(plain)}">Copiar</button>
-    </div>`;
-  }
-
   function card(item) {
-    const processed = processingStatus(item) === 'processed';
+    const finalStatus = ['processed', 'rejected'].includes(processingStatus(item));
+    const rejected = processingStatus(item) === 'rejected';
     return `<article class="institutional-card">
       <header>
         <p class="eyebrow">Formulario homologado UNA</p>
         <h2>Boleta de gira · ${escapeHtml(item.destination || 'Sin destino')}</h2>
-        <p>${escapeHtml(item.responsible_name)} · ${formatDateTime(item.starts_at)} → ${formatDateTime(item.ends_at)}${processed ? ` · Tramitada por ${escapeHtml(processorName(item.processed_by))}` : ''}</p>
+        <p>${escapeHtml(item.responsible_name)} · ${formatDateTime(item.starts_at)} → ${formatDateTime(item.ends_at)}${finalStatus ? ` · ${rejected ? 'Rechazada' : 'Tramitada'} por ${escapeHtml(processorName(item.processed_by))}` : ''}</p>
       </header>
       <div class="institutional-grid">
         ${row('Objetivo', item.objective, true)}
@@ -80,7 +58,10 @@
         ${row('Fecha y hora de regreso', formatDateTime(item.ends_at))}
         ${row('Responsable de la gira', [item.responsible_id_number, item.responsible_name].filter(Boolean).join(' · '))}
         ${row('Lugar de salida', item.departure_place)}
-        ${destinationRow(item)}
+        ${row('Provincia', item.destination_province)}
+        ${row('Cantón', item.destination_canton)}
+        ${row('Distrito', item.destination_district)}
+        ${row('Destino', item.destination)}
         ${row('Itinerario', item.itinerary, true)}
         ${row('Vehículo', vehicleLabel(item))}
         ${row('Chofer', [item.driver_id_number, item.driver_name].filter(Boolean).join(' · '))}
@@ -90,7 +71,7 @@
       <label class="processing-note-label" for="processingNote-${item.id}">Nota interna de trámite</label>
       <textarea id="processingNote-${item.id}" class="institutional-note" maxlength="800">${escapeHtml(item.processing_notes || '')}</textarea>
       <div class="institutional-actions">
-        ${processed ? '<button class="secondary-button compact-button" type="button" data-processing-action="pending" data-id="' + item.id + '">Volver a por procesar</button>' : '<button class="primary-button compact-button" type="button" data-processing-action="processed" data-id="' + item.id + '">Marcar tramitada</button>'}
+        ${finalStatus ? '<button class="secondary-button compact-button" type="button" data-processing-action="pending" data-id="' + item.id + '">Volver a por procesar</button>' : '<button class="primary-button compact-button" type="button" data-processing-action="processed" data-id="' + item.id + '">Tramitada</button><button class="danger-button compact-button" type="button" data-processing-action="rejected" data-id="' + item.id + '">Rechazada</button>'}
       </div>
     </article>`;
   }
@@ -105,7 +86,7 @@
   }
 
   function renderStats() {
-    const processed = state.reservations.filter((item) => processingStatus(item) === 'processed');
+    const processed = state.reservations.filter((item) => ['processed', 'rejected'].includes(processingStatus(item)));
     const scoped = isSuperadmin() ? processed : processed.filter((item) => item.processed_by === state.session.user.id);
     const requester = countBy(scoped, (item) => item.responsible_name)[0];
     const vehicle = countBy(scoped, vehicleLabel)[0];
@@ -124,7 +105,7 @@
     });
     if (state.tab === 'stats') { renderStats(); return; }
     const items = state.reservations.filter((item) => !['cancelled', 'rejected'].includes(item.status)
-      && (state.tab === 'processed' ? processingStatus(item) === 'processed' : processingStatus(item) !== 'processed'));
+      && (state.tab === 'processed' ? ['processed', 'rejected'].includes(processingStatus(item)) : !['processed', 'rejected'].includes(processingStatus(item))));
     $('processingContent').innerHTML = items.length
       ? `<div class="institutional-form-list">${items.map(card).join('')}</div>`
       : '<p class="empty-state">No hay reservas en esta pestaña.</p>';
@@ -142,7 +123,7 @@
       p_id: id, p_processing_status: status, p_processing_notes: note
     });
     if (error) { setMessage(error.message); return; }
-    setMessage(status === 'processed' ? 'Reserva marcada como tramitada.' : 'Reserva devuelta a por procesar.', true);
+    setMessage(status === 'processed' ? 'Reserva marcada como tramitada.' : status === 'rejected' ? 'Reserva marcada como rechazada.' : 'Reserva devuelta a por procesar.', true);
     await loadData();
   }
 

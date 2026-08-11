@@ -18,6 +18,7 @@ function response(body: Record<string, unknown>, status = 200) {
 
 function normalizedRole(value: unknown) {
   if (value === 'superadmin') return { role: 'admin', admin_scope: 'superadmin' };
+  if (value === 'operations_admin') return { role: 'admin', admin_scope: 'operations' };
   if (value === 'reservation_admin') return { role: 'admin', admin_scope: 'reservations' };
   if (value === 'conserjeria_admin') return { role: 'admin', admin_scope: 'conserjeria' };
   return { role: 'teacher', admin_scope: null };
@@ -50,7 +51,7 @@ Deno.serve(async (request) => {
       .eq('id', userData.user.id)
       .single();
     if (callerError || caller?.role !== 'admin'
-      || !['superadmin', 'reservations'].includes(caller.admin_scope)
+      || !['superadmin', 'operations', 'reservations'].includes(caller.admin_scope)
       || !caller.active) {
       return response({ ok: false, error: 'Se requiere acceso de administrador.' }, 403);
     }

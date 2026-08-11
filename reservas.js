@@ -82,9 +82,9 @@
   };
 
   const isAdmin = () => state.profile?.role === 'admin'
-    && ['superadmin', 'reservations'].includes(state.profile?.admin_scope);
+    && ['superadmin', 'operations', 'reservations'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => isAdmin() && state.profile?.admin_scope === 'superadmin';
-  const isConserjeriaAdmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'conserjeria';
+  const isConserjeriaAdmin = () => state.profile?.role === 'admin' && ['superadmin', 'operations', 'conserjeria'].includes(state.profile?.admin_scope);
 
   function escapeHtml(value) {
     return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
@@ -285,11 +285,12 @@
     elements.currentUserName.textContent = state.profile.full_name;
     elements.currentUserRole.textContent = isSuperadmin() ? 'Superadministrador'
       : isAdmin() ? 'Administrador de reservas'
-        : isConserjeriaAdmin() ? 'Administrador de conserjería' : 'Docente';
+        : state.profile?.admin_scope === 'operations' ? 'Administrador operativo'
+          : isConserjeriaAdmin() ? 'Administrador de conserjería' : 'Docente';
     elements.adminProfessorField.hidden = !isAdmin();
     elements.dialogAdminProfessorField.hidden = !isAdmin();
     if (elements.showConserjeriaAdmin) elements.showConserjeriaAdmin.hidden = !(isConserjeriaAdmin() || isSuperadmin());
-    if (elements.vehicleProcessingNav) elements.vehicleProcessingNav.hidden = !(state.profile?.role === 'admin' && ['superadmin', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope));
+    if (elements.vehicleProcessingNav) elements.vehicleProcessingNav.hidden = !(state.profile?.role === 'admin' && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope));
     elements.adminAccessLabel.textContent = isSuperadmin() ? 'Acceso de superadministrador' : 'Acceso de administración de reservas';
     elements.scheduleEditorTitle.textContent = isAdmin() ? 'Horario, reservas y ocupación académica' : 'Disponibilidad semanal por aula';
     elements.scheduleEditorDescription.textContent = isAdmin()

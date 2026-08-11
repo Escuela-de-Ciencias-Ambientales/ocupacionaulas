@@ -160,7 +160,7 @@
              <label for="newUserEmail">Correo electrónico</label><input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
              <label for="newUserUnit">Unidad institucional</label><select id="newUserUnit" name="unit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select>
              <label for="newUserPassword">Contraseña temporal</label><input id="newUserPassword" name="password" type="password" minlength="8" title="Mínimo 8 caracteres, una mayúscula y un número" required />
-            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="conserjeria_admin">Administrador de conserjería</option><option value="admin">Superadministrador</option></select>
+            <label class="superadmin-only" for="newUserRole">Tipo de acceso</label><select class="superadmin-only" id="newUserRole" name="role" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="operations_admin">Administrador operativo</option><option value="conserjeria_admin">Administrador de conserjería</option><option value="admin">Superadministrador</option></select>
             <button class="primary-button" type="submit">Crear cuenta</button>
           </form>
         </div>
@@ -545,9 +545,9 @@
         <div><label for="vehicleBookingPartySize">Cantidad de personas</label><input id="vehicleBookingPartySize" type="number" min="1" max="60" step="1" value="1" required /></div>
         <div><label for="vehicleBookingDeparturePlace">Lugar de salida</label><input id="vehicleBookingDeparturePlace" maxlength="160" placeholder="Ej.: Campus Omar Dengo" required /></div>
         <div><label for="vehicleBookingCourse">Curso o actividad</label><input id="vehicleBookingCourse" maxlength="160" placeholder="Ej.: Manejo de Recursos Naturales" required /></div>
-        <div><label for="vehicleBookingDestinationProvince">Provincia</label><select id="vehicleBookingDestinationProvince" required><option value="">Selecciona provincia</option><option>SAN JOSE</option><option>ALAJUELA</option><option>CARTAGO</option><option>HEREDIA</option><option>GUANACASTE</option><option>PUNTARENAS</option><option>LIMON</option></select></div>
-        <div><label for="vehicleBookingDestinationCanton">Cantón</label><input id="vehicleBookingDestinationCanton" maxlength="80" list="vehicleCantonOptions" required /></div>
-        <div><label for="vehicleBookingDestinationDistrict">Distrito</label><input id="vehicleBookingDestinationDistrict" maxlength="80" list="vehicleDistrictOptions" required /></div>
+        <div><label for="vehicleBookingDestinationProvince">Provincia</label><select id="vehicleBookingDestinationProvince" required><option value="">Selecciona provincia</option></select></div>
+        <div><label for="vehicleBookingDestinationCanton">Cantón</label><select id="vehicleBookingDestinationCanton" required><option value="">Selecciona cantón</option></select></div>
+        <div><label for="vehicleBookingDestinationDistrict">Distrito</label><select id="vehicleBookingDestinationDistrict" required><option value="">Selecciona distrito</option></select></div>
         <div class="field-wide"><label for="vehicleBookingDestination">Destino específico</label><input id="vehicleBookingDestination" maxlength="160" placeholder="Lugar, finca, institución o ruta principal" required /></div>
         <div class="field-wide"><label for="vehicleBookingObjective">Objetivo de la gira</label><textarea id="vehicleBookingObjective" maxlength="240" required></textarea></div>
         <div class="field-wide"><label for="vehicleBookingItinerary">Itinerario</label><textarea id="vehicleBookingItinerary" maxlength="600" placeholder="Indica la ruta, lugares y orden de las paradas" required></textarea></div>
@@ -556,8 +556,6 @@
         <div><label for="vehicleDriverIdNumber">Cédula del chofer</label><input id="vehicleDriverIdNumber" maxlength="40" required /></div>
         <div><label for="vehicleDriverOne">Chofer adicional 1 (opcional)</label><input id="vehicleDriverOne" maxlength="100" /></div>
         <div><label for="vehicleDriverTwo">Chofer adicional 2 (opcional)</label><input id="vehicleDriverTwo" maxlength="100" /></div>
-        <datalist id="vehicleCantonOptions"><option>SAN JOSE</option><option>ALAJUELA</option><option>CARTAGO</option><option>HEREDIA</option><option>LIBERIA</option><option>PUNTARENAS</option><option>LIMON</option></datalist>
-        <datalist id="vehicleDistrictOptions"><option>CARMEN</option><option>MERCED</option><option>HOSPITAL</option><option>CATEDRAL</option><option>HEREDIA</option><option>LIBERIA</option><option>PUNTARENAS</option><option>LIMON</option></datalist>
         <label class="field-wide vehicle-override-option" id="vehicleOverrideOption" hidden><input id="vehiclePolicyOverride" type="checkbox" /> Autorizar una excepción a los límites de uso justo</label>
         <div class="field-wide" id="vehicleOverrideReasonField" hidden><label for="vehicleOverrideReason" data-required-label>Justificación de la excepción</label><textarea id="vehicleOverrideReason" maxlength="500"></textarea></div>
       </div>
@@ -613,10 +611,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
   <script src="config.js?v=5"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="reservas.js?v=25"></script>
+  <script src="reservas.js?v=26"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
-  <script src="vehiculos.js?v=19"></script>
-  <script src="conserjeria-admin.js?v=3"></script>
+  <script src="vehicle-locations.js?v=1"></script>
+  <script src="vehiculos.js?v=20"></script>
+  <script src="conserjeria-admin.js?v=4"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>

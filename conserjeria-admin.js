@@ -11,7 +11,7 @@
   };
 
   const isConserjeriaAdmin = () => state.profile?.role === 'admin'
-    && ['conserjeria', 'superadmin'].includes(state.profile?.admin_scope);
+    && ['conserjeria', 'operations', 'superadmin'].includes(state.profile?.admin_scope);
   const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
   }[char]));
