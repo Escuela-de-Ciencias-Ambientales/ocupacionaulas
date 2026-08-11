@@ -182,7 +182,9 @@
       if(!profileResult.data?.active){await state.client.auth.signOut();window.location.replace('ingreso.html?v=7');return;}
       state.profile=profileResult.data;state.vehicles=vehiclesResult.data||[];state.trips=tripsResult.data||[];
       $('tripHeaderAccount').hidden=false;$('tripCurrentName').textContent=state.profile.full_name;
-      $('tripCurrentRole').textContent=state.profile.role==='admin'?(state.profile.admin_scope==='superadmin'?'Superadministrador':'Administrador de reservas'):'Docente';
+      $('tripCurrentRole').textContent=state.profile.role==='admin'
+        ? (state.profile.admin_scope==='superadmin'?'Superadministrador':state.profile.admin_scope==='conserjeria'?'Administrador de conserjería':'Administrador de reservas')
+        : 'Docente';
       populateFilters();renderSummary();renderTable();$('tripHistoryStatus').textContent='Historial disponible';
       const requestedTrip=new URLSearchParams(window.location.search).get('gira');
       if(requestedTrip)await openTrip(requestedTrip);

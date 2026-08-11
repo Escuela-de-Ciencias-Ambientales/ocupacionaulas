@@ -9,9 +9,14 @@
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
   }[char]));
   const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
-  const accessType = (user) => user.role !== 'admin' ? 'teacher' : user.admin_scope === 'superadmin' ? 'superadmin' : 'reservation_admin';
+  const accessType = (user) => {
+    if (user.role !== 'admin') return 'teacher';
+    if (user.admin_scope === 'superadmin') return 'superadmin';
+    return user.admin_scope === 'conserjeria' ? 'conserjeria_admin' : 'reservation_admin';
+  };
   const accessName = (user) => accessType(user) === 'superadmin' ? 'Superadministrador'
-    : accessType(user) === 'reservation_admin' ? 'Administrador de reservas' : 'Docente';
+    : accessType(user) === 'reservation_admin' ? 'Administrador de reservas'
+      : accessType(user) === 'conserjeria_admin' ? 'Administrador de conserjería' : 'Docente';
   const canEdit = (user) => isSuperadmin() || user.role === 'teacher' || user.id === state.profile?.id;
   const canManageAccess = (user) => isSuperadmin() || user.role === 'teacher';
 
@@ -175,7 +180,7 @@
       .select('id,full_name,email,role,admin_scope,active')
       .eq('id', state.session.user.id)
       .single();
-    if (error || !data?.active || data.role !== 'admin') {
+    if (error || !data?.active || data.role !== 'admin' || !['superadmin', 'reservations'].includes(data.admin_scope)) {
       await state.client.auth.signOut();
       window.location.replace('ingreso.html?v=7');
       throw new Error('Se requiere acceso administrativo.');

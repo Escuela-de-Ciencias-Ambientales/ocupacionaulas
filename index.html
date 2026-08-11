@@ -186,6 +186,7 @@
     }
   </style>
   <link rel="stylesheet" href="vehiculos.css?v=2" />
+  <link rel="stylesheet" href="conserjeria.css?v=2" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -366,6 +367,7 @@
     <nav class="module-switch" aria-label="Tipo de disponibilidad">
       <button type="button" id="showPublicClassrooms" aria-selected="true">Aulas</button>
       <button type="button" id="showPublicVehicles" aria-selected="false">Vehículos</button>
+      <button type="button" class="conserjeria-launch" id="conserjeriaOpenBtn">🧹 Conserjería</button>
     </nav>
 
     <div id="classroomPublicView">
@@ -1564,11 +1566,93 @@
 
     renderSchedules();
   </script>
+  <dialog class="conserjeria-dialog" id="conserjeriaDialog">
+    <div class="conserjeria-head">
+      <div class="lock-mark">🔐</div>
+      <div>
+        <h2>Conserjería</h2>
+        <p>Reporte de limpieza por aposento</p>
+      </div>
+      <button type="button" class="conserjeria-close" id="conserjeriaCloseBtn" aria-label="Cerrar">×</button>
+    </div>
+    <div class="conserjeria-body">
+
+      <div class="conserjeria-step is-active" data-step="login">
+        <form id="conserjeriaLoginForm">
+          <label for="conserjeriaPassword">Contraseña de conserjería</label>
+          <input type="password" id="conserjeriaPassword" required autocomplete="current-password" placeholder="••••••••" />
+          <button type="submit" class="conserjeria-btn-primary" id="conserjeriaLoginBtn">Entrar</button>
+        </form>
+        <p class="conserjeria-msg" id="conserjeriaLoginMsg"></p>
+      </div>
+
+      <div class="conserjeria-step" data-step="scan">
+        <div class="conserjeria-session-row">
+          <span>Sesión activa: <strong id="conserjeriaSessionName">—</strong></span>
+          <button type="button" id="conserjeriaLogoutBtn">Cerrar sesión</button>
+        </div>
+
+        <div id="conserjeriaScanIdle">
+          <button type="button" class="conserjeria-scan-btn" id="conserjeriaScanBtn">
+            <span class="emoji">📷</span>Escanear QR
+          </button>
+          <p class="conserjeria-tip">Apunta la cámara al código QR del aposento que acabas de limpiar</p>
+          <button type="button" class="conserjeria-manual-toggle" id="conserjeriaManualToggle">Ingresar código manualmente</button>
+          <div id="conserjeriaManualBox" hidden>
+            <label for="conserjeriaManualSlug">Código del aposento</label>
+            <input type="text" id="conserjeriaManualSlug" placeholder="ej: aula-1" />
+            <button type="button" class="conserjeria-btn-secondary" id="conserjeriaManualBtn">Buscar aposento</button>
+          </div>
+        </div>
+
+        <div id="conserjeriaScanActivo" hidden>
+          <div id="conserjeriaQrReader"></div>
+          <button type="button" class="conserjeria-btn-secondary" id="conserjeriaCancelScanBtn">Cancelar</button>
+        </div>
+
+        <p class="conserjeria-msg" id="conserjeriaScanMsg"></p>
+      </div>
+
+      <div class="conserjeria-step" data-step="form">
+        <div class="conserjeria-badge">
+          <span class="icon" id="conserjeriaAposentoIcono">📍</span>
+          <div><b id="conserjeriaAposentoLabel">Aposento</b><span>Estos datos se registran automáticamente</span></div>
+        </div>
+        <form id="conserjeriaReporteForm">
+          <label for="conserjeriaFechaHora">Fecha y hora</label>
+          <input type="text" id="conserjeriaFechaHora" disabled />
+          <label for="conserjeriaFuncionario">Funcionario</label>
+          <input type="text" id="conserjeriaFuncionario" disabled />
+          <label for="conserjeriaAposento">Aposento</label>
+          <input type="text" id="conserjeriaAposento" disabled />
+          <label for="conserjeriaObservaciones">Observaciones</label>
+          <textarea id="conserjeriaObservaciones" placeholder="Opcional"></textarea>
+          <button type="submit" class="conserjeria-btn-primary" id="conserjeriaEnviarBtn">Enviar</button>
+          <button type="button" class="conserjeria-btn-secondary" id="conserjeriaVolverScanBtn">📷 Volver a escanear</button>
+        </form>
+        <p class="conserjeria-msg" id="conserjeriaFormMsg"></p>
+      </div>
+
+      <div class="conserjeria-step" data-step="exito">
+        <div class="conserjeria-success">
+          <div class="check">✅</div>
+          <h3>¡Reporte enviado!</h3>
+          <p id="conserjeriaExitoTexto">Gracias por su trabajo.</p>
+          <button type="button" class="conserjeria-btn-primary" id="conserjeriaSiguienteBtn">📷 Escanear siguiente aposento</button>
+          <div class="conserjeria-countdown" id="conserjeriaCountdown"></div>
+        </div>
+      </div>
+
+    </div>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script src="config.js?v=5"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
-  <script src="vehiculos-publicos.js?v=6"></script>
-  <script src="visit-counter.js?v=1"></script>
+  <script src="vehiculos-publicos.js?v=7"></script>
+  <script src="conserjeria-publico.js?v=2"></script>
+  <script src="visit-counter.js?v=2"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>
 </html>

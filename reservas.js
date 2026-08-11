@@ -80,8 +80,10 @@
     fixedOccupancies: [], reservations: [], teachers: []
   };
 
-  const isAdmin = () => state.profile?.role === 'admin';
+  const isAdmin = () => state.profile?.role === 'admin'
+    && ['superadmin', 'reservations'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => isAdmin() && state.profile?.admin_scope === 'superadmin';
+  const isConserjeriaAdmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'conserjeria';
 
   function escapeHtml(value) {
     return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
@@ -280,7 +282,9 @@
     elements.manageUsersLink.hidden = !loggedIn || !isAdmin();
     if (!loggedIn) return;
     elements.currentUserName.textContent = state.profile.full_name;
-    elements.currentUserRole.textContent = isSuperadmin() ? 'Superadministrador' : isAdmin() ? 'Administrador de reservas' : 'Docente';
+    elements.currentUserRole.textContent = isSuperadmin() ? 'Superadministrador'
+      : isAdmin() ? 'Administrador de reservas'
+        : isConserjeriaAdmin() ? 'Administrador de conserjería' : 'Docente';
     elements.adminProfessorField.hidden = !isAdmin();
     elements.dialogAdminProfessorField.hidden = !isAdmin();
     elements.adminAccessLabel.textContent = isSuperadmin() ? 'Acceso de superadministrador' : 'Acceso de administración de reservas';
