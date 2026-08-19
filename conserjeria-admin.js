@@ -3,7 +3,7 @@
   const config = window.RESERVAS_CONFIG || {};
   const $ = (id) => document.getElementById(id);
   const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-  const state = { client: null, session: null, profile: null, catalogos: [], programacion: [], rutinaLabores: [], control: [], weekly: [], reportes: [], chartReportes: [], conserjeId: null, loaded: false, chart: null };
+  const state = { client: null, session: null, profile: null, catalogos: [], programacion: [], rutinaLabores: [], control: [], weekly: [], weeklyDay: null, reportes: [], chartReportes: [], conserjeId: null, loaded: false, chart: null };
   const isAdmin = () => state.profile?.role === 'admin' && ['conserjeria', 'operations', 'superadmin'].includes(state.profile?.admin_scope);
   const escapeHtml = (value = '') => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const catalogo = (tipo) => state.catalogos.filter((item) => item.tipo === tipo && item.extra?.activo !== false);
@@ -92,21 +92,25 @@
   function sumarDias(fecha, cantidad) { const d = new Date(`${fecha}T12:00:00`); d.setDate(d.getDate() + cantidad); return hoyCr(d); }
   function inicioSemana(fecha) { const d = new Date(`${fecha}T12:00:00`); const dow = d.getDay(); d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1)); return hoyCr(d); }
   function renderWeekly(aposentoId) {
-    const base = inicioSemana($('conserjeriaControlFecha').value || hoyCr()); const end = sumarDias(base, 6);
+    const selectedDate = $('conserjeriaControlFecha').value || hoyCr(); const base = inicioSemana(selectedDate); const end = sumarDias(base, 4);
+    if (!state.weeklyDay || state.weeklyDay < base || state.weeklyDay > end) {
+      const selectedDow = new Date(`${selectedDate}T12:00:00`).getDay();
+      state.weeklyDay = selectedDow >= 1 && selectedDow <= 5 ? selectedDate : base;
+    }
     $('conserjeriaWeekLabel').textContent = `${fechaCorta(base)} – ${fechaCorta(end)}`;
-    const rows = state.weekly.filter((item) => !aposentoId || item.aposento_id === aposentoId);
-    $('conserjeriaWeeklySummary').innerHTML = Array.from({ length: 7 }, (_, index) => {
+    const rows = state.weekly.filter((item) => item.fecha >= base && item.fecha <= end && (!aposentoId || item.aposento_id === aposentoId));
+    $('conserjeriaWeeklySummary').innerHTML = Array.from({ length: 5 }, (_, index) => {
       const date = sumarDias(base, index); const dayRows = rows.filter((item) => item.fecha === date); const pending = dayRows.filter((item) => !item.reportado);
-      const pendingRooms = pending.map((item) => `${item.aposento} (${hora(item.hora_inicio)})`);
-      return `<article class="conserjeria-week-day ${pending.length ? 'is-pending' : ''}"><strong>${escapeHtml(nombreDia(date))}</strong><span>${escapeHtml(fechaCorta(date))}</span><b>${dayRows.length - pending.length}/${dayRows.length}</b><span>completadas</span>${pendingRooms.length ? `<p><b>Pendientes:</b> ${escapeHtml(pendingRooms.join(', '))}</p>` : ''}</article>`;
+      return `<button type="button" class="conserjeria-week-day ${pending.length ? 'is-pending' : ''} ${state.weeklyDay === date ? 'is-active' : ''}" data-week-date="${date}" aria-pressed="${state.weeklyDay === date}"><strong>${escapeHtml(nombreDia(date))}</strong><span>${escapeHtml(fechaCorta(date))}</span><b>${dayRows.length - pending.length}/${dayRows.length}</b><span>completadas · ${pending.length} pendientes</span></button>`;
     }).join('');
-    const list = $('conserjeriaWeeklyList'); if (!rows.length) { list.innerHTML = '<p class="conserjeria-empty">No hay labores programadas en esta semana.</p>'; return; }
-    list.innerHTML = rows.map((item) => {
-      const missing = missingNames(item); const planned = (Array.isArray(item.labores_programadas) ? item.labores_programadas : []).map((labor) => labor.nombre).filter(Boolean); let status = 'pending'; let label = 'Pendiente';
+    const dayRows = rows.filter((item) => item.fecha === state.weeklyDay); const list = $('conserjeriaWeeklyList');
+    if (!dayRows.length) { list.innerHTML = '<p class="conserjeria-empty">No hay turnos programados para este día.</p>'; return; }
+    list.innerHTML = dayRows.map((item) => {
+      const missing = missingNames(item); let status = 'pending'; let label = 'Pendiente';
       if (item.reportado && missing.length) { status = 'incomplete'; label = item.dentro_horario ? 'Incompleto · En horario' : 'Incompleto · Fuera de horario'; }
       else if (item.reportado && item.dentro_horario) { status = 'on-time'; label = 'Completado en horario'; }
       else if (item.reportado) { status = 'late'; label = 'Completado fuera de horario'; }
-      return `<article class="conserjeria-week-row is-${status}"><div><strong>${escapeHtml(nombreDia(item.fecha, 'short'))}</strong><span>${escapeHtml(fechaCorta(item.fecha))}</span></div><div><b>${hora(item.hora_inicio)}</b><span>${hora(item.hora_fin)}</span></div><div><strong>${escapeHtml(item.aposento)}</strong><small>${escapeHtml(item.rutina || 'Rutina')}</small></div><div><small>Escaneó</small><b>${escapeHtml(soloHora(item.escaneado_at))}</b></div><div><small>Envió</small><b>${escapeHtml(soloHora(item.enviado_at))}</b></div><b class="is-status">${escapeHtml(label)}</b><p class="is-planned"><b>Labores:</b> ${escapeHtml(planned.join(', ') || 'Sin labores configuradas')}</p>${missing.length ? `<p><b>Labores pendientes:</b> ${escapeHtml(missing.join(', '))}</p>` : ''}</article>`;
+      return `<article class="conserjeria-week-row is-${status}"><div><b>${hora(item.hora_inicio)}</b><span>${hora(item.hora_fin)}</span></div><div><strong>${escapeHtml(item.aposento)}</strong><small>${escapeHtml(item.rutina || 'Rutina')}</small></div><div><small>Escaneó</small><b>${escapeHtml(soloHora(item.escaneado_at))}</b></div><div><small>Envió</small><b>${escapeHtml(soloHora(item.enviado_at))}</b></div><b class="is-status">${escapeHtml(label)}</b></article>`;
     }).join('');
   }
   function renderReportes() {
@@ -149,8 +153,9 @@
   }
   function activateManagement(tab) { document.querySelectorAll('[data-management-tab]').forEach((button) => button.classList.toggle('is-active', button.dataset.managementTab === tab)); document.querySelectorAll('[data-management-panel]').forEach((panel) => { panel.hidden = panel.dataset.managementPanel !== tab; }); }
 
-  $('showConserjeriaAdmin')?.addEventListener('click', setModule); $('refreshConserjeriaAdmin')?.addEventListener('click', loadPanel); $('exportConserjeriaExcel')?.addEventListener('click', exportExcel); $('conserjeriaControlFecha')?.addEventListener('change', loadDashboard); $('conserjeriaControlRecinto')?.addEventListener('change', loadDashboard);
+  $('showConserjeriaAdmin')?.addEventListener('click', setModule); $('refreshConserjeriaAdmin')?.addEventListener('click', loadPanel); $('exportConserjeriaExcel')?.addEventListener('click', exportExcel); $('conserjeriaControlFecha')?.addEventListener('change', () => { state.weeklyDay = null; loadDashboard(); }); $('conserjeriaControlRecinto')?.addEventListener('change', loadDashboard);
   $('conserjeriaAdminTabs')?.addEventListener('click', (event) => { const button = event.target.closest('[data-conserje-id]'); if (button) { state.conserjeId = button.dataset.conserjeId; loadDashboard(); } }); $('conserjeriaReportesFiltrados')?.addEventListener('click', (event) => { const button = event.target.closest('[data-photo-path]'); if (button) openPhoto(button.dataset.photoPath); });
+  $('conserjeriaWeeklySummary')?.addEventListener('click', (event) => { const button = event.target.closest('[data-week-date]'); if (button) { state.weeklyDay = button.dataset.weekDate; renderWeekly($('conserjeriaControlRecinto').value || null); } });
   $('conserjeriaScheduleAposento')?.addEventListener('change', renderRutinasAsignacion); $('conserjeriaScheduleForm')?.addEventListener('submit', saveSchedule); $('conserjeriaScheduleCancel')?.addEventListener('click', resetScheduleForm); $('conserjeriaScheduleList')?.addEventListener('click', (event) => { const edit = event.target.closest('[data-schedule-edit]'); const close = event.target.closest('[data-schedule-close]'); if (edit) editSchedule(edit.dataset.scheduleEdit); if (close) closeSchedule(close.dataset.scheduleClose); });
   ['conserjeriaScheduleFilterConserje', 'conserjeriaScheduleFilterDia', 'conserjeriaScheduleFilterHorario'].forEach((id) => $(id)?.addEventListener('change', renderProgramacion));
   document.querySelectorAll('[data-management-tab]').forEach((button) => button.addEventListener('click', () => activateManagement(button.dataset.managementTab))); $('conserjeriaLaborRutina')?.addEventListener('change', renderLaborList); $('conserjeriaSaveLabors')?.addEventListener('click', saveLabors); $('conserjeriaNewLaborForm')?.addEventListener('submit', addLabor);
