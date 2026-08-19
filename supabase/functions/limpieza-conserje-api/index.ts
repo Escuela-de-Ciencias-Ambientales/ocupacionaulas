@@ -40,6 +40,11 @@ function validSlug(value: unknown) {
   return typeof value === 'string' && /^[a-z0-9-]{2,80}$/.test(value);
 }
 
+function validUuid(value: unknown): value is string {
+  return typeof value === 'string'
+    && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 function newSessionToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return btoa(String.fromCharCode(...bytes))
@@ -99,30 +104,21 @@ Deno.serve(async (request) => {
     }
 
     const hasSession = validSessionToken(payload.sessionToken);
-    const hasLegacyPassword = validPassword(payload.password);
-    if (!hasSession && !hasLegacyPassword) {
+    if (!hasSession) {
       return response(origin, { ok: false, error: 'La sesión no es válida.', sessionExpired: true }, 401);
     }
-    const tokenHash = hasSession ? await sha256(payload.sessionToken) : null;
+    const tokenHash = await sha256(payload.sessionToken);
 
     if (action === 'logout') {
-      if (tokenHash) await admin.rpc('limpieza_api_cerrar_sesion', { p_token_hash: tokenHash });
+      await admin.rpc('limpieza_api_cerrar_sesion', { p_token_hash: tokenHash });
       return response(origin, { ok: true });
     }
 
     if (action === 'summary' || action === 'reports') {
       const date = String(payload.date || '');
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return response(origin, { ok: false, error: 'Fecha inválida.' }, 400);
-      if (action === 'reports' && !tokenHash) {
-        return response(origin, { ok: false, error: 'Actualiza la sesión para consultar los reportes.' }, 401);
-      }
-      const rpcName = action === 'reports'
-        ? 'limpieza_api_reportes_v3'
-        : tokenHash ? 'limpieza_api_resumen_v3' : 'limpieza_api_resumen';
-      const rpcParams = action === 'reports' || tokenHash
-        ? { p_token_hash: tokenHash, p_fecha: date }
-        : { p_password: payload.password, p_fecha: date };
-      const { data, error } = await admin.rpc(rpcName, rpcParams);
+      const rpcName = action === 'reports' ? 'limpieza_api_reportes_v4' : 'limpieza_api_resumen_v4';
+      const { data, error } = await admin.rpc(rpcName, { p_token_hash: tokenHash, p_fecha: date });
       if (error) {
         const sessionExpired = Boolean(tokenHash && error.message.includes('Sesion invalida'));
         return response(origin, {
@@ -134,26 +130,30 @@ Deno.serve(async (request) => {
       return response(origin, { ok: true, [action === 'reports' ? 'reports' : 'items']: data || [] });
     }
 
-    const slug = payload.slug;
-    if (!validSlug(slug)) return response(origin, { ok: false, error: 'Código QR no reconocido.' }, 400);
-    const contextRpc = tokenHash ? 'limpieza_api_contexto_v3' : 'limpieza_api_contexto';
-    const contextParams = tokenHash
-      ? { p_token_hash: tokenHash, p_slug: slug }
-      : { p_password: payload.password, p_slug: slug };
-    const { data: contextData, error: contextError } = await admin.rpc(contextRpc, contextParams);
-    if (contextError || !contextData?.length) {
-      const sessionExpired = Boolean(tokenHash && contextError?.message?.includes('Sesion invalida'));
-      const message = sessionExpired
-        ? 'La sesión venció. Ingresa nuevamente.'
-        : contextError?.message?.includes('asignado a otro')
-          ? 'Este aposento está asignado a otro conserje para hoy.'
-          : 'No fue posible abrir el formulario de este aposento.';
-      return response(origin, { ok: false, error: message, sessionExpired }, sessionExpired ? 401 : 400);
+    if (action === 'context') {
+      const slug = payload.slug;
+      if (!validSlug(slug)) return response(origin, { ok: false, error: 'Código QR no reconocido.' }, 400);
+      const { data: contextData, error: contextError } = await admin.rpc('limpieza_api_contexto_v4', {
+        p_token_hash: tokenHash,
+        p_slug: slug
+      });
+      if (contextError || !contextData?.length) {
+        const raw = contextError?.message || '';
+        const sessionExpired = raw.includes('Sesion invalida');
+        let message = 'No fue posible abrir el formulario de este recinto.';
+        if (sessionExpired) message = 'La sesión venció. Ingresa nuevamente.';
+        else if (raw.includes('asignado a otro')) message = 'Este recinto está asignado a otro conserje para hoy.';
+        else if (raw.includes('no esta programado')) message = 'Este recinto no está programado para ti hoy.';
+        else if (raw.includes('Ya completaste')) message = 'Ya completaste las tareas programadas para este recinto hoy.';
+        else if (raw.includes('no tiene labores')) message = 'Este turno todavía no tiene labores configuradas.';
+        return response(origin, { ok: false, error: message, sessionExpired }, sessionExpired ? 401 : 400);
+      }
+      return response(origin, { ok: true, context: contextData[0] });
     }
-    const context = contextData[0];
-
-    if (action === 'context') return response(origin, { ok: true, context });
     if (action !== 'report') return response(origin, { ok: false, error: 'Acción no válida.' }, 400);
+
+    const scanId = payload.scanId;
+    if (!validUuid(scanId)) return response(origin, { ok: false, error: 'Escaneo inválido. Escanea nuevamente el código QR.' }, 400);
 
     const checklist = Array.isArray(payload.checklist) ? payload.checklist : null;
     if (!checklist || checklist.length > 100) return response(origin, { ok: false, error: 'Checklist inválido.' }, 400);
@@ -165,15 +165,8 @@ Deno.serve(async (request) => {
       photoBytes = decodePhoto(payload.photoBase64);
       if (!photoBytes) return response(origin, { ok: false, error: 'La fotografía no es válida o supera 1 MB.' }, 400);
     }
-    if (context.foto_requerida && !photoBytes) {
-      return response(origin, { ok: false, error: 'Este turno requiere al menos una fotografía.' }, 400);
-    }
-
     const reportId = crypto.randomUUID();
-    const dateCr = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'America/Costa_Rica', year: 'numeric', month: '2-digit', day: '2-digit'
-    }).format(new Date());
-    const photoPath = photoBytes ? `${context.conserje_id}/${dateCr}/${reportId}.jpg` : null;
+    const photoPath = photoBytes ? `escaneos/${scanId}/${reportId}.jpg` : null;
 
     if (photoBytes && photoPath) {
       const { error: uploadError } = await admin.storage.from('limpieza-reportes').upload(photoPath, photoBytes, {
@@ -182,27 +175,17 @@ Deno.serve(async (request) => {
       if (uploadError) return response(origin, { ok: false, error: 'No fue posible guardar la fotografía.' }, 500);
     }
 
-    const reportRpc = tokenHash ? 'limpieza_api_crear_reporte_v3' : 'limpieza_api_crear_reporte';
-    const reportParams = tokenHash ? {
+    const reportParams = {
       p_report_id: reportId,
-      p_aposento_slug: slug,
+      p_escaneo_id: scanId,
       p_token_hash: tokenHash,
       p_checklist: checklist,
       p_observaciones: observations || null,
       p_foto_path: photoPath,
       p_foto_mime: photoPath ? 'image/jpeg' : null,
       p_foto_bytes: photoBytes?.length || null
-    } : {
-      p_report_id: reportId,
-      p_aposento_slug: slug,
-      p_conserje_password: payload.password,
-      p_checklist: checklist,
-      p_observaciones: observations || null,
-      p_foto_path: photoPath,
-      p_foto_mime: photoPath ? 'image/jpeg' : null,
-      p_foto_bytes: photoBytes?.length || null
     };
-    const { data, error } = await admin.rpc(reportRpc, reportParams);
+    const { data, error } = await admin.rpc('limpieza_api_crear_reporte_v4', reportParams);
     if (error || !data?.[0]?.ok) {
       if (photoPath) await admin.storage.from('limpieza-reportes').remove([photoPath]);
       const sessionExpired = Boolean(tokenHash && error?.message?.includes('Sesion invalida'));

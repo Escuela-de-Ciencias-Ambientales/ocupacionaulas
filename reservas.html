@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=16" />
-  <link rel="stylesheet" href="conserjeria-admin.css?v=3" />
+  <link rel="stylesheet" href="conserjeria-admin.css?v=4" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
@@ -339,8 +339,8 @@
       <section class="cycle-banner panel" aria-live="polite">
         <div>
           <p class="eyebrow">Panel administrativo</p>
-          <h2 id="conserjeriaAdminTitle">Reportes de limpieza por conserje</h2>
-          <p>Datos en tiempo real enviados desde el formulario de Conserjería.</p>
+          <h2 id="conserjeriaAdminTitle">Control de limpieza</h2>
+          <p>Seguimiento diario, evidencia y tiempos de atención por conserje.</p>
         </div>
         <div class="conserjeria-admin-actions">
           <button class="secondary-button compact-button" id="refreshConserjeriaAdmin" type="button">↻ Actualizar</button>
@@ -348,69 +348,77 @@
         </div>
       </section>
 
-      <div class="conserjeria-admin-kpis">
-        <div class="panel conserjeria-kpi"><strong id="conserjeriaKpiTotal">0</strong><span>Reportes totales</span></div>
-        <div class="panel conserjeria-kpi"><strong id="conserjeriaKpiHoy">0</strong><span>Reportes hoy</span></div>
-        <div class="panel conserjeria-kpi"><strong id="conserjeriaKpiSemana">0</strong><span>Últimos 7 días</span></div>
-      </div>
-
       <section class="panel conserjeria-control-panel" aria-labelledby="conserjeriaControlTitle">
         <div class="conserjeria-section-heading">
           <div>
             <p class="eyebrow">Control diario</p>
-            <h3 id="conserjeriaControlTitle">Cumplimiento por conserje y aposento</h3>
-            <p>Consulta cuántos reportes realizó cada conserje, desde cuáles aposentos y cuáles asignaciones quedaron pendientes.</p>
+            <h3 id="conserjeriaControlTitle">Trabajo realizado y pendiente</h3>
+            <p>Seleccione la fecha y, si lo necesita, un recinto. Henry y Rocío se consultan en pestañas separadas.</p>
           </div>
-          <label class="conserjeria-date-field" for="conserjeriaControlFecha">Fecha
-            <input id="conserjeriaControlFecha" type="date" />
-          </label>
+          <div class="conserjeria-dashboard-filters">
+            <label for="conserjeriaControlFecha">Fecha<input id="conserjeriaControlFecha" type="date" /></label>
+            <label for="conserjeriaControlRecinto">Recinto<select id="conserjeriaControlRecinto"><option value="">Todos</option></select></label>
+          </div>
         </div>
-        <div class="conserjeria-daily-grid" id="conserjeriaControlResumen"></div>
+        <nav class="conserjeria-admin-tabs" aria-label="Conserje" id="conserjeriaAdminTabs"></nav>
+        <div class="conserjeria-admin-kpis">
+          <div class="conserjeria-kpi"><strong id="conserjeriaKpiProgramadas">0</strong><span>Programadas</span></div>
+          <div class="conserjeria-kpi"><strong id="conserjeriaKpiCompletadas">0</strong><span>Completadas</span></div>
+          <div class="conserjeria-kpi"><strong id="conserjeriaKpiPendientes">0</strong><span>Pendientes</span></div>
+          <div class="conserjeria-kpi"><strong id="conserjeriaKpiTiempo">—</strong><span>Tiempo promedio</span></div>
+        </div>
+        <div class="conserjeria-dashboard-grid">
+          <div>
+            <h4>Agenda y cumplimiento</h4>
+            <div class="conserjeria-daily-list" id="conserjeriaControlResumen"></div>
+          </div>
+          <div>
+            <h4>Reportes enviados</h4>
+            <div class="conserjeria-report-list" id="conserjeriaReportesFiltrados"></div>
+          </div>
+        </div>
+        <div class="conserjeria-chart-panel"><h4>Reportes por día · últimos 14 días</h4><canvas id="conserjeriaChartActivo" height="90"></canvas></div>
         <p class="conserjeria-schedule-notice" id="conserjeriaControlNotice" hidden></p>
       </section>
 
-      <details class="panel conserjeria-schedule-panel">
-        <summary>
-          <span><strong>Programación semanal de limpieza</strong><small>Configure las asignaciones cuando el horario esté definido.</small></span>
-        </summary>
-        <form class="conserjeria-schedule-form" id="conserjeriaScheduleForm">
-          <label>Conserje<select id="conserjeriaScheduleConserje" required></select></label>
-          <label>Aposento<select id="conserjeriaScheduleAposento" required></select></label>
-          <label>Día<select id="conserjeriaScheduleDia" required>
-            <option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option>
-            <option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option>
-          </select></label>
-          <label>Vigente desde<input id="conserjeriaScheduleDesde" type="date" required /></label>
-          <label>Vigente hasta <span class="conserjeria-optional">(opcional)</span><input id="conserjeriaScheduleHasta" type="date" /></label>
-          <button class="primary-button compact-button" type="submit">Guardar asignación</button>
-        </form>
-        <div class="conserjeria-schedule-list" id="conserjeriaScheduleList"></div>
+      <details class="panel conserjeria-management-panel">
+        <summary><span><strong>Administrar programación y labores</strong><small>Cambiar responsables, recintos, horarios, días y listas de trabajo.</small></span></summary>
+        <div class="conserjeria-management-tabs">
+          <button type="button" class="is-active" data-management-tab="schedule">Asignaciones</button>
+          <button type="button" data-management-tab="chores">Labores</button>
+        </div>
+
+        <section data-management-panel="schedule">
+          <form class="conserjeria-schedule-form" id="conserjeriaScheduleForm">
+            <input id="conserjeriaScheduleId" type="hidden" />
+            <label>Responsable<select id="conserjeriaScheduleConserje" required></select></label>
+            <label>Recinto<select id="conserjeriaScheduleAposento" required></select></label>
+            <label>Rutina<select id="conserjeriaScheduleRutina" required></select></label>
+            <label>Hora inicio<input id="conserjeriaScheduleHoraInicio" type="time" required /></label>
+            <label>Hora fin<input id="conserjeriaScheduleHoraFin" type="time" required /></label>
+            <fieldset class="conserjeria-day-selector"><legend>Días</legend>
+              <label><input type="checkbox" name="conserjeriaDia" value="1" />Lun</label><label><input type="checkbox" name="conserjeriaDia" value="2" />Mar</label>
+              <label><input type="checkbox" name="conserjeriaDia" value="3" />Mié</label><label><input type="checkbox" name="conserjeriaDia" value="4" />Jue</label>
+              <label><input type="checkbox" name="conserjeriaDia" value="5" />Vie</label><label><input type="checkbox" name="conserjeriaDia" value="6" />Sáb</label>
+              <label><input type="checkbox" name="conserjeriaDia" value="0" />Dom</label>
+            </fieldset>
+            <label>Vigente desde<input id="conserjeriaScheduleDesde" type="date" required /></label>
+            <label>Vigente hasta <span class="conserjeria-optional">(opcional)</span><input id="conserjeriaScheduleHasta" type="date" /></label>
+            <label class="conserjeria-inline-check"><input id="conserjeriaScheduleFoto" type="checkbox" /> Fotografía requerida</label>
+            <div class="conserjeria-form-actions"><button class="primary-button compact-button" type="submit">Guardar</button><button class="secondary-button compact-button" id="conserjeriaScheduleCancel" type="button" hidden>Cancelar edición</button></div>
+          </form>
+          <div class="conserjeria-schedule-list" id="conserjeriaScheduleList"></div>
+        </section>
+
+        <section data-management-panel="chores" hidden>
+          <div class="conserjeria-labor-toolbar">
+            <label>Rutina<select id="conserjeriaLaborRutina"></select></label>
+            <form id="conserjeriaNewLaborForm"><label>Nueva labor<input id="conserjeriaNewLabor" maxlength="120" placeholder="Nombre de la labor" /></label><button class="secondary-button compact-button" type="submit">Agregar</button></form>
+          </div>
+          <div class="conserjeria-labor-list" id="conserjeriaLaborList"></div>
+          <button class="primary-button compact-button" id="conserjeriaSaveLabors" type="button">Guardar labores de la rutina</button>
+        </section>
       </details>
-
-      <div class="panel conserjeria-chart-panel">
-        <h3>Reportes por día (últimos 14 días)</h3>
-        <canvas id="conserjeriaChartDias" height="90"></canvas>
-      </div>
-
-      <div class="conserjeria-admin-grid">
-        <section class="panel conserjeria-conserje-panel" id="conserjeriaPanelHenry" aria-labelledby="conserjeriaPanelHenryTitle">
-          <div class="conserjeria-conserje-heading">
-            <h3 id="conserjeriaPanelHenryTitle">Henry Leiton</h3>
-            <span class="conserjeria-conserje-count" id="conserjeriaCountHenry">0 reportes</span>
-          </div>
-          <canvas id="conserjeriaChartHenry" height="120"></canvas>
-          <div class="conserjeria-report-list" id="conserjeriaListHenry"></div>
-        </section>
-
-        <section class="panel conserjeria-conserje-panel" id="conserjeriaPanelRocio" aria-labelledby="conserjeriaPanelRocioTitle">
-          <div class="conserjeria-conserje-heading">
-            <h3 id="conserjeriaPanelRocioTitle">Rocío Román</h3>
-            <span class="conserjeria-conserje-count" id="conserjeriaCountRocio">0 reportes</span>
-          </div>
-          <canvas id="conserjeriaChartRocio" height="120"></canvas>
-          <div class="conserjeria-report-list" id="conserjeriaListRocio"></div>
-        </section>
-      </div>
 
       <p class="conserjeria-admin-message" id="conserjeriaAdminMessage" hidden></p>
     </section>
@@ -617,7 +625,7 @@
   <script src="vehiculos-imagenes.js?v=1"></script>
   <script src="vehicle-locations.js?v=1"></script>
   <script src="vehiculos.js?v=21"></script>
-  <script src="conserjeria-admin.js?v=5"></script>
+  <script src="conserjeria-admin.js?v=6"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>

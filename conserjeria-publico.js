@@ -12,6 +12,8 @@
     sessionToken: null,
     conserjeNombre: null,
     aposentoActual: null,
+    scanId: null,
+    scanStartedAt: null,
     labores: [],
     resumen: [],
     reportes: [],
@@ -56,6 +58,13 @@
     return new Intl.DateTimeFormat('es-CR', {
       timeZone: 'America/Costa_Rica', hour: '2-digit', minute: '2-digit'
     }).format(new Date(fecha));
+  }
+
+  function formatDuracion(segundos) {
+    const total = Math.max(0, Number(segundos) || 0);
+    const minutos = Math.floor(total / 60);
+    const resto = total % 60;
+    return minutos ? `${minutos} min ${resto} s` : `${resto} s`;
   }
 
   function escapeHtml(value) {
@@ -166,6 +175,8 @@
     if (token) await callApi('logout').catch(() => {});
     eliminarSesionLocal();
     state.aposentoActual = null;
+    state.scanId = null;
+    state.scanStartedAt = null;
     state.labores = [];
     state.resumen = [];
     state.reportes = [];
@@ -234,12 +245,13 @@
     $('conserjeriaSummaryList').innerHTML = items.map((item) => {
       const estado = estadoResumen(item);
       const faltan = laboresFaltantes(item);
+      const horario = `${formatHora(item.hora_inicio)}–${formatHora(item.hora_fin)}`;
       const detalle = faltan.length
         ? `${item.reportado ? 'Falta' : 'Pendiente'}: ${escapeHtml(faltan.join(', '))}`
-        : `Último reporte ${formatHora(item.ultima_hora)}${Number(item.cantidad_reportes) > 1 ? ` · ${item.cantidad_reportes} reportes` : ''}`;
+        : `Completado a las ${formatHora(item.ultima_hora)}`;
       return `<article class="conserjeria-summary-item is-${estado.key}">
         <span class="conserjeria-summary-status" aria-hidden="true">${estado.icon}</span>
-        <div><strong>${escapeHtml(item.aposento)}</strong><p>${detalle}</p></div>
+        <div><strong>${escapeHtml(item.aposento)}</strong><p>${escapeHtml(horario)} · ${escapeHtml(item.rutina || 'Rutina')}</p><p>${detalle}</p></div>
         <small>${estado.label}</small>
       </article>`;
     }).join('');
@@ -248,7 +260,8 @@
   function actualizarFiltroRecintos() {
     const select = $('conserjeriaSummaryRoom');
     const previo = select.value;
-    select.innerHTML = '<option value="">Todos</option>' + state.resumen.map((item) =>
+    const unicos = [...new Map(state.resumen.map((item) => [item.aposento_id, item])).values()];
+    select.innerHTML = '<option value="">Todos</option>' + unicos.map((item) =>
       `<option value="${escapeHtml(item.aposento_id)}">${escapeHtml(item.aposento)}</option>`
     ).join('');
     if ([...select.options].some((option) => option.value === previo)) select.value = previo;
@@ -284,6 +297,7 @@
         <div class="conserjeria-report-item-head"><strong>${escapeHtml(reporte.aposento)}</strong><time>${escapeHtml(formatFechaReporte(reporte.fecha))}</time></div>
         <div class="conserjeria-report-badges">
           <span>${realizadas.length} labores realizadas</span>
+          <span>${escapeHtml(formatDuracion(reporte.duracion_segundos))}</span>
           ${reporte.foto_adjunta ? '<span>📷 Con fotografía</span>' : ''}
           ${faltantes.length ? `<span class="is-missing">Faltan ${faltantes.length}</span>` : ''}
         </div>
@@ -374,16 +388,22 @@
   }
 
   function abrirFormulario(context, slug) {
+    state.scanId = context.escaneo_id;
+    state.scanStartedAt = context.escaneado_at;
     state.aposentoActual = {
       slug,
       nombre: context.aposento_nombre,
       tipo: context.aposento_tipo,
-      fotoRequerida: Boolean(context.foto_requerida)
+      fotoRequerida: Boolean(context.foto_requerida),
+      rutina: context.rutina_nombre
     };
     state.labores = Array.isArray(context.labores) ? context.labores : [];
     limpiarFoto();
     $('conserjeriaAposentoLabel').textContent = state.aposentoActual.nombre;
-    $('conserjeriaFechaHora').value = fechaHoraActual();
+    $('conserjeriaRutinaLabel').textContent = `${context.rutina_nombre} · ${formatHora(context.hora_inicio)}–${formatHora(context.hora_fin)}`;
+    $('conserjeriaFechaHora').value = context.escaneado_at
+      ? new Intl.DateTimeFormat('es-CR', { timeZone: 'America/Costa_Rica', dateStyle: 'full', timeStyle: 'short' }).format(new Date(context.escaneado_at))
+      : fechaHoraActual();
     $('conserjeriaFuncionario').value = state.conserjeNombre;
     $('conserjeriaAposento').value = state.aposentoActual.nombre;
     $('conserjeriaAposentoIcono').textContent = iconos[state.aposentoActual.tipo] || iconos.otro;
@@ -396,18 +416,6 @@
 
   async function cargarAposentoEscaneado(slug) {
     const msg = $('conserjeriaScanMsg');
-    const cached = $('conserjeriaSummaryDate').value === fechaCR()
-      ? state.resumen.find((item) => item.aposento_slug === slug && Array.isArray(item.labores))
-      : null;
-    if (cached) {
-      abrirFormulario({
-        aposento_nombre: cached.aposento,
-        aposento_tipo: cached.aposento_tipo,
-        foto_requerida: cached.foto_requerida,
-        labores: cached.labores
-      }, slug);
-      return;
-    }
     setMsg(msg, 'Abriendo formulario…', 'success');
     try {
       const data = await callApi('context', { slug });
@@ -500,6 +508,10 @@
     const msg = $('conserjeriaFormMsg');
     setMsg(msg, '');
     if (!state.aposentoActual) return;
+    if (!state.scanId) {
+      setMsg(msg, 'El escaneo ya no es válido. Escanea nuevamente el código QR.', 'error');
+      return;
+    }
     if (state.aposentoActual.fotoRequerida && !state.foto) {
       setMsg(msg, 'Este turno requiere una fotografía antes de enviar.', 'error');
       return;
@@ -513,16 +525,19 @@
     try {
       const photoBase64 = state.foto ? await blobBase64(state.foto) : null;
       const data = await callApi('report', {
-        slug: state.aposentoActual.slug,
+        scanId: state.scanId,
         checklist,
         observations: $('conserjeriaObservaciones').value.trim(),
         photoBase64
       });
       $('conserjeriaExitoTexto').textContent = `${state.aposentoActual.nombre} — gracias ${data.result.conserje_nombre}.`;
       limpiarFoto();
+      state.scanId = null;
+      state.scanStartedAt = null;
+      state.aposentoActual = null;
       showStep('exito');
       Promise.allSettled([cargarResumen({ silent: true }), cargarReportes({ silent: true })]);
-      let seg = 3;
+      let seg = 1;
       $('conserjeriaCountdown').textContent = `Volviendo al escáner en ${seg}s…`;
       clearInterval(state.autoTimer);
       state.autoTimer = setInterval(() => {
@@ -530,7 +545,7 @@
         if (seg <= 0) {
           clearInterval(state.autoTimer);
           showStep('scan');
-          activarTab('scan');
+          activarTab('scan', { autoScan: true });
         } else $('conserjeriaCountdown').textContent = `Volviendo al escáner en ${seg}s…`;
       }, 1000);
     } catch (error) {
@@ -566,8 +581,8 @@
   $('conserjeriaFoto')?.addEventListener('change', seleccionarFoto);
   $('conserjeriaFotoRemove')?.addEventListener('click', limpiarFoto);
   $('conserjeriaReporteForm')?.addEventListener('submit', enviarReporte);
-  $('conserjeriaVolverScanBtn')?.addEventListener('click', () => { limpiarFoto(); showStep('scan'); activarTab('scan'); });
-  $('conserjeriaSiguienteBtn')?.addEventListener('click', () => { clearInterval(state.autoTimer); showStep('scan'); activarTab('scan'); });
+  $('conserjeriaVolverScanBtn')?.addEventListener('click', () => { limpiarFoto(); state.scanId = null; showStep('scan'); activarTab('scan', { autoScan: true }); });
+  $('conserjeriaSiguienteBtn')?.addEventListener('click', () => { clearInterval(state.autoTimer); showStep('scan'); activarTab('scan', { autoScan: true }); });
 
   if (window.CONSERJERIA_TEST_MODE) {
     window.__CONSERJERIA_TEST__ = { onScanSuccess, activarTab, cargarResumen, cargarReportes, state };
