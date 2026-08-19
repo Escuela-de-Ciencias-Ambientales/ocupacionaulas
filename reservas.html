@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=16" />
-  <link rel="stylesheet" href="conserjeria-admin.css?v=4" />
+  <link rel="stylesheet" href="conserjeria-admin.css?v=5" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
@@ -353,7 +353,7 @@
           <div>
             <p class="eyebrow">Control diario</p>
             <h3 id="conserjeriaControlTitle">Trabajo realizado y pendiente</h3>
-            <p>Seleccione la fecha y, si lo necesita, un recinto. Henry y Rocío se consultan en pestañas separadas.</p>
+            <p>Seleccione una fecha para consultar ese día y la semana correspondiente. Henry y Rocío se consultan en pestañas separadas.</p>
           </div>
           <div class="conserjeria-dashboard-filters">
             <label for="conserjeriaControlFecha">Fecha<input id="conserjeriaControlFecha" type="date" /></label>
@@ -377,6 +377,14 @@
             <div class="conserjeria-report-list" id="conserjeriaReportesFiltrados"></div>
           </div>
         </div>
+        <section class="conserjeria-week-panel" aria-labelledby="conserjeriaWeekTitle">
+          <div class="conserjeria-week-heading">
+            <div><p class="eyebrow">Control semanal</p><h4 id="conserjeriaWeekTitle">Cumplimiento por horario</h4></div>
+            <strong id="conserjeriaWeekLabel"></strong>
+          </div>
+          <div class="conserjeria-week-summary" id="conserjeriaWeeklySummary"></div>
+          <div class="conserjeria-week-list" id="conserjeriaWeeklyList"></div>
+        </section>
         <div class="conserjeria-chart-panel"><h4>Reportes por día · últimos 14 días</h4><canvas id="conserjeriaChartActivo" height="90"></canvas></div>
         <p class="conserjeria-schedule-notice" id="conserjeriaControlNotice" hidden></p>
       </section>
@@ -407,6 +415,14 @@
             <label class="conserjeria-inline-check"><input id="conserjeriaScheduleFoto" type="checkbox" /> Fotografía requerida</label>
             <div class="conserjeria-form-actions"><button class="primary-button compact-button" type="submit">Guardar</button><button class="secondary-button compact-button" id="conserjeriaScheduleCancel" type="button" hidden>Cancelar edición</button></div>
           </form>
+          <div class="conserjeria-list-heading">
+            <div><h4>Todas las asignaciones</h4><span id="conserjeriaScheduleCount"></span></div>
+            <div class="conserjeria-schedule-filters" aria-label="Filtros de asignaciones">
+              <label>Conserje<select id="conserjeriaScheduleFilterConserje"><option value="">Todos</option></select></label>
+              <label>Día<select id="conserjeriaScheduleFilterDia"><option value="">Todos</option><option value="1">Lunes</option><option value="2">Martes</option><option value="3">Miércoles</option><option value="4">Jueves</option><option value="5">Viernes</option><option value="6">Sábado</option><option value="0">Domingo</option></select></label>
+              <label>Horario<select id="conserjeriaScheduleFilterHorario"><option value="">Todos</option></select></label>
+            </div>
+          </div>
           <div class="conserjeria-schedule-list" id="conserjeriaScheduleList"></div>
         </section>
 
@@ -625,7 +641,7 @@
   <script src="vehiculos-imagenes.js?v=1"></script>
   <script src="vehicle-locations.js?v=1"></script>
   <script src="vehiculos.js?v=21"></script>
-  <script src="conserjeria-admin.js?v=6"></script>
+  <script src="conserjeria-admin.js?v=7"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>
