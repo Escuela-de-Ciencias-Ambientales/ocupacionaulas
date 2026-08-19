@@ -94,7 +94,7 @@
   const missingNames = (item) => (Array.isArray(item.labores_faltantes) ? item.labores_faltantes : []).map((labor) => labor.nombre).filter(Boolean);
   function renderControl(items) {
     const el = $('conserjeriaControlResumen'); if (!items.length) { el.innerHTML = '<p class="conserjeria-empty">Sin tareas programadas.</p>'; return; }
-    el.innerHTML = items.map((item) => { const missing = missingNames(item); const report = state.reportes.find((row) => row.id === item.reporte_id); const status = !item.reportado ? 'pending' : missing.length ? 'incomplete' : 'complete'; const label = !item.reportado ? 'Pendiente' : missing.length ? 'Incompleto' : 'Completado'; return `<article class="conserjeria-task-row is-${status}"><div class="conserjeria-task-time">${hora(item.hora_inicio)}<small>${hora(item.hora_fin)}</small></div><div><strong>${escapeHtml(item.aposento)}</strong><span>${escapeHtml(item.rutina || 'Rutina')}</span>${report ? `<span>Escaneó ${escapeHtml(soloHora(report.escaneado_at))} · Envió ${escapeHtml(soloHora(report.enviado_at || report.fecha))}</span>` : ''}${missing.length ? `<p><b>${item.reportado ? 'Faltó' : 'Debe realizar'}:</b> ${escapeHtml(missing.join(', '))}</p>` : ''}</div><div class="conserjeria-task-result"><b>${label}</b>${item.reportado ? `<small>${escapeHtml(duracion(item.duracion_segundos))}</small>` : ''}</div></article>`; }).join('');
+    el.innerHTML = items.map((item) => { const missing = missingNames(item); const report = state.reportes.find((row) => row.id === item.reporte_id); const status = !item.reportado ? 'pending' : missing.length ? 'incomplete' : 'complete'; const label = !item.reportado ? 'Pendiente' : missing.length ? 'Incompleto' : 'Realizado'; return `<article class="conserjeria-task-row is-${status}"><div class="conserjeria-task-time">${hora(item.hora_inicio)}<small>${hora(item.hora_fin)}</small></div><div><strong>${escapeHtml(item.aposento)}</strong><span>${escapeHtml(item.rutina || 'Rutina')}</span>${report ? `<span>Escaneó ${escapeHtml(soloHora(report.escaneado_at))} · Envió ${escapeHtml(soloHora(report.enviado_at || report.fecha))}</span>` : ''}${missing.length ? `<p><b>${item.reportado ? 'Faltó' : 'Debe realizar'}:</b> ${escapeHtml(missing.join(', '))}</p>` : ''}</div><div class="conserjeria-task-result"><b>${label}</b>${item.reportado ? `<small>${escapeHtml(duracion(item.duracion_segundos))}</small>` : ''}</div></article>`; }).join('');
   }
   function sumarDias(fecha, cantidad) { const d = new Date(`${fecha}T12:00:00`); d.setDate(d.getDate() + cantidad); return hoyCr(d); }
   function inicioSemana(fecha) { const d = new Date(`${fecha}T12:00:00`); const dow = d.getDay(); d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1)); return hoyCr(d); }
@@ -115,8 +115,8 @@
     list.innerHTML = dayRows.map((item) => {
       const missing = missingNames(item); let status = 'pending'; let label = 'Pendiente';
       if (item.reportado && missing.length) { status = 'incomplete'; label = item.dentro_horario ? 'Incompleto · En horario' : 'Incompleto · Fuera de horario'; }
-      else if (item.reportado && item.dentro_horario) { status = 'on-time'; label = 'Completado en horario'; }
-      else if (item.reportado) { status = 'late'; label = 'Completado fuera de horario'; }
+      else if (item.reportado && item.dentro_horario) { status = 'on-time'; label = 'Realizado'; }
+      else if (item.reportado) { status = 'late'; label = 'Realizado'; }
       return `<article class="conserjeria-week-row is-${status}"><div><b>${hora(item.hora_inicio)}</b><span>${hora(item.hora_fin)}</span></div><div><strong>${escapeHtml(item.aposento)}</strong><small>${escapeHtml(item.rutina || 'Rutina')}</small></div><div><small>Escaneó</small><b>${escapeHtml(soloHora(item.escaneado_at))}</b></div><div><small>Envió</small><b>${escapeHtml(soloHora(item.enviado_at))}</b></div><b class="is-status">${escapeHtml(label)}</b></article>`;
     }).join('');
   }
