@@ -3,13 +3,16 @@
   const config = window.RESERVAS_CONFIG || {};
   const $ = (id) => document.getElementById(id);
   const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-  const state = { client: null, session: null, profile: null, catalogos: [], programacion: [], rutinaLabores: [], control: [], reportes: [], chartReportes: [], conserjeId: null, loaded: false, chart: null };
+  const state = { client: null, session: null, profile: null, catalogos: [], programacion: [], rutinaLabores: [], control: [], weekly: [], reportes: [], chartReportes: [], conserjeId: null, loaded: false, chart: null };
   const isAdmin = () => state.profile?.role === 'admin' && ['conserjeria', 'operations', 'superadmin'].includes(state.profile?.admin_scope);
   const escapeHtml = (value = '') => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const catalogo = (tipo) => state.catalogos.filter((item) => item.tipo === tipo && item.extra?.activo !== false);
   const hoyCr = (date = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Costa_Rica', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
   const hora = (value) => value ? String(value).slice(0, 5) : '—';
   const fechaHora = (value) => value ? new Intl.DateTimeFormat('es-CR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Costa_Rica' }).format(new Date(value)) : '—';
+  const soloHora = (value) => value ? new Intl.DateTimeFormat('es-CR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Costa_Rica' }).format(new Date(value)) : '—';
+  const fechaCorta = (value) => new Intl.DateTimeFormat('es-CR', { day: '2-digit', month: '2-digit', timeZone: 'America/Costa_Rica' }).format(new Date(`${value}T12:00:00`));
+  const nombreDia = (value, format = 'long') => new Intl.DateTimeFormat('es-CR', { weekday: format, timeZone: 'America/Costa_Rica' }).format(new Date(`${value}T12:00:00`));
   const duracion = (seconds) => { const total = Number(seconds); if (!Number.isFinite(total)) return 'Sin medición'; const minutes = Math.floor(total / 60); return minutes ? `${minutes} min ${total % 60} s` : `${total} s`; };
 
   function setMessage(text, kind = 'error') {
@@ -37,6 +40,15 @@
   function fillSelect(id, items, label = (item) => item.nombre) { const select = $(id); const previous = select.value; select.innerHTML = items.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(label(item))}</option>`).join(''); if ([...select.options].some((option) => option.value === previous)) select.value = previous; }
 
   function renderRutinasAsignacion() { const roomId = $('conserjeriaScheduleAposento').value; fillSelect('conserjeriaScheduleRutina', catalogo('rutina').filter((item) => item.extra?.aposento_id === roomId)); }
+  function renderScheduleFilters() {
+    const conserjes = catalogo('conserje'); const conserje = $('conserjeriaScheduleFilterConserje'); const selectedConserje = conserje.value;
+    conserje.innerHTML = '<option value="">Todos</option>' + conserjes.map((item) => `<option value="${item.id}">${escapeHtml(item.nombre)}</option>`).join('');
+    if ([...conserje.options].some((option) => option.value === selectedConserje)) conserje.value = selectedConserje;
+    const horarios = [...new Set(state.programacion.map((item) => `${hora(item.hora_inicio)}|${hora(item.hora_fin)}`))].sort();
+    const horario = $('conserjeriaScheduleFilterHorario'); const selectedHorario = horario.value;
+    horario.innerHTML = '<option value="">Todos</option>' + horarios.map((value) => { const [inicio, fin] = value.split('|'); return `<option value="${value}">${inicio}–${fin}</option>`; }).join('');
+    if ([...horario.options].some((option) => option.value === selectedHorario)) horario.value = selectedHorario;
+  }
   function renderAdminTabs() {
     const conserjes = catalogo('conserje'); if (!state.conserjeId || !conserjes.some((item) => item.id === state.conserjeId)) state.conserjeId = conserjes[0]?.id || null;
     $('conserjeriaAdminTabs').innerHTML = conserjes.map((item) => `<button type="button" class="${item.id === state.conserjeId ? 'is-active' : ''}" data-conserje-id="${escapeHtml(item.id)}">${escapeHtml(item.nombre)}</button>`).join('');
@@ -45,7 +57,7 @@
     const conserjes = catalogo('conserje'); const aposentos = catalogo('aposento');
     fillSelect('conserjeriaScheduleConserje', conserjes); fillSelect('conserjeriaScheduleAposento', aposentos);
     const filter = $('conserjeriaControlRecinto'); const selected = filter.value; filter.innerHTML = '<option value="">Todos</option>' + aposentos.map((item) => `<option value="${item.id}">${escapeHtml(item.nombre)}</option>`).join(''); if ([...filter.options].some((option) => option.value === selected)) filter.value = selected;
-    renderRutinasAsignacion(); fillSelect('conserjeriaLaborRutina', catalogo('rutina'), (item) => `${aposentos.find((a) => a.id === item.extra?.aposento_id)?.nombre || ''} · ${item.nombre}`); renderAdminTabs(); renderLaborList();
+    renderRutinasAsignacion(); fillSelect('conserjeriaLaborRutina', catalogo('rutina'), (item) => `${aposentos.find((a) => a.id === item.extra?.aposento_id)?.nombre || ''} · ${item.nombre}`); renderAdminTabs(); renderScheduleFilters(); renderLaborList();
   }
   async function loadPanel() {
     if (!isAdmin()) return; setMessage('');
@@ -59,8 +71,9 @@
   async function loadDashboard() {
     if (!state.conserjeId) return; setMessage(''); const fecha = $('conserjeriaControlFecha').value || hoyCr(); const aposentoId = $('conserjeriaControlRecinto').value || null;
     try {
-      [state.control, state.reportes, state.chartReportes] = await Promise.all([
+      [state.control, state.weekly, state.reportes, state.chartReportes] = await Promise.all([
         rpc('limpieza_admin_control_diario_v4', { p_fecha: fecha, p_conserje_id: state.conserjeId }),
+        rpc('limpieza_admin_control_semanal_v5', { p_fecha_semana: fecha, p_conserje_id: state.conserjeId }),
         rpc('limpieza_admin_reportes_v4', { p_desde: fecha, p_hasta: fecha, p_conserje_id: state.conserjeId, p_aposento_id: aposentoId }),
         rpc('limpieza_admin_reportes_v4', { p_desde: restarDias(fecha, 13), p_hasta: fecha, p_conserje_id: state.conserjeId, p_aposento_id: aposentoId })
       ]); renderDashboard(aposentoId);
@@ -69,12 +82,32 @@
   function renderDashboard(aposentoId) {
     renderAdminTabs(); const control = state.control.filter((item) => !aposentoId || item.aposento_id === aposentoId); const completed = control.filter((item) => item.reportado); const times = state.reportes.map((item) => Number(item.duracion_segundos)).filter(Number.isFinite);
     $('conserjeriaKpiProgramadas').textContent = control.length; $('conserjeriaKpiCompletadas').textContent = completed.length; $('conserjeriaKpiPendientes').textContent = control.length - completed.length; $('conserjeriaKpiTiempo').textContent = times.length ? duracion(Math.round(times.reduce((a, b) => a + b, 0) / times.length)) : '—';
-    renderControl(control); renderReportes(); renderChart(); const notice = $('conserjeriaControlNotice'); notice.hidden = control.length > 0; notice.textContent = 'No hay asignaciones vigentes para este conserje en la fecha y recinto seleccionados.';
+    renderControl(control); renderWeekly(aposentoId); renderReportes(); renderChart(); const notice = $('conserjeriaControlNotice'); notice.hidden = control.length > 0; notice.textContent = 'No hay asignaciones vigentes para este conserje en la fecha y recinto seleccionados.';
   }
   const missingNames = (item) => (Array.isArray(item.labores_faltantes) ? item.labores_faltantes : []).map((labor) => labor.nombre).filter(Boolean);
   function renderControl(items) {
     const el = $('conserjeriaControlResumen'); if (!items.length) { el.innerHTML = '<p class="conserjeria-empty">Sin tareas programadas.</p>'; return; }
-    el.innerHTML = items.map((item) => { const missing = missingNames(item); const status = !item.reportado ? 'pending' : missing.length ? 'incomplete' : 'complete'; const label = !item.reportado ? 'Pendiente' : missing.length ? 'Incompleto' : 'Completado'; return `<article class="conserjeria-task-row is-${status}"><div class="conserjeria-task-time">${hora(item.hora_inicio)}<small>${hora(item.hora_fin)}</small></div><div><strong>${escapeHtml(item.aposento)}</strong><span>${escapeHtml(item.rutina || 'Rutina')}</span>${missing.length ? `<p><b>${item.reportado ? 'Faltó' : 'Debe realizar'}:</b> ${escapeHtml(missing.join(', '))}</p>` : ''}</div><div class="conserjeria-task-result"><b>${label}</b>${item.reportado ? `<small>${escapeHtml(duracion(item.duracion_segundos))}</small>` : ''}</div></article>`; }).join('');
+    el.innerHTML = items.map((item) => { const missing = missingNames(item); const report = state.reportes.find((row) => row.id === item.reporte_id); const status = !item.reportado ? 'pending' : missing.length ? 'incomplete' : 'complete'; const label = !item.reportado ? 'Pendiente' : missing.length ? 'Incompleto' : 'Completado'; return `<article class="conserjeria-task-row is-${status}"><div class="conserjeria-task-time">${hora(item.hora_inicio)}<small>${hora(item.hora_fin)}</small></div><div><strong>${escapeHtml(item.aposento)}</strong><span>${escapeHtml(item.rutina || 'Rutina')}</span>${report ? `<span>Escaneó ${escapeHtml(soloHora(report.escaneado_at))} · Envió ${escapeHtml(soloHora(report.enviado_at || report.fecha))}</span>` : ''}${missing.length ? `<p><b>${item.reportado ? 'Faltó' : 'Debe realizar'}:</b> ${escapeHtml(missing.join(', '))}</p>` : ''}</div><div class="conserjeria-task-result"><b>${label}</b>${item.reportado ? `<small>${escapeHtml(duracion(item.duracion_segundos))}</small>` : ''}</div></article>`; }).join('');
+  }
+  function sumarDias(fecha, cantidad) { const d = new Date(`${fecha}T12:00:00`); d.setDate(d.getDate() + cantidad); return hoyCr(d); }
+  function inicioSemana(fecha) { const d = new Date(`${fecha}T12:00:00`); const dow = d.getDay(); d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1)); return hoyCr(d); }
+  function renderWeekly(aposentoId) {
+    const base = inicioSemana($('conserjeriaControlFecha').value || hoyCr()); const end = sumarDias(base, 6);
+    $('conserjeriaWeekLabel').textContent = `${fechaCorta(base)} – ${fechaCorta(end)}`;
+    const rows = state.weekly.filter((item) => !aposentoId || item.aposento_id === aposentoId);
+    $('conserjeriaWeeklySummary').innerHTML = Array.from({ length: 7 }, (_, index) => {
+      const date = sumarDias(base, index); const dayRows = rows.filter((item) => item.fecha === date); const pending = dayRows.filter((item) => !item.reportado);
+      const pendingRooms = pending.map((item) => `${item.aposento} (${hora(item.hora_inicio)})`);
+      return `<article class="conserjeria-week-day ${pending.length ? 'is-pending' : ''}"><strong>${escapeHtml(nombreDia(date))}</strong><span>${escapeHtml(fechaCorta(date))}</span><b>${dayRows.length - pending.length}/${dayRows.length}</b><span>completadas</span>${pendingRooms.length ? `<p><b>Pendientes:</b> ${escapeHtml(pendingRooms.join(', '))}</p>` : ''}</article>`;
+    }).join('');
+    const list = $('conserjeriaWeeklyList'); if (!rows.length) { list.innerHTML = '<p class="conserjeria-empty">No hay labores programadas en esta semana.</p>'; return; }
+    list.innerHTML = rows.map((item) => {
+      const missing = missingNames(item); const planned = (Array.isArray(item.labores_programadas) ? item.labores_programadas : []).map((labor) => labor.nombre).filter(Boolean); let status = 'pending'; let label = 'Pendiente';
+      if (item.reportado && missing.length) { status = 'incomplete'; label = item.dentro_horario ? 'Incompleto · En horario' : 'Incompleto · Fuera de horario'; }
+      else if (item.reportado && item.dentro_horario) { status = 'on-time'; label = 'Completado en horario'; }
+      else if (item.reportado) { status = 'late'; label = 'Completado fuera de horario'; }
+      return `<article class="conserjeria-week-row is-${status}"><div><strong>${escapeHtml(nombreDia(item.fecha, 'short'))}</strong><span>${escapeHtml(fechaCorta(item.fecha))}</span></div><div><b>${hora(item.hora_inicio)}</b><span>${hora(item.hora_fin)}</span></div><div><strong>${escapeHtml(item.aposento)}</strong><small>${escapeHtml(item.rutina || 'Rutina')}</small></div><div><small>Escaneó</small><b>${escapeHtml(soloHora(item.escaneado_at))}</b></div><div><small>Envió</small><b>${escapeHtml(soloHora(item.enviado_at))}</b></div><b class="is-status">${escapeHtml(label)}</b><p class="is-planned"><b>Labores:</b> ${escapeHtml(planned.join(', ') || 'Sin labores configuradas')}</p>${missing.length ? `<p><b>Labores pendientes:</b> ${escapeHtml(missing.join(', '))}</p>` : ''}</article>`;
+    }).join('');
   }
   function renderReportes() {
     const el = $('conserjeriaReportesFiltrados'); if (!state.reportes.length) { el.innerHTML = '<p class="conserjeria-empty">No hay reportes enviados con estos filtros.</p>'; return; }
@@ -85,8 +118,11 @@
     if (state.chart) state.chart.destroy(); state.chart = new Chart($('conserjeriaChartActivo'), { type: 'bar', data: { labels: dates.map((d) => d.slice(5).split('-').reverse().join('/')), datasets: [{ data: counts, backgroundColor: '#087a55', borderRadius: 5 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } });
   }
   function renderProgramacion() {
-    const el = $('conserjeriaScheduleList'); if (!state.programacion.length) { el.innerHTML = '<p class="conserjeria-empty">No hay asignaciones.</p>'; return; }
-    el.innerHTML = state.programacion.map((item) => `<article class="conserjeria-schedule-row"><div><strong>${escapeHtml(item.conserje)}</strong><span>${escapeHtml(item.aposento)} · ${escapeHtml(item.rutina || 'Sin rutina')}</span></div><span>${DIAS[Number(item.dia_semana)]}</span><span>${hora(item.hora_inicio)}–${hora(item.hora_fin)}</span><span>${escapeHtml(item.vigente_desde)} → ${escapeHtml(item.vigente_hasta || 'sin final')}</span><span>${item.foto_requerida ? 'Foto requerida' : 'Foto opcional'}</span><div><button type="button" data-schedule-edit="${item.id}">Editar</button><button type="button" class="is-danger" data-schedule-close="${item.id}">Cerrar</button></div></article>`).join('');
+    const conserjeId = $('conserjeriaScheduleFilterConserje').value; const dia = $('conserjeriaScheduleFilterDia').value; const horario = $('conserjeriaScheduleFilterHorario').value;
+    const rows = state.programacion.filter((item) => (!conserjeId || item.conserje_id === conserjeId) && (dia === '' || Number(item.dia_semana) === Number(dia)) && (!horario || `${hora(item.hora_inicio)}|${hora(item.hora_fin)}` === horario));
+    $('conserjeriaScheduleCount').textContent = `${rows.length} de ${state.programacion.length} asignaciones`;
+    const el = $('conserjeriaScheduleList'); if (!rows.length) { el.innerHTML = '<p class="conserjeria-empty">No hay asignaciones con estos filtros.</p>'; return; }
+    el.innerHTML = rows.map((item) => `<article class="conserjeria-schedule-row"><div><strong>${escapeHtml(item.conserje)}</strong><span>${escapeHtml(item.aposento)} · ${escapeHtml(item.rutina || 'Sin rutina')}</span></div><span>${DIAS[Number(item.dia_semana)]}</span><span>${hora(item.hora_inicio)}–${hora(item.hora_fin)}</span><span>${escapeHtml(item.vigente_desde)} → ${escapeHtml(item.vigente_hasta || 'sin final')}</span><span>${item.foto_requerida ? 'Foto requerida' : 'Foto opcional'}</span><div><button type="button" data-schedule-edit="${item.id}">Editar</button><button type="button" class="is-danger" data-schedule-close="${item.id}">Cerrar</button></div></article>`).join('');
   }
   function resetScheduleForm() { $('conserjeriaScheduleId').value = ''; $('conserjeriaScheduleForm').reset(); $('conserjeriaScheduleDesde').value = hoyCr(); $('conserjeriaScheduleCancel').hidden = true; renderRutinasAsignacion(); }
   function editSchedule(id) {
@@ -95,9 +131,9 @@
   async function saveSchedule(event) {
     event.preventDefault(); const days = [...document.querySelectorAll('input[name="conserjeriaDia"]:checked')].map((input) => Number(input.value)); if (!days.length) { setMessage('Seleccione al menos un día.'); return; } const id = $('conserjeriaScheduleId').value || null;
     const base = { p_conserje_id: $('conserjeriaScheduleConserje').value, p_aposento_id: $('conserjeriaScheduleAposento').value, p_rutina_id: $('conserjeriaScheduleRutina').value, p_hora_inicio: $('conserjeriaScheduleHoraInicio').value, p_hora_fin: $('conserjeriaScheduleHoraFin').value, p_foto_requerida: $('conserjeriaScheduleFoto').checked, p_vigente_desde: $('conserjeriaScheduleDesde').value, p_vigente_hasta: $('conserjeriaScheduleHasta').value || null };
-    try { for (let i = 0; i < days.length; i += 1) await rpc('limpieza_admin_guardar_programacion_v4', { ...base, p_id: i === 0 ? id : null, p_dia_semana: days[i] }); state.programacion = await rpc('limpieza_admin_programacion_v4'); renderProgramacion(); resetScheduleForm(); await loadDashboard(); setMessage('Asignación guardada correctamente.', 'success'); } catch (error) { setMessage(`No fue posible guardar: ${error.message}`); }
+    try { for (let i = 0; i < days.length; i += 1) await rpc('limpieza_admin_guardar_programacion_v4', { ...base, p_id: i === 0 ? id : null, p_dia_semana: days[i] }); state.programacion = await rpc('limpieza_admin_programacion_v4'); renderScheduleFilters(); renderProgramacion(); resetScheduleForm(); await loadDashboard(); setMessage('Asignación guardada correctamente.', 'success'); } catch (error) { setMessage(`No fue posible guardar: ${error.message}`); }
   }
-  async function closeSchedule(id) { if (!confirm('¿Cerrar esta asignación? El historial se conservará.')) return; try { await rpc('limpieza_admin_cerrar_programacion_v4', { p_id: id }); state.programacion = await rpc('limpieza_admin_programacion_v4'); renderProgramacion(); await loadDashboard(); } catch (error) { setMessage(`No fue posible cerrar: ${error.message}`); } }
+  async function closeSchedule(id) { if (!confirm('¿Cerrar esta asignación? El historial se conservará.')) return; try { await rpc('limpieza_admin_cerrar_programacion_v4', { p_id: id }); state.programacion = await rpc('limpieza_admin_programacion_v4'); renderScheduleFilters(); renderProgramacion(); await loadDashboard(); } catch (error) { setMessage(`No fue posible cerrar: ${error.message}`); } }
   function renderLaborList() {
     const routineId = $('conserjeriaLaborRutina')?.value; const rows = state.rutinaLabores.filter((item) => item.rutina_id === routineId); const el = $('conserjeriaLaborList'); if (!el) return;
     el.innerHTML = rows.length ? rows.map((item) => `<div class="conserjeria-labor-row"><label><input type="checkbox" data-labor-assigned="${item.labor_id}" ${item.asignada ? 'checked' : ''} /><span>${escapeHtml(item.labor)}</span></label><label><input type="checkbox" data-labor-required="${item.labor_id}" ${item.obligatoria ? 'checked' : ''} /> Obligatoria</label><label>Orden <input type="number" min="1" max="100" value="${Number(item.orden) || 50}" data-labor-order="${item.labor_id}" /></label></div>`).join('') : '<p class="conserjeria-empty">Seleccione una rutina.</p>';
@@ -116,6 +152,7 @@
   $('showConserjeriaAdmin')?.addEventListener('click', setModule); $('refreshConserjeriaAdmin')?.addEventListener('click', loadPanel); $('exportConserjeriaExcel')?.addEventListener('click', exportExcel); $('conserjeriaControlFecha')?.addEventListener('change', loadDashboard); $('conserjeriaControlRecinto')?.addEventListener('change', loadDashboard);
   $('conserjeriaAdminTabs')?.addEventListener('click', (event) => { const button = event.target.closest('[data-conserje-id]'); if (button) { state.conserjeId = button.dataset.conserjeId; loadDashboard(); } }); $('conserjeriaReportesFiltrados')?.addEventListener('click', (event) => { const button = event.target.closest('[data-photo-path]'); if (button) openPhoto(button.dataset.photoPath); });
   $('conserjeriaScheduleAposento')?.addEventListener('change', renderRutinasAsignacion); $('conserjeriaScheduleForm')?.addEventListener('submit', saveSchedule); $('conserjeriaScheduleCancel')?.addEventListener('click', resetScheduleForm); $('conserjeriaScheduleList')?.addEventListener('click', (event) => { const edit = event.target.closest('[data-schedule-edit]'); const close = event.target.closest('[data-schedule-close]'); if (edit) editSchedule(edit.dataset.scheduleEdit); if (close) closeSchedule(close.dataset.scheduleClose); });
+  ['conserjeriaScheduleFilterConserje', 'conserjeriaScheduleFilterDia', 'conserjeriaScheduleFilterHorario'].forEach((id) => $(id)?.addEventListener('change', renderProgramacion));
   document.querySelectorAll('[data-management-tab]').forEach((button) => button.addEventListener('click', () => activateManagement(button.dataset.managementTab))); $('conserjeriaLaborRutina')?.addEventListener('change', renderLaborList); $('conserjeriaSaveLabors')?.addEventListener('click', saveLabors); $('conserjeriaNewLaborForm')?.addEventListener('submit', addLabor);
   document.addEventListener('DOMContentLoaded', () => setTimeout(initButtonVisibility, 400)); if (document.readyState !== 'loading') setTimeout(initButtonVisibility, 400);
 })();
