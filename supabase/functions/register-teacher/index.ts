@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.112.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,7 +52,7 @@ Deno.serve(async (request) => {
       email,
       password,
       email_confirm: true,
-      user_metadata: { full_name: authorized.full_name, role: 'teacher', unit }
+      user_metadata: { full_name: authorized.full_name, unit }
     });
     if (createError) return response({ ok: false, error: createError.message }, 400);
     await adminClient.from('teacher_registry').update({

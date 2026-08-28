@@ -12,18 +12,14 @@
     major_repair: 'Reparación mayor'
   };
   const weekdays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-  const dateKey = (value) => {
-    const date = new Date(value);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  };
   const localDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const formatTime = (value) => new Intl.DateTimeFormat('es-CR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value));
   const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const vehicleImage = (value = '') => {
     const path = String(value);
-    if (/mitsubishi/i.test(path) && window.VEHICLE_IMAGES?.mitsubishi) return window.VEHICLE_IMAGES.mitsubishi;
-    if (/toyota/i.test(path) && window.VEHICLE_IMAGES?.toyota) return window.VEHICLE_IMAGES.toyota;
-    return path.replace(/\.(webp|jpe?g)$/i, '.png');
+    if (/mitsubishi/i.test(path)) return 'vehiculo-mitsubishi-l200.webp';
+    if (/toyota/i.test(path)) return 'vehiculo-toyota-hilux.webp';
+    return path;
   };
 
   function setModule(module) {
@@ -47,7 +43,6 @@
   }
 
   function renderCards() {
-    const now = new Date();
     const available = state.vehicles.filter((vehicle) => !vehicle.maintenance_category).length;
     $('publicVehicleCount').textContent = state.vehicles.length;
     $('publicAvailableCount').textContent = available;
@@ -67,7 +62,6 @@
     ).join('');
     if (!state.vehicleId && state.vehicles[0]) state.vehicleId = String(state.vehicles[0].id);
     $('publicVehicleSelect').value = state.vehicleId || '';
-    void now;
   }
 
   function serviceState(vehicle) {

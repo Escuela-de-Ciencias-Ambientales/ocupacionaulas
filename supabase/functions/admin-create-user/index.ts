@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.112.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,6 +32,10 @@ function normalizeUser(source: Record<string, unknown>): RequestedUser {
     unit: String(source.unit || '').trim(),
     role: source.role === 'admin' ? 'admin' : source.role === 'reservation_admin' ? 'reservation_admin' : 'teacher'
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function validateUser(user: RequestedUser, allowEmptyPassword: boolean) {
@@ -71,13 +75,15 @@ Deno.serve(async (request) => {
       return response({ ok: false, error: 'Se requiere acceso de administrador.' }, 403);
     }
 
-    const payload = await request.json();
+    const payload: unknown = await request.json();
+    if (!isRecord(payload)) return response({ ok: false, error: 'Solicitud inválida.' }, 400);
     const isBulk = Array.isArray(payload.users);
     const isSuperadmin = callerProfile.admin_scope === 'superadmin';
     if (isBulk && !isSuperadmin) {
       return response({ ok: false, error: 'La carga masiva requiere acceso de superadministrador.' }, 403);
     }
-    const users = (isBulk ? payload.users : [payload]).map((item: Record<string, unknown>) => normalizeUser(item));
+    const sourceUsers = isBulk ? payload.users as unknown[] : [payload];
+    const users: RequestedUser[] = sourceUsers.map((item) => normalizeUser(isRecord(item) ? item : {}));
     if (!users.length) return response({ ok: false, error: 'No se recibieron docentes.' }, 400);
     if (users.length > 50) return response({ ok: false, error: 'El archivo no puede contener más de 50 docentes.' }, 400);
     if (!isSuperadmin && users.some((user) => user.role !== 'teacher')) {
@@ -133,15 +139,32 @@ Deno.serve(async (request) => {
         email_confirm: true,
         user_metadata: {
           full_name: user.fullName,
-          role: user.role === 'teacher' ? 'teacher' : 'admin',
-          admin_scope: user.role === 'admin' ? 'superadmin' : user.role === 'reservation_admin' ? 'reservations' : null,
           unit: user.unit
         }
       });
       if (createError) results.push({ email: user.email, ok: false, error: createError.message });
       else {
+        const userId = created.user?.id;
+        if (!userId) {
+          results.push({ email: user.email, ok: false, error: 'Supabase no devolvió el identificador de la cuenta.' });
+          continue;
+        }
+        const role = user.role === 'teacher' ? 'teacher' : 'admin';
+        const adminScope = user.role === 'admin' ? 'superadmin' : user.role === 'reservation_admin' ? 'reservations' : null;
+        const { error: profileUpdateError } = await adminClient.from('profiles').update({
+          full_name: user.fullName,
+          role,
+          admin_scope: adminScope,
+          unit: user.unit,
+          active: true
+        }).eq('id', userId);
+        if (profileUpdateError) {
+          await adminClient.auth.admin.deleteUser(userId);
+          results.push({ email: user.email, ok: false, error: profileUpdateError.message });
+          continue;
+        }
         createdCount += 1;
-        results.push({ email: user.email, ok: true, status: 'created', userId: created.user?.id });
+        results.push({ email: user.email, ok: true, status: 'created', userId });
         if (user.role === 'teacher') {
           await adminClient.from('teacher_registry').update({ claimed_at: new Date().toISOString() }).eq('email', user.email);
         }

@@ -1,10 +1,29 @@
-const CACHE_NAME = "edeca-reservas-v1";
+const CACHE_NAME = "edeca-reservas-v2";
 const APP_SHELL = [
   "./index.html",
   "./ingreso.html",
   "./reservas.html",
   "./usuarios.html",
   "./mis-giras.html",
+  "./config.js",
+  "./field-labels.css",
+  "./field-labels.js",
+  "./ingreso.css",
+  "./ingreso.js",
+  "./mis-giras.css",
+  "./mis-giras.js",
+  "./password-toggle.js",
+  "./pwa-install.js",
+  "./reservas.css",
+  "./reservas.js",
+  "./usuarios.css",
+  "./usuarios.js",
+  "./vehiculos-publicos.js",
+  "./vehiculos.css",
+  "./vehiculos.js",
+  "./visit-counter.js",
+  "./vehiculo-mitsubishi-l200.webp",
+  "./vehiculo-toyota-hilux.webp",
   "./manifest.webmanifest",
   "./logo-edeca.png",
   "./logo-una.png",
@@ -35,10 +54,15 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-        return response;
+        if (!response.ok) return response;
+        return caches.open(CACHE_NAME)
+          .then((cache) => cache.put(event.request, response.clone()))
+          .then(() => response);
       })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
+      .catch(() => caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        if (event.request.mode === "navigate") return caches.match("./index.html");
+        return Response.error();
+      }))
   );
 });

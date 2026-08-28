@@ -26,9 +26,9 @@
   };
   const vehicleImage = (value = '') => {
     const path = String(value);
-    if (/mitsubishi/i.test(path) && window.VEHICLE_IMAGES?.mitsubishi) return window.VEHICLE_IMAGES.mitsubishi;
-    if (/toyota/i.test(path) && window.VEHICLE_IMAGES?.toyota) return window.VEHICLE_IMAGES.toyota;
-    return path.replace(/\.(webp|jpe?g)$/i, '.png');
+    if (/mitsubishi/i.test(path)) return 'vehiculo-mitsubishi-l200.webp';
+    if (/toyota/i.test(path)) return 'vehiculo-toyota-hilux.webp';
+    return path;
   };
 
   function setMessage(element, text, success = false) {

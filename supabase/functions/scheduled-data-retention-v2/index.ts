@@ -1,6 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "jsr:@supabase/server@^1";
 
+type OldTrip = {
+  id: string;
+  trip_photo_path: string | null;
+};
+
 export default {
   fetch: withSupabase({ auth: ["secret"] }, async (request, context) => {
     if (request.method !== "POST") {
@@ -20,9 +25,10 @@ export default {
       return Response.json({ error: selectError.message }, { status: 500 });
     }
 
-    const photoPaths = (oldTrips || [])
+    const trips = (oldTrips || []) as OldTrip[];
+    const photoPaths = trips
       .map((trip) => trip.trip_photo_path)
-      .filter(Boolean);
+      .filter((path): path is string => Boolean(path));
     for (let index = 0; index < photoPaths.length; index += 100) {
       const { error } = await adminClient.storage
         .from("vehicle-trip-photos")
@@ -32,7 +38,7 @@ export default {
       }
     }
 
-    const ids = (oldTrips || []).map((trip) => trip.id);
+    const ids = trips.map((trip) => trip.id);
     if (ids.length) {
       const { error } = await adminClient
         .from("vehicle_reservations")
