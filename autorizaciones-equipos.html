@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autorización de equipos | EDECA</title>
+  <meta name="description" content="Autorización docente de préstamos de equipo para cursos y estudiantes de EDECA." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="autorizaciones-equipos.css?v=1" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#003C71" />
+  <link rel="icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Volver al inicio">
+      <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
+      <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
+    </a>
+    <div class="header-actions">
+      <button class="install-button" type="button" data-pwa-install hidden>Instalar App</button>
+      <button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button>
+      <img class="una-logo" src="logo-una.png" alt="Universidad Nacional" />
+    </div>
+  </header>
+
+  <main class="page">
+    <a class="back-link" href="index.html">← Volver al inicio</a>
+    <section class="intro">
+      <div>
+        <p class="eyebrow">Visto bueno docente</p>
+        <h1>Autorización de préstamo de equipos</h1>
+        <p>Autoriza a todo un curso o a un estudiante particular desde esta misma pantalla.</p>
+      </div>
+      <div class="session-card"><span>Sesión de</span><strong id="teacherName">Verificando…</strong></div>
+    </section>
+
+    <div class="message" id="pageMessage" role="status" aria-live="polite" hidden></div>
+
+    <section class="identity-card" aria-labelledby="identityTitle">
+      <div>
+        <p class="step">Paso único</p>
+        <h2 id="identityTitle">Ingrese su cédula</h2>
+        <p>Con ella cargaremos únicamente los cursos asociados a su cuenta.</p>
+      </div>
+      <form id="identityForm" class="identity-form">
+        <label for="teacherId">Cédula del profesor</label>
+        <div class="input-action">
+          <input id="teacherId" name="teacherId" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="Ej.: 101230456" required />
+          <button type="submit" id="loadCoursesButton">Cargar mis cursos</button>
+        </div>
+      </form>
+    </section>
+
+    <div class="authorization-grid" id="authorizationArea" hidden>
+      <section class="panel" aria-labelledby="courseTitle">
+        <div class="panel-heading">
+          <span class="panel-number">1</span>
+          <div><h2 id="courseTitle">Autorizar a un curso completo</h2><p>Una autorización cubre a todos los estudiantes matriculados.</p></div>
+        </div>
+        <form id="courseForm">
+          <label for="courseSelect">Curso</label>
+          <select id="courseSelect" required></select>
+          <fieldset>
+            <legend>Motivo</legend>
+            <div class="reason-options">
+              <label><input type="radio" name="courseReason" value="course_trip" checked /><span>Gira de curso</span></label>
+              <label><input type="radio" name="courseReason" value="supervised_practice" /><span>Práctica supervisada</span></label>
+              <label><input type="radio" name="courseReason" value="other" /><span>Otro</span></label>
+            </div>
+          </fieldset>
+          <div id="courseOtherWrap" hidden><label for="courseOther">Especifique el motivo</label><input id="courseOther" maxlength="240" /></div>
+          <button class="primary-action" id="authorizeCourseButton" type="submit">Autorizar préstamo para todo el curso</button>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="individualTitle">
+        <div class="panel-heading">
+          <span class="panel-number">2</span>
+          <div><h2 id="individualTitle">Otras autorizaciones</h2><p>Para un estudiante fuera de sus cursos.</p></div>
+        </div>
+        <form id="studentSearchForm">
+          <label for="studentId">Cédula del estudiante</label>
+          <div class="input-action compact">
+            <input id="studentId" inputmode="numeric" maxlength="20" placeholder="Digite la cédula" required />
+            <button type="submit" id="findStudentButton">Buscar</button>
+          </div>
+        </form>
+        <form id="individualForm" hidden>
+          <article class="student-result">
+            <span>Estudiante</span><strong id="studentName"></strong><small id="studentDetails"></small>
+          </article>
+          <fieldset>
+            <legend>Motivo</legend>
+            <div class="reason-options">
+              <label><input type="radio" name="individualReason" value="course_trip" checked /><span>Gira de curso</span></label>
+              <label><input type="radio" name="individualReason" value="supervised_practice" /><span>Práctica supervisada</span></label>
+              <label><input type="radio" name="individualReason" value="other" /><span>Otro</span></label>
+            </div>
+          </fieldset>
+          <div id="individualOtherWrap" hidden><label for="individualOther">Especifique el motivo</label><input id="individualOther" maxlength="240" /></div>
+          <button class="primary-action" id="authorizeStudentButton" type="submit">Autorizar a este estudiante</button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=5"></script>
+  <script src="autorizaciones-equipos.js?v=1"></script>
+  <script src="pwa-install.js?v=1"></script>
+</body>
+</html>

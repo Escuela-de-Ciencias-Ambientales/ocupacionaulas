@@ -1,7 +1,7 @@
 {
   "name": "Reservas de aulas EDECA",
   "short_name": "Reservas EDECA",
-  "description": "Consulta y reserva de aulas y vehículos de la Escuela de Ciencias Ambientales, UNA.",
+  "description": "Consulta y reserva de aulas y vehículos, y autorización de préstamos de equipo de EDECA, UNA.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

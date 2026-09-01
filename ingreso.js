@@ -12,6 +12,8 @@
   const loginTitle = document.getElementById('loginTitle');
   const accessModeDescription = document.getElementById('accessModeDescription');
   const message = document.getElementById('loginMessage');
+  const returnPage = new URLSearchParams(window.location.search).get('return');
+  const safeReturnPage = returnPage === 'autorizaciones-equipos.html' ? returnPage : 'reservas.html?v=18';
 
   function showMessage(text, success = false) {
     message.textContent = text;
@@ -50,7 +52,7 @@
   });
 
   client.auth.getSession().then(({ data }) => {
-    if (data.session) window.location.replace('reservas.html?v=18');
+    if (data.session) window.location.replace(safeReturnPage);
   });
 
   loginForm.addEventListener('submit', async (event) => {
@@ -68,7 +70,7 @@
       loginButton.textContent = 'Ingresar a reservas';
       return;
     }
-    window.location.replace('reservas.html?v=18');
+    window.location.replace(safeReturnPage);
   });
 
   registerForm.addEventListener('submit', async (event) => {

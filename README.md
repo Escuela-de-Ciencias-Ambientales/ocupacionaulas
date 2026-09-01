@@ -7,6 +7,7 @@ Sistema pequeño de consulta y reserva de aulas para la Escuela de Ciencias Ambi
 - Consulta pública del horario académico fijo.
 - Página pública limpia, dedicada únicamente a la ocupación académica.
 - Página independiente para el ingreso del personal docente.
+- Módulo responsive para que cada docente autorice préstamos de equipo a todo un curso o a un estudiante particular.
 - Área privada de reservas disponible únicamente después de iniciar sesión.
 - Vista diaria de tramos disponibles y ocupados para cada aula dentro del área privada.
 - Inicio de sesión individual con correo y contraseña.
@@ -34,6 +35,11 @@ Sistema pequeño de consulta y reserva de aulas para la Escuela de Ciencias Ambi
 ## Estructura
 
 - `index.html`: página pública del horario académico, con acceso hacia el ingreso docente.
+- `autorizaciones-equipos.html`: autorización docente de préstamos por curso completo o estudiante individual.
+
+### Prueba del módulo de equipos
+
+La migración `202609010002_equipment_authorizations_test_data.sql` vincula temporalmente la cuenta `adrian.delgado.torres@una.cr` con la cédula ficticia `999999999`, el NRC `TEST-001` y cinco estudiantes ficticios con cédulas de `900000001` a `900000005`. Estos datos deben sustituirse al cargar los padrones oficiales.
 - `ingreso.html`: página exclusiva para usuario y contraseña.
 - `reservas.html`: área privada de consulta y reservación.
 - `ingreso.css` y `ingreso.js`: presentación y autenticación de la página de acceso.

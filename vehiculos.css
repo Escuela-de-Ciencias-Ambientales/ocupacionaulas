@@ -12,6 +12,8 @@
   --vehicle-line: #d7e2de;
 }
 
+[data-feature-disabled] { display: none !important; }
+
 .module-switch {
   display: inline-flex;
   width: fit-content;
