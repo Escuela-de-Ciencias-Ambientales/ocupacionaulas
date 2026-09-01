@@ -1,5 +1,5 @@
 -- Datos ficticios para validar el flujo docente antes de cargar padrones oficiales.
--- Profesor de prueba: adrian.delgado.torres@una.cr / cedula 999999999.
+-- Profesor de prueba: profe.prueba.primero@una.cr / cedula 999999999.
 
 do $$
 declare
@@ -10,11 +10,11 @@ declare
 begin
   select * into test_teacher
   from public.profiles
-  where lower(email) = 'adrian.delgado.torres@una.cr'
+  where lower(email) = 'profe.prueba.primero@una.cr'
   limit 1;
 
   if not found then
-    raise notice 'No existe la cuenta adrian.delgado.torres@una.cr; se omite el curso docente de prueba';
+    raise notice 'No existe la cuenta profe.prueba.primero@una.cr; se omite el curso docente de prueba';
     return;
   end if;
 
@@ -24,7 +24,7 @@ begin
 
   update public.teacher_registry
   set national_id = '999999999'
-  where lower(email) = 'adrian.delgado.torres@una.cr';
+  where lower(email) = 'profe.prueba.primero@una.cr';
 
   select id into current_cycle_id
   from public.reservation_cycles
