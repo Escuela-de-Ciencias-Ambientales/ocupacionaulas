@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Gestión de bodega | EDECA</title>
+    <meta name="theme-color" content="#073b2a" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="bodega-equipos.css?v=1" />
+  </head>
+  <body>
+    <section id="loginView" class="login-shell">
+      <div class="login-brand">
+        <img src="logo-edeca.png" alt="EDECA" />
+        <p>Escuela de Ciencias Ambientales</p>
+        <h1>Gestión de bodega</h1>
+        <span>Administración de solicitudes y préstamos de equipo.</span>
+      </div>
+      <form id="loginForm" class="login-card">
+        <p class="eyebrow">Acceso privado</p>
+        <h2>Iniciar sesión</h2>
+        <label>Correo institucional<input id="email" type="email" autocomplete="username" required /></label>
+        <label>Contraseña<input id="password" type="password" autocomplete="current-password" required /></label>
+        <button type="submit">Ingresar a bodega</button>
+        <p id="loginMessage" class="message" hidden></p>
+      </form>
+    </section>
+
+    <div id="appView" class="app-shell" hidden>
+      <aside class="sidebar">
+        <div class="brand"><img src="logo-edeca.png" alt="EDECA" /><div><strong>SIGEP</strong><small>Gestión de bodega</small></div></div>
+        <nav aria-label="Secciones de bodega">
+          <button class="nav-item active" data-view="requests">Solicitudes <span id="pendingBadge">0</span></button>
+          <button class="nav-item" data-view="equipment">Inventario</button>
+          <button class="nav-item" data-view="clients">Clientes</button>
+        </nav>
+        <button id="logout" class="logout">Cerrar sesión</button>
+      </aside>
+      <main class="workspace">
+        <header class="topbar"><div><small>ESCUELA DE CIENCIAS AMBIENTALES · UNA</small><strong id="staffName"></strong></div><img src="logo-una.png" alt="Universidad Nacional" /></header>
+        <div id="appMessage" class="app-message" hidden></div>
+
+        <section id="requestsView" class="view">
+          <div class="page-heading"><div><p class="eyebrow">Panel operativo</p><h1>Préstamos de estudiantes</h1><span>Solicitudes recibidas desde el formulario móvil.</span></div><button id="refresh" class="secondary">Actualizar</button></div>
+          <div class="metrics">
+            <article><span>Pendientes</span><strong id="metricPending">0</strong></article>
+            <article><span>Aprobadas</span><strong id="metricApproved">0</strong></article>
+            <article><span>Prestados</span><strong id="metricDelivered">0</strong></article>
+            <article class="alert"><span>Vencidos</span><strong id="metricOverdue">0</strong></article>
+          </div>
+          <div class="filter-row"><input id="requestSearch" type="search" placeholder="Buscar por número, cédula o estudiante" /><select id="statusFilter"><option value="active">Operaciones activas</option><option value="all">Todas</option><option value="pending">Pendientes</option><option value="approved">Aprobadas</option><option value="delivered">Prestadas</option><option value="returned">Devueltas</option><option value="rejected">Rechazadas</option></select></div>
+          <div id="requestList" class="request-list"></div>
+        </section>
+
+        <section id="equipmentView" class="view" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Control de existencias</p><h1>Inventario por tipo</h1><span>Cantidades disponibles para nuevas solicitudes.</span></div><button id="newEquipment">＋ Agregar equipo</button></div>
+          <div id="equipmentGrid" class="equipment-grid"></div>
+        </section>
+
+        <section id="clientsView" class="view" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Personas registradas</p><h1>Clientes</h1><span>Estudiantes y sus préstamos activos.</span></div></div>
+          <input id="clientSearch" class="wide-search" type="search" placeholder="Buscar por nombre, cédula o carrera" />
+          <div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Cédula</th><th>Carrera</th><th>Préstamos activos</th></tr></thead><tbody id="clientRows"></tbody></table></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="equipmentDialog">
+      <form id="equipmentForm" method="dialog">
+        <div class="dialog-head"><div><p class="eyebrow">Inventario</p><h2 id="equipmentDialogTitle">Agregar equipo</h2></div><button type="button" id="closeEquipment" class="icon-button" aria-label="Cerrar">×</button></div>
+        <input id="equipmentId" type="hidden" />
+        <label>Tipo o nombre del equipo<input id="equipmentName" maxlength="100" required /></label>
+        <label>Cantidad disponible<input id="equipmentAvailable" type="number" min="0" max="10000" required /></label>
+        <label class="check"><input id="equipmentActive" type="checkbox" checked /> Disponible para solicitudes</label>
+        <button type="submit">Guardar equipo</button>
+      </form>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js?v=5"></script>
+    <script src="bodega-equipos.js?v=1"></script>
+  </body>
+</html>
