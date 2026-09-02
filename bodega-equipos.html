@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="bodega-equipos.css?v=1" />
     <link rel="stylesheet" href="student-view.css?v=1" />
-    <link rel="stylesheet" href="warehouse-enhancements.css?v=2" />
+    <link rel="stylesheet" href="warehouse-enhancements.css?v=3" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=2" />
 </head>
   <body>
@@ -72,7 +72,7 @@
         <section id="loansView" class="view" hidden>
           <div class="page-heading"><div><p class="eyebrow">Trazabilidad</p><h1>Préstamos activos</h1><span>Busque por boleta, estudiante, tipo, activo, código, marca o modelo.</span></div></div>
           <input id="loanSearch" class="wide-search" type="search" placeholder="Filtrar préstamos activos" />
-          <div class="table-wrap"><table><thead><tr><th>Boleta</th><th>Estudiante</th><th>Equipo</th><th>Activo / código</th><th>Marca / modelo</th><th>Devolución</th><th></th></tr></thead><tbody id="loanRows"></tbody></table></div>
+          <div class="table-wrap"><table class="loan-table"><thead><tr><th>Boleta</th><th>Estudiante</th><th>Equipos pendientes</th><th>Devolución</th><th></th></tr></thead><tbody id="loanRows"></tbody></table></div>
         </section>
 
         <section id="clientsView" class="view" hidden>
@@ -131,7 +131,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
-    <script src="bodega-equipos.js?v=6"></script>
+    <script src="bodega-equipos.js?v=7"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>
 </html>
