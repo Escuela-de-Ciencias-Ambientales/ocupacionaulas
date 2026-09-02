@@ -14,7 +14,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="solicitar-equipo.css?v=1" />
-  <link rel="stylesheet" href="navigation-enhancements.css?v=1" />
+    <link rel="stylesheet" href="request-signature.css?v=1" />
+  <link rel="stylesheet" href="navigation-enhancements.css?v=2" />
 </head>
   <body>
     <header>
@@ -71,6 +72,12 @@
             <label for="returnAt">Fecha y hora de devolución</label
             ><input id="returnAt" type="datetime-local" required />
           </div>
+          <section class="request-signature">
+            <label>Firma del estudiante</label>
+            <p>Firme con el dedo o con el mouse para confirmar la solicitud.</p>
+            <canvas id="studentSignature" aria-label="Área para firma del estudiante"></canvas>
+            <div><span id="studentSignatureStatus">Firma pendiente</span><button id="clearStudentSignature" type="button">Limpiar firma</button></div>
+          </section>
           <button class="send" type="submit">Enviar solicitud</button>
         </form>
       </section>
@@ -85,7 +92,7 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
-    <script src="solicitar-equipo.js?v=2"></script>
+    <script src="solicitar-equipo.js?v=3"></script>
     <script src="pwa-install.js?v=1"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>

@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
   <link rel="icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="navigation-enhancements.css?v=1" />
+  <link rel="stylesheet" href="navigation-enhancements.css?v=2" />
 </head>
 <body>
   <header class="site-header">
@@ -55,13 +55,6 @@
     </section>
 
     <div class="authorization-grid" id="authorizationArea" hidden>
-      <section class="signature-panel" id="signaturePanel">
-        <div><p class="step">Firma del profesor</p><h2>Firme para confirmar la autorización</h2><p>Puede firmar con el dedo en el teléfono o con el mouse.</p></div>
-        <div class="signature-box">
-          <canvas id="teacherSignature" aria-label="Área para firma táctil"></canvas>
-          <div class="signature-actions"><span id="signatureStatus">Firma pendiente</span><button id="clearSignature" type="button">Limpiar firma</button></div>
-        </div>
-      </section>
       <section class="panel" aria-labelledby="courseTitle">
         <div class="panel-heading">
           <span class="panel-number">1</span>
@@ -110,6 +103,13 @@
           <div id="individualOtherWrap" hidden><label for="individualOther">Especifique el motivo</label><input id="individualOther" maxlength="240" /></div>
           <button class="primary-action" id="authorizeStudentButton" type="submit">Autorizar a este estudiante</button>
         </form>
+      </section>
+      <section class="signature-panel" id="signaturePanel">
+        <div><p class="step">Paso final · Firma del profesor</p><h2>Firme para confirmar la autorización</h2><p>Puede firmar con el dedo en el teléfono o con el mouse.</p></div>
+        <div class="signature-box">
+          <canvas id="teacherSignature" aria-label="Área para firma táctil"></canvas>
+          <div class="signature-actions"><span id="signatureStatus">Firma pendiente</span><button id="clearSignature" type="button">Limpiar firma</button></div>
+        </div>
       </section>
     </div>
   </main>

@@ -1,3 +1,4 @@
+.login-shell[hidden], .app-shell[hidden], .view[hidden] { display: none !important; }
 .student-request-frame {
   display: block;
   width: 100%;

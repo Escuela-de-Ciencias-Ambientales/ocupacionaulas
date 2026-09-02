@@ -12,7 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="bodega-equipos.css?v=1" />
     <link rel="stylesheet" href="student-view.css?v=1" />
-  <link rel="stylesheet" href="navigation-enhancements.css?v=1" />
+    <link rel="stylesheet" href="warehouse-enhancements.css?v=1" />
+  <link rel="stylesheet" href="navigation-enhancements.css?v=2" />
 </head>
   <body>
     <section id="loginView" class="login-shell">
@@ -37,6 +38,7 @@
         <div class="brand"><img src="logo-edeca.png" alt="EDECA" /><div><strong>SIGEP</strong><small>Gestión de bodega</small></div></div>
         <nav aria-label="Secciones de bodega">
           <button class="nav-item active" data-view="requests">Solicitudes <span id="pendingBadge">0</span></button>
+          <button class="nav-item" data-view="loans">Préstamos activos</button>
           <button class="nav-item" data-view="equipment">Inventario</button>
           <button class="nav-item" data-view="clients">Clientes</button>
           <button class="nav-item" data-view="authorizations">Autorizaciones</button>
@@ -61,14 +63,21 @@
         </section>
 
         <section id="equipmentView" class="view" hidden>
-          <div class="page-heading"><div><p class="eyebrow">Control de existencias</p><h1>Inventario por tipo</h1><span>Cantidades disponibles para nuevas solicitudes.</span></div><button id="newEquipment">＋ Agregar equipo</button></div>
+          <div class="page-heading"><div><p class="eyebrow">Control de existencias</p><h1>Inventario por tipo</h1><span>La disponibilidad se calcula automáticamente con los equipos individuales.</span></div><button id="newEquipment">＋ Agregar equipo individual</button></div>
           <div id="equipmentGrid" class="equipment-grid"></div>
+          <section id="unitDetail" class="unit-detail" hidden><div class="authorization-heading"><h2 id="unitDetailTitle">Equipos</h2><span id="unitDetailCount"></span></div><div class="table-wrap"><table><thead><tr><th>Código</th><th>Activo</th><th>Marca / modelo</th><th>Serie</th><th>Estado</th><th>Observaciones</th><th></th></tr></thead><tbody id="unitRows"></tbody></table></div></section>
+        </section>
+
+        <section id="loansView" class="view" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Trazabilidad</p><h1>Préstamos activos</h1><span>Busque por boleta, estudiante, tipo, activo, código, marca o modelo.</span></div></div>
+          <input id="loanSearch" class="wide-search" type="search" placeholder="Filtrar préstamos activos" />
+          <div class="table-wrap"><table><thead><tr><th>Boleta</th><th>Estudiante</th><th>Equipo</th><th>Activo / código</th><th>Marca / modelo</th><th>Devolución</th><th></th></tr></thead><tbody id="loanRows"></tbody></table></div>
         </section>
 
         <section id="clientsView" class="view" hidden>
-          <div class="page-heading"><div><p class="eyebrow">Personas registradas</p><h1>Clientes</h1><span>Estudiantes y sus préstamos activos.</span></div></div>
+          <div class="page-heading"><div><p class="eyebrow">Personas registradas</p><h1>Clientes</h1><span>Estudiantes y sus préstamos activos.</span></div><button id="newClient">＋ Agregar estudiante</button></div>
           <input id="clientSearch" class="wide-search" type="search" placeholder="Buscar por nombre, cédula o carrera" />
-          <div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Cédula</th><th>Carrera</th><th>Préstamos activos</th></tr></thead><tbody id="clientRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Cédula</th><th>Carrera</th><th>Préstamos activos</th><th></th></tr></thead><tbody id="clientRows"></tbody></table></div>
         </section>
 
         <section id="authorizationsView" class="view" hidden>
@@ -101,18 +110,26 @@
 
     <dialog id="equipmentDialog">
       <form id="equipmentForm" method="dialog">
-        <div class="dialog-head"><div><p class="eyebrow">Inventario</p><h2 id="equipmentDialogTitle">Agregar equipo</h2></div><button type="button" id="closeEquipment" class="icon-button" aria-label="Cerrar">×</button></div>
+        <div class="dialog-head"><div><p class="eyebrow">Inventario individual</p><h2 id="equipmentDialogTitle">Agregar equipo</h2></div><button type="button" id="closeEquipment" class="icon-button" aria-label="Cerrar">×</button></div>
         <input id="equipmentId" type="hidden" />
-        <label>Tipo o nombre del equipo<input id="equipmentName" maxlength="100" required /></label>
-        <label>Cantidad disponible<input id="equipmentAvailable" type="number" min="0" max="10000" required /></label>
-        <label class="check"><input id="equipmentActive" type="checkbox" checked /> Disponible para solicitudes</label>
+        <label>Tipo de equipo<select id="equipmentCategory" required></select></label>
+        <label>Código consecutivo<input id="equipmentCode" maxlength="40" required /></label>
+        <label>Número de activo institucional<input id="equipmentAsset" maxlength="80" /></label>
+        <label>Marca<input id="equipmentBrand" maxlength="100" /></label><label>Modelo<input id="equipmentModel" maxlength="100" /></label>
+        <label>Número de serie<input id="equipmentSerial" maxlength="120" /></label><label>Uso<input id="equipmentUse" maxlength="240" /></label>
+        <label>Estado<select id="equipmentStatus"><option value="available">Disponible</option><option value="loaned">Prestado</option><option value="maintenance">Mantenimiento</option><option value="retired">Retirado</option></select></label>
+        <label>Observaciones<textarea id="equipmentObservations" maxlength="1000"></textarea></label>
+        <label class="check"><input id="equipmentActive" type="checkbox" checked /> Equipo activo</label>
         <button type="submit">Guardar equipo</button>
       </form>
     </dialog>
+    <dialog id="clientDialog"><form id="clientForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Clientes</p><h2 id="clientDialogTitle">Agregar estudiante</h2></div><button type="button" id="closeClient" class="icon-button">×</button></div><input id="clientId" type="hidden" /><label>Cédula<input id="clientNationalId" required inputmode="numeric" /></label><label>Nombre completo<input id="clientName" required /></label><label>Correo<input id="clientEmail" type="email" /></label><label>Carrera<select id="clientCareer"><option>Ingeniería en Ciencias Forestales</option><option>Ingeniería en Gestión Ambiental</option></select></label><label class="check"><input id="clientActive" type="checkbox" checked /> Estudiante activo</label><button type="submit">Guardar estudiante</button></form></dialog>
+    <dialog id="deliveryDialog"><form id="deliveryForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Entrega</p><h2 id="deliveryTitle">Asignar equipos</h2></div><button type="button" data-close-dialog="deliveryDialog" class="icon-button">×</button></div><p>Seleccione exactamente las unidades que se entregarán.</p><div id="deliveryUnits" class="dialog-list"></div><button type="submit">Confirmar entrega y generar comprobante</button></form></dialog>
+    <dialog id="returnDialog"><form id="returnForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Devolución</p><h2 id="returnTitle">Registrar devolución</h2></div><button type="button" data-close-dialog="returnDialog" class="icon-button">×</button></div><label>¿Quién devuelve?<input id="returnedBy" required placeholder="Nombre de la persona" /></label><div id="returnUnits" class="dialog-list"></div><button type="submit">Registrar devolución y enviar comprobante</button></form></dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
-    <script src="bodega-equipos.js?v=4"></script>
+    <script src="bodega-equipos.js?v=5"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>
 </html>

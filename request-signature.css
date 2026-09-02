@@ -1,0 +1,7 @@
+.request-signature { margin: 18px 0; overflow: hidden; border: 1px solid #bdcac5; border-radius: 13px; background: #fff; }
+.request-signature > label, .request-signature > p { display: block; margin: 10px 13px 0; }
+.request-signature > p { color: #63706d; font-weight: 400; }
+#studentSignature { display: block; width: 100%; height: 170px; margin-top: 10px; background: repeating-linear-gradient(#fff 0,#fff 139px,#d9e3df 140px,#fff 141px); cursor: crosshair; touch-action: none; }
+.request-signature > div { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-top: 1px solid #dce5e1; background: #eef6f1; color: #63706d; font-weight: 700; }
+.request-signature > div button { min-height: 38px; padding: 7px 12px; color: #034991; background: #fff; border: 1px solid #034991; }
+.request-signature .signed { color: #0e5936; }

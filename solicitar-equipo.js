@@ -4,7 +4,20 @@
     cfg = window.RESERVAS_CONFIG || {};
   let client,
     context,
-    quantities = {};
+    quantities = {}, signatureDrawn = false, drawing = false;
+  const signatureCanvas = () => $("studentSignature");
+  const signatureContext = () => signatureCanvas().getContext("2d");
+  function resizeSignature() {
+    const canvas=signatureCanvas(), ratio=Math.max(devicePixelRatio||1,1), old=signatureDrawn?canvas.toDataURL():null;
+    canvas.width=Math.max(1,Math.floor(canvas.clientWidth*ratio)); canvas.height=Math.floor(170*ratio);
+    const ctx=signatureContext(); ctx.setTransform(ratio,0,0,ratio,0,0); ctx.lineWidth=2.6; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle="#122c24";
+    if(old){const image=new Image(); image.onload=()=>ctx.drawImage(image,0,0,canvas.clientWidth,170); image.src=old;}
+  }
+  function point(event){const rect=signatureCanvas().getBoundingClientRect();return{x:event.clientX-rect.left,y:event.clientY-rect.top};}
+  function startSignature(event){event.preventDefault();drawing=true;const p=point(event),ctx=signatureContext();ctx.beginPath();ctx.moveTo(p.x,p.y);signatureCanvas().setPointerCapture?.(event.pointerId);}
+  function moveSignature(event){if(!drawing)return;event.preventDefault();const p=point(event),ctx=signatureContext();ctx.lineTo(p.x,p.y);ctx.stroke();signatureDrawn=true;$("studentSignatureStatus").textContent="Firma registrada";$("studentSignatureStatus").classList.add("signed");}
+  function stopSignature(){drawing=false;}
+  function clearSignature(){const canvas=signatureCanvas();signatureContext().clearRect(0,0,canvas.width,canvas.height);signatureDrawn=false;$("studentSignatureStatus").textContent="Firma pendiente";$("studentSignatureStatus").classList.remove("signed");}
   function msg(t, ok = false) {
     $("message").textContent = t;
     $("message").classList.toggle("ok", ok);
@@ -44,6 +57,7 @@
     $("studentName").textContent = data.full_name;
     $("authorization").textContent = `Autorizado: ${data.authorization_label}`;
     $("requestArea").hidden = false;
+    requestAnimationFrame(resizeSignature);
     render();
     const d = new Date(Date.now() + 86400000);
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -56,14 +70,17 @@
       .filter(([, q]) => q > 0)
       .map(([id, quantity]) => ({ id: Number(id), quantity }));
     if (!items.length) return msg("Seleccione al menos un equipo.");
+    if (!signatureDrawn) return msg("Firme en el recuadro antes de enviar la solicitud.");
     const { data, error } = await client.rpc("create_student_loan_request", {
       p_national_id: context.nationalId,
       p_authorization_id: context.authorization_id,
       p_expected_return_at: new Date($("returnAt").value).toISOString(),
       p_items: items,
+      p_signature_data: signatureCanvas().toDataURL("image/png"),
     });
     if (error) return msg(error.message);
     $("requestNumber").textContent = data.request_number;
+    client.functions.invoke("send-equipment-receipt", { body:{ event:"request", requestId:data.request_id, token:data.receipt_token } }).catch(() => {});
     $("confirmation").showModal();
   }
   $("idForm").addEventListener("submit", identify);
@@ -81,6 +98,10 @@
     render($("search").value);
   });
   $("newRequest").addEventListener("click", () => location.reload());
+  $("clearStudentSignature").addEventListener("click", clearSignature);
+  signatureCanvas().addEventListener("pointerdown", startSignature); signatureCanvas().addEventListener("pointermove", moveSignature);
+  ["pointerup","pointercancel","pointerleave"].forEach((name)=>signatureCanvas().addEventListener(name,stopSignature));
+  window.addEventListener("resize",resizeSignature); resizeSignature();
   if (
     !cfg.supabaseUrl ||
     !cfg.supabaseAnonKey ||
