@@ -1,8 +1,14 @@
-.sigep-header-logo{display:block!important;width:clamp(150px,18vw,250px)!important;height:70px!important;object-fit:cover!important;object-position:center!important;border-radius:8px;background:#fff}
+.sigep-header-logo{display:block!important;width:clamp(190px,22vw,300px)!important;height:72px!important;object-fit:contain!important;object-position:left center!important;background:#fff}
 .sigep-login-logo{width:min(520px,100%)!important;height:auto!important;margin:0 0 38px!important;filter:none!important;border-radius:10px}
 .sigep-loading-logo{width:min(340px,72vw)!important;height:auto!important;border-radius:10px}
 .sigep-sidebar-brand img{width:82px!important;height:42px!important;object-fit:cover!important;filter:none!important;border-radius:5px;background:#fff}
-.topbar .sigep-header-logo{width:190px!important;height:58px!important;margin-left:auto}
-@media(max-width:1050px){.topbar .sigep-header-logo{width:150px!important}.topbar .top-links{display:none}}
-@media(max-width:700px){body>header .sigep-header-logo,.site-header .sigep-header-logo{width:138px!important;height:58px!important;margin-left:auto}.site-header .brand span{display:none}.sigep-sidebar-brand img{width:68px!important}.topbar .sigep-header-logo{width:135px!important;height:52px!important}.topbar>div small{display:none}}
-@media(max-width:480px){body>header{gap:8px}body>header>div{display:none}.site-header .sigep-header-logo{width:155px!important}.topbar .sigep-header-logo{width:120px!important}.topbar>img:last-child{display:none}}
+.sigep-site-header,.site-header{min-height:98px!important;padding:10px max(20px,calc((100% - 1320px)/2))!important;border-top:0!important;border-bottom:1px solid #d7e2de!important;background:#fff!important;box-shadow:none!important}
+.sigep-primary-brand{display:flex;align-items:center;min-width:270px;text-decoration:none}
+.sigep-primary-brand img{width:clamp(220px,25vw,340px)!important;height:76px!important;object-fit:contain!important;object-position:left center!important}
+.sigep-module-name{display:grid!important;gap:2px!important;margin-left:auto!important;padding-right:22px!important;text-align:right!important;border-right:1px solid #d7e2de!important;color:#102a3a!important}
+.sigep-module-name strong{font-size:.84rem!important;letter-spacing:.055em!important;text-transform:uppercase!important}.sigep-module-name span{font-size:.92rem!important;color:#5b6f77!important}
+.sigep-site-header>.una,.site-header .una-logo,.sigep-una-logo{width:92px!important;height:72px!important;object-fit:contain!important}
+.topbar.sigep-admin-header{height:98px;gap:22px;background:#fff}.topbar.sigep-admin-header .sigep-header-logo{margin:0 auto 0 0!important}.sigep-admin-user{display:grid!important;min-width:180px;padding-left:20px;border-left:1px solid #d7e2de}.topbar.sigep-admin-header .top-links{margin-left:auto}.topbar.sigep-admin-header .sigep-una-logo{width:88px!important}
+@media(max-width:1100px){.topbar.sigep-admin-header .top-links{display:none}.sigep-module-name{display:none!important}.sigep-primary-brand{min-width:0}}
+@media(max-width:700px){.sigep-site-header,.site-header{min-height:82px!important;padding:8px 14px!important}.sigep-primary-brand img{width:210px!important;height:62px!important}.sigep-site-header>.una,.site-header .una-logo{width:68px!important;height:58px!important}.sigep-sidebar-brand img{width:68px!important}.topbar.sigep-admin-header{height:82px;gap:10px}.topbar.sigep-admin-header .sigep-header-logo{width:185px!important;height:60px!important}.sigep-admin-user{border:0;padding:0;min-width:0}.topbar.sigep-admin-header .sigep-una-logo{display:none!important}}
+@media(max-width:480px){.sigep-primary-brand img{width:175px!important}.site-header .header-actions{margin-left:auto}.site-header .una-logo{display:block!important}.topbar.sigep-admin-header .sigep-header-logo{width:155px!important}.sigep-admin-user small{display:none}.sigep-admin-user strong{font-size:.82rem}}
