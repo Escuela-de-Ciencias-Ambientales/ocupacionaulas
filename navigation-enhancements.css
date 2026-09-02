@@ -1,0 +1,19 @@
+.global-back-button {
+  position: fixed;
+  z-index: 10000;
+  top: 14px;
+  left: 14px;
+  min-height: 46px;
+  padding: 10px 18px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  color: #fff;
+  background: #075f41;
+  box-shadow: 0 8px 24px rgba(4, 48, 34, .28);
+  font: 800 16px/1.2 "Source Sans 3", "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+.global-back-button:hover { background: #034991; transform: translateY(-1px); }
+.global-back-button:focus-visible { outline: 4px solid rgba(3, 73, 145, .3); outline-offset: 3px; }
+@media (max-width: 600px) { .global-back-button { top: 9px; left: 9px; min-height: 42px; padding: 8px 14px; font-size: 14px; } }
+@media print { .global-back-button { display: none !important; } }

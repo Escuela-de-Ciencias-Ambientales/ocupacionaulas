@@ -295,8 +295,12 @@
     if (equipmentNav) {
       equipmentNav.href = isAdmin() ? 'bodega-equipos.html?view=authorizations' : 'autorizaciones-equipos.html';
       equipmentNav.textContent = isAdmin() ? 'Bodega de equipos' : 'Autorización de equipos';
-      equipmentNav.onclick = isAdmin() ? () => {
-        if (state.session) window.name = `EDECA_SESSION:${btoa(JSON.stringify({ access_token:state.session.access_token, refresh_token:state.session.refresh_token }))}`;
+      equipmentNav.onclick = isAdmin() ? (event) => {
+        if (!state.session) return;
+        event.preventDefault();
+        const payload = btoa(JSON.stringify({ access_token:state.session.access_token, refresh_token:state.session.refresh_token }));
+        window.name = `EDECA_SESSION:${payload}`;
+        location.href = `${equipmentNav.href.split('#')[0]}#session=${encodeURIComponent(payload)}`;
       } : null;
     }
     if (elements.showConserjeriaAdmin) elements.showConserjeriaAdmin.hidden = !isConserjeriaAdmin();

@@ -11,7 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="bodega-equipos.css?v=1" />
-  </head>
+    <link rel="stylesheet" href="student-view.css?v=1" />
+  <link rel="stylesheet" href="navigation-enhancements.css?v=1" />
+</head>
   <body>
     <section id="loginView" class="login-shell">
       <div class="login-brand">
@@ -38,6 +40,7 @@
           <button class="nav-item" data-view="equipment">Inventario</button>
           <button class="nav-item" data-view="clients">Clientes</button>
           <button class="nav-item" data-view="authorizations">Autorizaciones</button>
+          <button class="nav-item" data-view="student">Vista estudiante</button>
         </nav>
         <button id="logout" class="logout">Cerrar sesión</button>
       </aside>
@@ -89,6 +92,10 @@
           <div class="authorization-heading"><h2>Autorizaciones vigentes</h2><span id="authorizationCount"></span></div>
           <div id="authorizationList" class="authorization-list"></div>
         </section>
+        <section id="studentView" class="view" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Solicitud asistida</p><h1>Vista del estudiante</h1><span>Realice una solicitud desde el panel administrativo usando el mismo formulario público.</span></div></div>
+          <iframe class="student-request-frame" src="solicitar-equipo.html?embedded=1" title="Formulario de solicitud de equipos"></iframe>
+        </section>
       </main>
     </div>
 
@@ -105,6 +112,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
-    <script src="bodega-equipos.js?v=3"></script>
-  </body>
+    <script src="bodega-equipos.js?v=4"></script>
+  <script src="navigation-enhancements.js?v=1"></script>
+</body>
 </html>

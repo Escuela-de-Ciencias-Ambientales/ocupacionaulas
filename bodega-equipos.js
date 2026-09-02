@@ -77,12 +77,19 @@
   }
   function switchView(view) { state.view = view; document.querySelectorAll(".view").forEach((node) => { node.hidden = node.id !== `${view}View`; }); document.querySelectorAll(".nav-item").forEach((node) => node.classList.toggle("active", node.dataset.view === view)); }
   async function receiveSharedSession() {
-    if (!window.name.startsWith("EDECA_SESSION:")) return;
+    const hashPayload = location.hash.startsWith("#session=") ? decodeURIComponent(location.hash.slice("#session=".length)) : "";
+    const namePayload = window.name.startsWith("EDECA_SESSION:") ? window.name.slice("EDECA_SESSION:".length) : "";
+    const payload = hashPayload || namePayload;
+    if (!payload) return;
     try {
-      const session = JSON.parse(atob(window.name.slice("EDECA_SESSION:".length)));
+      const session = JSON.parse(atob(payload));
       window.name = "";
       if (session.access_token && session.refresh_token) await state.client.auth.setSession(session);
-    } catch (_error) { window.name = ""; }
+      if (hashPayload) { try { history.replaceState(null, "", `${location.pathname}${location.search}`); } catch (_error) {} }
+    } catch (_error) {
+      window.name = "";
+      if (hashPayload) { try { history.replaceState(null, "", `${location.pathname}${location.search}`); } catch (_historyError) {} }
+    }
   }
   async function init() {
     if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase?.createClient) return showLogin("No fue posible conectar con el servicio.");
@@ -96,7 +103,7 @@
     $("newEquipment").addEventListener("click", () => openEquipment()); $("closeEquipment").addEventListener("click", () => $("equipmentDialog").close()); $("equipmentForm").addEventListener("submit", saveEquipment);
     $("adminCourseAuthorization").addEventListener("submit", authorizeAdminCourse); $("adminStudentAuthorization").addEventListener("submit", authorizeAdminStudent);
     $("authorizationList").addEventListener("click", (event) => { const button = event.target.closest("[data-revoke-authorization]"); if (button) revokeAuthorization(button.dataset.revokeAuthorization); });
-    const requestedView = new URLSearchParams(location.search).get("view"); if (["requests", "equipment", "clients", "authorizations"].includes(requestedView)) state.view = requestedView;
+    const requestedView = new URLSearchParams(location.search).get("view"); if (["requests", "equipment", "clients", "authorizations", "student"].includes(requestedView)) state.view = requestedView;
     const { data: { session } } = await state.client.auth.getSession(); if (session) { await load(); switchView(state.view); } else showLogin();
   }
   init();

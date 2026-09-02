@@ -1,4 +1,4 @@
-const CACHE_NAME = "edeca-reservas-v28";
+const CACHE_NAME = "edeca-reservas-v29";
 const APP_SHELL = [
   "./index.html",
   "./ingreso.html",
@@ -12,6 +12,9 @@ const APP_SHELL = [
   "./bodega-equipos.html",
   "./bodega-equipos.css",
   "./bodega-equipos.js",
+  "./student-view.css",
+  "./navigation-enhancements.css",
+  "./navigation-enhancements.js",
   "./tramites-vehiculos.html",
   "./usuarios.html",
   "./mis-giras.html",

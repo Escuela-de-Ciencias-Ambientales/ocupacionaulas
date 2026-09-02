@@ -44,8 +44,14 @@
     header.insertAdjacentElement('afterend', navigation);
   }
 
-  function handoffSession() {
-    if (state.session) window.name = `EDECA_SESSION:${btoa(JSON.stringify({ access_token:state.session.access_token, refresh_token:state.session.refresh_token }))}`;
+  function handoffSession(event) {
+    if (!state.session) return;
+    const payload = btoa(JSON.stringify({ access_token:state.session.access_token, refresh_token:state.session.refresh_token }));
+    window.name = `EDECA_SESSION:${payload}`;
+    if (event?.currentTarget) {
+      event.preventDefault();
+      location.href = `${event.currentTarget.href.split('#')[0]}#session=${encodeURIComponent(payload)}`;
+    }
   }
 
   async function copyValue(value, button) {

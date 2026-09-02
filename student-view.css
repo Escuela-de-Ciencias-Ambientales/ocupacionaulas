@@ -1,0 +1,8 @@
+.student-request-frame {
+  display: block;
+  width: 100%;
+  min-height: 900px;
+  border: 1px solid #d7e2de;
+  border-radius: 18px;
+  background: #fff;
+}
