@@ -1,0 +1,8 @@
+.sigep-header-logo{display:block!important;width:clamp(150px,18vw,250px)!important;height:70px!important;object-fit:cover!important;object-position:center!important;border-radius:8px;background:#fff}
+.sigep-login-logo{width:min(520px,100%)!important;height:auto!important;margin:0 0 38px!important;filter:none!important;border-radius:10px}
+.sigep-loading-logo{width:min(340px,72vw)!important;height:auto!important;border-radius:10px}
+.sigep-sidebar-brand img{width:82px!important;height:42px!important;object-fit:cover!important;filter:none!important;border-radius:5px;background:#fff}
+.topbar .sigep-header-logo{width:190px!important;height:58px!important;margin-left:auto}
+@media(max-width:1050px){.topbar .sigep-header-logo{width:150px!important}.topbar .top-links{display:none}}
+@media(max-width:700px){body>header .sigep-header-logo,.site-header .sigep-header-logo{width:138px!important;height:58px!important;margin-left:auto}.site-header .brand span{display:none}.sigep-sidebar-brand img{width:68px!important}.topbar .sigep-header-logo{width:135px!important;height:52px!important}.topbar>div small{display:none}}
+@media(max-width:480px){body>header{gap:8px}body>header>div{display:none}.site-header .sigep-header-logo{width:155px!important}.topbar .sigep-header-logo{width:120px!important}.topbar>img:last-child{display:none}}
