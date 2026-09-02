@@ -44,6 +44,10 @@
     header.insertAdjacentElement('afterend', navigation);
   }
 
+  function handoffSession() {
+    if (state.session) window.name = `EDECA_SESSION:${btoa(JSON.stringify({ access_token:state.session.access_token, refresh_token:state.session.refresh_token }))}`;
+  }
+
   async function copyValue(value, button) {
     const text = String(value || 'No indicado');
     if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
@@ -198,6 +202,7 @@
       state.profile = profile;
       if (!canProcess()) { window.location.replace('reservas.html?modulo=vehiculos'); return; }
       ensureModuleNavigation();
+      if ($('processingEquipmentNav')) $('processingEquipmentNav').addEventListener('click', handoffSession);
       $('processingHeaderAccount').hidden = false;
       $('processingUserName').textContent = profile.full_name;
       if ($('processingManageUsersLink')) $('processingManageUsersLink').hidden = !isSuperadmin();

@@ -21,7 +21,6 @@
     </a>
     <div class="header-actions">
       <button class="install-button" type="button" data-pwa-install hidden>Instalar App</button>
-      <button class="logout-button" id="logoutButton" type="button">Cerrar sesión</button>
       <img class="una-logo" src="logo-una.png" alt="Universidad Nacional" />
     </div>
   </header>
@@ -34,7 +33,7 @@
         <h1>Autorización de préstamo de equipos</h1>
         <p>Autoriza a todo un curso o a un estudiante particular desde esta misma pantalla.</p>
       </div>
-      <div class="session-card"><span>Sesión de</span><strong id="teacherName">Verificando…</strong></div>
+      <div class="session-card"><span>Profesor</span><strong id="teacherName">Ingrese su cédula</strong></div>
     </section>
 
     <div class="message" id="pageMessage" role="status" aria-live="polite" hidden></div>
@@ -109,7 +108,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=5"></script>
-  <script src="autorizaciones-equipos.js?v=2"></script>
+  <script src="autorizaciones-equipos.js?v=3"></script>
   <script src="pwa-install.js?v=1"></script>
 </body>
 </html>

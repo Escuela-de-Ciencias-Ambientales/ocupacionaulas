@@ -76,9 +76,18 @@
     if (error) return message(error.message, true); message("Autorización revocada."); await load(); switchView("authorizations");
   }
   function switchView(view) { state.view = view; document.querySelectorAll(".view").forEach((node) => { node.hidden = node.id !== `${view}View`; }); document.querySelectorAll(".nav-item").forEach((node) => node.classList.toggle("active", node.dataset.view === view)); }
+  async function receiveSharedSession() {
+    if (!window.name.startsWith("EDECA_SESSION:")) return;
+    try {
+      const session = JSON.parse(atob(window.name.slice("EDECA_SESSION:".length)));
+      window.name = "";
+      if (session.access_token && session.refresh_token) await state.client.auth.setSession(session);
+    } catch (_error) { window.name = ""; }
+  }
   async function init() {
     if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase?.createClient) return showLogin("No fue posible conectar con el servicio.");
-    state.client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    state.client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+    await receiveSharedSession();
     $("loginForm").addEventListener("submit", login); $("logout").addEventListener("click", async () => { await state.client.auth.signOut(); showLogin(); }); $("refresh").addEventListener("click", load);
     document.querySelector("nav").addEventListener("click", (event) => { const button = event.target.closest("[data-view]"); if (button) switchView(button.dataset.view); });
     $("requestSearch").addEventListener("input", renderRequests); $("statusFilter").addEventListener("change", renderRequests); $("clientSearch").addEventListener("input", renderClients);

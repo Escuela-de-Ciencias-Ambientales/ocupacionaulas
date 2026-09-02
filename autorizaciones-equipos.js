@@ -2,7 +2,7 @@
   'use strict';
   const config = window.RESERVAS_CONFIG || {};
   const el = (id) => document.getElementById(id);
-  const state = { client:null, session:null, profile:null, courses:[], student:null };
+  const state = { client:null, teacherNationalId:'', courses:[], student:null };
 
   function message(text, success = false) {
     const box = el('pageMessage'); box.textContent = text; box.classList.toggle('is-success', success); box.hidden = false;
@@ -35,10 +35,13 @@
     const nationalId = cleanId(el('teacherId').value);
     if (nationalId.length < 7) return message('Revise el número de cédula.');
     const button = el('loadCoursesButton'); busy(button, true, 'Cargando…');
-    const { data, error } = await state.client.rpc('my_equipment_courses', { p_national_id:nationalId });
+    const { data, error } = await state.client.rpc('public_equipment_teacher_context', { p_national_id:nationalId });
     busy(button, false);
     if (error) return message(friendly(error));
-    state.courses = data || [];
+    if (!data?.found) return message('No se encontró un profesor activo con esa cédula. Solicite a la administración que revise el registro docente.');
+    state.teacherNationalId = nationalId;
+    state.courses = data.courses || [];
+    el('teacherName').textContent = data.teacher_name;
     const select = el('courseSelect');
     select.innerHTML = state.courses.length
       ? state.courses.map((course, index) => `<option value="${index}">${course.course_code || 'Curso'} · ${course.course_name || 'Sin nombre'} · NRC ${course.nrc}${course.group_code ? ` · Grupo ${course.group_code}` : ''}</option>`).join('')
@@ -54,7 +57,7 @@
     if (!course) return message('Seleccione un curso válido.');
     let selected; try { selected = reason(event.currentTarget, 'courseReason', 'courseOther'); } catch (error) { return message(error.message); }
     const button = el('authorizeCourseButton'); busy(button, true, 'Autorizando…');
-    const { error } = await state.client.rpc('authorize_equipment_course', { p_cycle_id:course.cycle_id, p_nrc:course.nrc, p_reason:selected.selected, p_reason_detail:selected.detail });
+    const { error } = await state.client.rpc('public_authorize_equipment_course', { p_teacher_national_id:state.teacherNationalId, p_cycle_id:course.cycle_id, p_nrc:course.nrc, p_reason:selected.selected, p_reason_detail:selected.detail });
     busy(button, false);
     if (error) return message(friendly(error));
     message(`Autorización registrada para todo el curso ${course.course_code || course.course_name} (NRC ${course.nrc}).`, true);
@@ -65,10 +68,10 @@
     const nationalId = cleanId(el('studentId').value);
     if (nationalId.length < 7) return message('Revise la cédula del estudiante.');
     const button = el('findStudentButton'); busy(button, true, 'Buscando…');
-    const { data, error } = await state.client.rpc('find_equipment_student', { p_national_id:nationalId });
+    const { data, error } = await state.client.rpc('public_find_equipment_student', { p_national_id:nationalId });
     busy(button, false);
     if (error) return message(friendly(error));
-    state.student = data?.[0] || null;
+    state.student = data?.found ? data : null;
     if (!state.student) return message('No se encontró un estudiante activo con esa cédula. Debe incluirse primero en la carga estudiantil.');
     el('studentName').textContent = state.student.full_name;
     el('studentDetails').textContent = [state.student.national_id, state.student.career, state.student.email].filter(Boolean).join(' · ');
@@ -80,7 +83,7 @@
     if (!state.student) return message('Busque primero al estudiante.');
     let selected; try { selected = reason(event.currentTarget, 'individualReason', 'individualOther'); } catch (error) { return message(error.message); }
     const button = el('authorizeStudentButton'); busy(button, true, 'Autorizando…');
-    const { error } = await state.client.rpc('authorize_equipment_student', { p_student_id:state.student.student_id, p_reason:selected.selected, p_reason_detail:selected.detail });
+    const { error } = await state.client.rpc('public_authorize_equipment_student', { p_teacher_national_id:state.teacherNationalId, p_student_id:state.student.student_id, p_reason:selected.selected, p_reason_detail:selected.detail });
     busy(button, false);
     if (error) return message(friendly(error));
     message(`Autorización registrada para ${state.student.full_name}.`, true);
@@ -89,15 +92,7 @@
 
   async function init() {
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) return message('La conexión está pendiente de configuración.');
-    state.client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
-    const { data } = await state.client.auth.getSession(); state.session = data.session;
-    if (!state.session) { window.location.replace(`ingreso.html?return=${encodeURIComponent('autorizaciones-equipos.html')}`); return; }
-    const result = await state.client.from('profiles').select('id,full_name,role,active').eq('id', state.session.user.id).single();
-    if (result.data?.active && result.data.role === 'admin') {
-      window.location.replace('bodega-equipos.html?view=authorizations'); return;
-    }
-    if (result.error || !result.data?.active || result.data.role !== 'teacher') return message('Este módulo requiere una cuenta docente activa.');
-    state.profile = result.data; el('teacherName').textContent = state.profile.full_name;
+    state.client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth:{ persistSession:false, autoRefreshToken:false, detectSessionInUrl:false } });
   }
 
   el('identityForm').addEventListener('submit', loadCourses);
@@ -106,6 +101,5 @@
   el('individualForm').addEventListener('submit', authorizeStudent);
   document.querySelectorAll('input[name="courseReason"]').forEach((input) => input.addEventListener('change', () => toggleOther('courseReason','courseOtherWrap','courseOther')));
   document.querySelectorAll('input[name="individualReason"]').forEach((input) => input.addEventListener('change', () => toggleOther('individualReason','individualOtherWrap','individualOther')));
-  el('logoutButton').addEventListener('click', async () => { if (state.client) await state.client.auth.signOut(); window.location.replace('ingreso.html'); });
   init();
 })();
