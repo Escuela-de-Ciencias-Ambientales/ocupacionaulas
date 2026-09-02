@@ -59,9 +59,10 @@
     $("requestArea").hidden = false;
     requestAnimationFrame(resizeSignature);
     render();
-    const d = new Date(Date.now() + 86400000);
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    $("returnAt").value = d.toISOString().slice(0, 16);
+    const dateInput = $("returnAt");
+    const dateInCostaRica = (value) => new Intl.DateTimeFormat("en-CA", { year:"numeric", month:"2-digit", day:"2-digit", timeZone:"America/Costa_Rica" }).format(value);
+    dateInput.min = dateInCostaRica(new Date());
+    dateInput.value = dateInCostaRica(new Date(Date.now() + 86400000));
     $("requestArea").scrollIntoView({ behavior: "smooth" });
   }
   async function send(e) {
@@ -74,7 +75,7 @@
     const { data, error } = await client.rpc("create_student_loan_request", {
       p_national_id: context.nationalId,
       p_authorization_id: context.authorization_id,
-      p_expected_return_at: new Date($("returnAt").value).toISOString(),
+      p_expected_return_at: new Date(`${$("returnAt").value}T23:59:59-06:00`).toISOString(),
       p_items: items,
       p_signature_data: signatureCanvas().toDataURL("image/png"),
     });
