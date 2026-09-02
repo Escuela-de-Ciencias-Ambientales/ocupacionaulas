@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="bodega-equipos.css?v=1" />
     <link rel="stylesheet" href="student-view.css?v=1" />
-    <link rel="stylesheet" href="warehouse-enhancements.css?v=4" />
+    <link rel="stylesheet" href="warehouse-enhancements.css?v=5" />
     <link rel="stylesheet" href="sigep-brand.css?v=1" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=2" />
 </head>
@@ -43,6 +43,7 @@
           <button class="nav-item" data-view="loans">Préstamos activos</button>
           <button class="nav-item" data-view="equipment">Inventario</button>
           <button class="nav-item" data-view="clients">Clientes</button>
+          <button class="nav-item" data-view="professors">Profesores</button>
           <button class="nav-item" data-view="authorizations">Autorizaciones</button>
           <button class="nav-item" data-view="student">Vista estudiante</button>
         </nav>
@@ -103,6 +104,11 @@
           <div class="authorization-heading"><h2>Autorizaciones vigentes</h2><span id="authorizationCount"></span></div>
           <div id="authorizationList" class="authorization-list"></div>
         </section>
+        <section id="professorsView" class="view" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Docentes autorizadores</p><h1>Profesores</h1><span>Administre los datos y cursos que se cargan al ingresar la cédula.</span></div><button id="newProfessor">＋ Agregar profesor</button></div>
+          <input id="professorSearch" class="wide-search" type="search" placeholder="Buscar por nombre, cédula, ciclo o curso" />
+          <div class="table-wrap"><table><thead><tr><th>Profesor</th><th>Cédula</th><th>Ciclo</th><th>Cursos asignados</th><th>Autorizaciones</th><th></th></tr></thead><tbody id="professorRows"></tbody></table></div>
+        </section>
         <section id="studentView" class="view" hidden>
           <div class="page-heading"><div><p class="eyebrow">Solicitud asistida</p><h1>Vista del estudiante</h1><span>Realice una solicitud desde el panel administrativo usando el mismo formulario público.</span></div></div>
           <iframe class="student-request-frame" src="solicitar-equipo.html?embedded=1" title="Formulario de solicitud de equipos"></iframe>
@@ -126,6 +132,9 @@
       </form>
     </dialog>
     <dialog id="clientDialog"><form id="clientForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Clientes</p><h2 id="clientDialogTitle">Agregar estudiante</h2></div><button type="button" id="closeClient" class="icon-button">×</button></div><input id="clientId" type="hidden" /><label>Cédula<input id="clientNationalId" required inputmode="numeric" /></label><label>Nombre completo<input id="clientName" required /></label><label>Correo<input id="clientEmail" type="email" /></label><label>Teléfono<input id="clientPhone" type="tel" inputmode="tel" placeholder="Ej.: 8888-8888" /></label><label>Carrera<select id="clientCareer"><option>Ingeniería en Ciencias Forestales</option><option>Ingeniería en Gestión Ambiental</option></select></label><label class="check"><input id="clientActive" type="checkbox" checked /> Estudiante activo</label><button type="submit">Guardar estudiante</button></form></dialog>
+    <dialog id="professorDialog" class="professor-dialog"><form id="professorForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Docente autorizador</p><h2 id="professorDialogTitle">Agregar profesor</h2></div><button type="button" id="closeProfessor" class="icon-button">×</button></div><input id="professorId" type="hidden" /><label>Nombre completo<input id="professorName" required /></label><label>Cédula<input id="professorNationalId" required inputmode="numeric" /></label><label>Correo institucional (opcional)<input id="professorEmail" type="email" /></label><label class="check"><input id="professorActive" type="checkbox" checked /> Puede autorizar equipos</label><button type="submit">Guardar profesor</button></form></dialog>
+    <dialog id="professorCoursesDialog" class="professor-dialog"><div class="professor-dialog-body"><div class="dialog-head"><div><p class="eyebrow">Cursos por ciclo</p><h2 id="professorCoursesTitle">Cursos asignados</h2></div><button type="button" data-close-dialog="professorCoursesDialog" class="icon-button">×</button></div><form id="assignCourseForm" class="inline-course-form"><label>Ciclo<select id="professorCycle"></select></label><label>Curso<select id="professorCourse"></select></label><button type="submit">Asignar curso</button></form><div id="professorCourseList" class="professor-course-list"></div></div></dialog>
+    <dialog id="professorAuthorizationsDialog" class="professor-dialog wide-professor-dialog"><div class="professor-dialog-body"><div class="dialog-head"><div><p class="eyebrow">Historial</p><h2 id="professorAuthorizationsTitle">Autorizaciones</h2></div><button type="button" data-close-dialog="professorAuthorizationsDialog" class="icon-button">×</button></div><div id="professorAuthorizationList" class="authorization-list"></div></div></dialog>
     <dialog id="deliveryDialog"><form id="deliveryForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Entrega</p><h2 id="deliveryTitle">Asignar equipos</h2></div><button type="button" data-close-dialog="deliveryDialog" class="icon-button">×</button></div><p>Seleccione exactamente las unidades que se entregarán.</p><div id="deliveryUnits" class="dialog-list"></div><button type="submit">Confirmar entrega y generar comprobante</button></form></dialog>
     <dialog id="returnDialog"><form id="returnForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Devolución</p><h2 id="returnTitle">Registrar devolución</h2></div><button type="button" data-close-dialog="returnDialog" class="icon-button">×</button></div><label>¿Quién devuelve?<input id="returnedBy" required placeholder="Nombre de la persona" /></label><div id="returnUnits" class="dialog-list"></div><button type="submit">Registrar devolución y enviar comprobante</button></form></dialog>
     <dialog id="editLoanDialog" class="loan-edit-dialog"><form id="editLoanForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Superadministración</p><h2 id="editLoanTitle">Editar préstamo</h2></div><button type="button" data-close-dialog="editLoanDialog" class="icon-button">×</button></div><p>Los cambios se guardarán en el historial de trazabilidad de la boleta.</p><label>Fecha y hora de entrega<input id="editDeliveredAt" type="datetime-local" required /></label><label>Fecha prevista de devolución<input id="editExpectedReturn" type="date" required /></label><section><h3>Sustituir equipos asignados</h3><div id="editLoanUnits" class="dialog-list"></div></section><section><h3>Agregar equipos adicionales</h3><p>Marque únicamente las unidades que desea agregar a esta boleta.</p><div id="editLoanAvailable" class="dialog-list"></div></section><button type="submit">Guardar cambios del préstamo</button></form></dialog>
@@ -133,7 +142,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
-    <script src="bodega-equipos.js?v=10"></script>
+    <script src="bodega-equipos.js?v=11"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>
 </html>
