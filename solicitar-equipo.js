@@ -80,7 +80,6 @@
     });
     if (error) return msg(error.message);
     $("requestNumber").textContent = data.request_number;
-    client.functions.invoke("send-equipment-receipt", { body:{ event:"request", requestId:data.request_id, token:data.receipt_token } }).catch(() => {});
     $("confirmation").showModal();
   }
   $("idForm").addEventListener("submit", identify);
