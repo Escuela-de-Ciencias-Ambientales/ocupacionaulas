@@ -37,11 +37,12 @@
           <button class="nav-item active" data-view="requests">Solicitudes <span id="pendingBadge">0</span></button>
           <button class="nav-item" data-view="equipment">Inventario</button>
           <button class="nav-item" data-view="clients">Clientes</button>
+          <button class="nav-item" data-view="authorizations">Autorizaciones</button>
         </nav>
         <button id="logout" class="logout">Cerrar sesión</button>
       </aside>
       <main class="workspace">
-        <header class="topbar"><div><small>ESCUELA DE CIENCIAS AMBIENTALES · UNA</small><strong id="staffName"></strong></div><img src="logo-una.png" alt="Universidad Nacional" /></header>
+        <header class="topbar"><div><small>ESCUELA DE CIENCIAS AMBIENTALES · UNA</small><strong id="staffName"></strong></div><nav class="top-links"><a href="reservas.html?modulo=aulas">Aulas</a><a href="reservas.html?modulo=vehiculos">Vehículos</a><a href="tramites-vehiculos.html">Trámite de giras</a></nav><img src="logo-una.png" alt="Universidad Nacional" /></header>
         <div id="appMessage" class="app-message" hidden></div>
 
         <section id="requestsView" class="view">
@@ -66,6 +67,28 @@
           <input id="clientSearch" class="wide-search" type="search" placeholder="Buscar por nombre, cédula o carrera" />
           <div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Cédula</th><th>Carrera</th><th>Préstamos activos</th></tr></thead><tbody id="clientRows"></tbody></table></div>
         </section>
+
+        <section id="authorizationsView" class="view" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Vistos buenos</p><h1>Autorizaciones de equipos</h1><span>Autorice cursos completos o estudiantes individuales desde la administración.</span></div></div>
+          <div class="authorization-admin-grid">
+            <form id="adminCourseAuthorization" class="authorization-card">
+              <p class="eyebrow">Curso completo</p><h2>Autorizar un curso</h2>
+              <label>Curso<select id="adminCourse" required></select></label>
+              <label>Motivo<select id="adminCourseReason"><option value="course_trip">Gira de curso</option><option value="supervised_practice">Práctica supervisada</option><option value="other">Otro</option></select></label>
+              <label>Detalle, si seleccionó “Otro”<input id="adminCourseDetail" maxlength="240" /></label>
+              <button type="submit">Autorizar curso completo</button>
+            </form>
+            <form id="adminStudentAuthorization" class="authorization-card">
+              <p class="eyebrow">Autorización individual</p><h2>Autorizar estudiante</h2>
+              <label>Cédula o nombre<input id="adminStudent" list="adminStudentOptions" autocomplete="off" placeholder="Escriba para buscar" required /><datalist id="adminStudentOptions"></datalist></label>
+              <label>Motivo<select id="adminStudentReason"><option value="course_trip">Gira de curso</option><option value="supervised_practice">Práctica supervisada</option><option value="other">Otro</option></select></label>
+              <label>Detalle, si seleccionó “Otro”<input id="adminStudentDetail" maxlength="240" /></label>
+              <button type="submit">Autorizar estudiante</button>
+            </form>
+          </div>
+          <div class="authorization-heading"><h2>Autorizaciones vigentes</h2><span id="authorizationCount"></span></div>
+          <div id="authorizationList" class="authorization-list"></div>
+        </section>
       </main>
     </div>
 
@@ -82,6 +105,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
-    <script src="bodega-equipos.js?v=1"></script>
+    <script src="bodega-equipos.js?v=2"></script>
   </body>
 </html>

@@ -7,8 +7,6 @@
   const canProcess = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
-  const canOpenConserjeria = () => state.profile?.role === 'admin'
-    && ['superadmin', 'operations', 'conserjeria'].includes(state.profile?.admin_scope);
   const escapeHtml = (value = '') => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const formatDateTime = (value) => new Intl.DateTimeFormat('es-CR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   const processingStatus = (item) => item.processing_status || 'pending';
@@ -38,7 +36,7 @@
     toolbar.innerHTML = `<nav class="module-switch" aria-label="Tipo de reservación">
       <a href="reservas.html?modulo=aulas" id="processingClassroomsNav">Aulas</a>
       <a href="reservas.html?modulo=vehiculos" id="processingVehiclesNav">Vehículos</a>
-      <a href="reservas.html?modulo=conserjeria" id="processingConserjeriaNav" hidden>Conserjería</a>
+      <a href="bodega-equipos.html?view=authorizations" id="processingEquipmentNav">Bodega de equipos</a>
       <a href="tramites-vehiculos.html" id="processingCurrentNav" aria-current="page">Trámite de giras</a>
     </nav>
     <a class="secondary-button compact-button manage-users-link" id="processingManageUsersLink" href="usuarios.html" hidden>Administrar usuarios</a>`;
@@ -202,7 +200,6 @@
       ensureModuleNavigation();
       $('processingHeaderAccount').hidden = false;
       $('processingUserName').textContent = profile.full_name;
-      if ($('processingConserjeriaNav')) $('processingConserjeriaNav').hidden = !canOpenConserjeria();
       if ($('processingManageUsersLink')) $('processingManageUsersLink').hidden = !isSuperadmin();
       $('processingStatus').textContent = 'Conectado';
       await loadData();

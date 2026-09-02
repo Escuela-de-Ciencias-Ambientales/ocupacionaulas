@@ -93,6 +93,9 @@
     const { data } = await state.client.auth.getSession(); state.session = data.session;
     if (!state.session) { window.location.replace(`ingreso.html?return=${encodeURIComponent('autorizaciones-equipos.html')}`); return; }
     const result = await state.client.from('profiles').select('id,full_name,role,active').eq('id', state.session.user.id).single();
+    if (result.data?.active && result.data.role === 'admin') {
+      window.location.replace('bodega-equipos.html?view=authorizations'); return;
+    }
     if (result.error || !result.data?.active || result.data.role !== 'teacher') return message('Este módulo requiere una cuenta docente activa.');
     state.profile = result.data; el('teacherName').textContent = state.profile.full_name;
   }

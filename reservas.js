@@ -291,6 +291,11 @@
           : isConserjeriaAdmin() ? 'Administrador de conserjería' : 'Docente';
     elements.adminProfessorField.hidden = !isAdmin();
     elements.dialogAdminProfessorField.hidden = !isAdmin();
+    const equipmentNav = document.getElementById('equipmentAuthorizationNav');
+    if (equipmentNav) {
+      equipmentNav.href = isAdmin() ? 'bodega-equipos.html?view=authorizations' : 'autorizaciones-equipos.html';
+      equipmentNav.textContent = isAdmin() ? 'Bodega de equipos' : 'Autorización de equipos';
+    }
     if (elements.showConserjeriaAdmin) elements.showConserjeriaAdmin.hidden = !isConserjeriaAdmin();
     if (elements.vehicleProcessingNav) elements.vehicleProcessingNav.hidden = !(state.profile?.role === 'admin' && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope));
     elements.adminAccessLabel.textContent = isSuperadmin() ? 'Acceso de superadministrador' : 'Acceso de administración de reservas';
