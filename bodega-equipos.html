@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="bodega-equipos.css?v=1" />
     <link rel="stylesheet" href="student-view.css?v=1" />
-    <link rel="stylesheet" href="warehouse-enhancements.css?v=3" />
+    <link rel="stylesheet" href="warehouse-enhancements.css?v=4" />
     <link rel="stylesheet" href="sigep-brand.css?v=1" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=2" />
 </head>
@@ -79,7 +79,7 @@
         <section id="clientsView" class="view" hidden>
           <div class="page-heading"><div><p class="eyebrow">Personas registradas</p><h1>Clientes</h1><span>Estudiantes y sus préstamos activos.</span></div><button id="newClient">＋ Agregar estudiante</button></div>
           <input id="clientSearch" class="wide-search" type="search" placeholder="Buscar por nombre, cédula o carrera" />
-          <div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Cédula</th><th>Correo</th><th>Teléfono</th><th>Carrera</th><th>Préstamos activos</th><th></th></tr></thead><tbody id="clientRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Cédula</th><th>Correo</th><th>Teléfono</th><th>Carrera</th><th>Préstamos activos</th><th>Restricción</th><th></th></tr></thead><tbody id="clientRows"></tbody></table></div>
         </section>
 
         <section id="authorizationsView" class="view" hidden>
@@ -128,11 +128,12 @@
     <dialog id="clientDialog"><form id="clientForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Clientes</p><h2 id="clientDialogTitle">Agregar estudiante</h2></div><button type="button" id="closeClient" class="icon-button">×</button></div><input id="clientId" type="hidden" /><label>Cédula<input id="clientNationalId" required inputmode="numeric" /></label><label>Nombre completo<input id="clientName" required /></label><label>Correo<input id="clientEmail" type="email" /></label><label>Teléfono<input id="clientPhone" type="tel" inputmode="tel" placeholder="Ej.: 8888-8888" /></label><label>Carrera<select id="clientCareer"><option>Ingeniería en Ciencias Forestales</option><option>Ingeniería en Gestión Ambiental</option></select></label><label class="check"><input id="clientActive" type="checkbox" checked /> Estudiante activo</label><button type="submit">Guardar estudiante</button></form></dialog>
     <dialog id="deliveryDialog"><form id="deliveryForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Entrega</p><h2 id="deliveryTitle">Asignar equipos</h2></div><button type="button" data-close-dialog="deliveryDialog" class="icon-button">×</button></div><p>Seleccione exactamente las unidades que se entregarán.</p><div id="deliveryUnits" class="dialog-list"></div><button type="submit">Confirmar entrega y generar comprobante</button></form></dialog>
     <dialog id="returnDialog"><form id="returnForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Devolución</p><h2 id="returnTitle">Registrar devolución</h2></div><button type="button" data-close-dialog="returnDialog" class="icon-button">×</button></div><label>¿Quién devuelve?<input id="returnedBy" required placeholder="Nombre de la persona" /></label><div id="returnUnits" class="dialog-list"></div><button type="submit">Registrar devolución y enviar comprobante</button></form></dialog>
+    <dialog id="editLoanDialog" class="loan-edit-dialog"><form id="editLoanForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Superadministración</p><h2 id="editLoanTitle">Editar préstamo</h2></div><button type="button" data-close-dialog="editLoanDialog" class="icon-button">×</button></div><p>Los cambios se guardarán en el historial de trazabilidad de la boleta.</p><label>Fecha y hora de entrega<input id="editDeliveredAt" type="datetime-local" required /></label><label>Fecha prevista de devolución<input id="editExpectedReturn" type="date" required /></label><section><h3>Sustituir equipos asignados</h3><div id="editLoanUnits" class="dialog-list"></div></section><section><h3>Agregar equipos adicionales</h3><p>Marque únicamente las unidades que desea agregar a esta boleta.</p><div id="editLoanAvailable" class="dialog-list"></div></section><button type="submit">Guardar cambios del préstamo</button></form></dialog>
     <dialog id="signatureDialog" class="signature-dialog"><div class="signature-dialog-content"><div class="dialog-head"><div><p class="eyebrow">Firmas almacenadas</p><h2 id="signatureTitle">Firmas</h2></div><button type="button" id="closeSignature" class="icon-button" aria-label="Cerrar">×</button></div><div class="signature-preview-grid"><section><h3>Firma del profesor</h3><div id="teacherSignaturePreview"></div></section><section><h3>Firma del estudiante</h3><div id="studentSignaturePreview"></div></section></div><button type="button" id="closeSignatureBottom" class="signature-close">Cerrar</button></div></dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
-    <script src="bodega-equipos.js?v=9"></script>
+    <script src="bodega-equipos.js?v=10"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>
 </html>

@@ -48,6 +48,10 @@
     if (error) return msg(error.message);
     if (!data?.found)
       return msg("No encontramos un estudiante registrado con esa cédula.");
+    if (data.blocked_by_outstanding_loan)
+      return msg(
+        `Tiene un préstamo de equipo pendiente${data.outstanding_request_number ? ` (${data.outstanding_request_number})` : ""}. Por favor, diríjase a la bodega para solventar la situación.`,
+      );
     if (!data.authorized)
       return msg(
         "Todavía no existe una autorización docente vigente para solicitar equipos.",
