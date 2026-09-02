@@ -84,7 +84,9 @@
   const isAdmin = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations'].includes(state.profile?.admin_scope);
   const isSuperadmin = () => isAdmin() && state.profile?.admin_scope === 'superadmin';
-  const isConserjeriaAdmin = () => state.profile?.role === 'admin' && ['superadmin', 'operations', 'conserjeria'].includes(state.profile?.admin_scope);
+  const isConserjeriaAdmin = () => state.profile?.role === 'admin'
+    && String(state.profile?.email || '').toLowerCase() !== 'adrian.delgado.torres@una.cr'
+    && ['superadmin', 'operations', 'conserjeria'].includes(state.profile?.admin_scope);
 
   function escapeHtml(value) {
     return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
@@ -289,7 +291,7 @@
           : isConserjeriaAdmin() ? 'Administrador de conserjería' : 'Docente';
     elements.adminProfessorField.hidden = !isAdmin();
     elements.dialogAdminProfessorField.hidden = !isAdmin();
-    if (elements.showConserjeriaAdmin) elements.showConserjeriaAdmin.hidden = !(isConserjeriaAdmin() || isSuperadmin());
+    if (elements.showConserjeriaAdmin) elements.showConserjeriaAdmin.hidden = !isConserjeriaAdmin();
     if (elements.vehicleProcessingNav) elements.vehicleProcessingNav.hidden = !(state.profile?.role === 'admin' && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope));
     elements.adminAccessLabel.textContent = isSuperadmin() ? 'Acceso de superadministrador' : 'Acceso de administración de reservas';
     elements.scheduleEditorTitle.textContent = isAdmin() ? 'Horario, reservas y ocupación académica' : 'Disponibilidad semanal por aula';
