@@ -561,7 +561,7 @@
     const pending = uploadablePhotosFor();
     const target = $('pendingTripPhotos');
     if (!pending.length) {
-      target.innerHTML = '<p class="empty-state">No tienes reservas pendientes de fotografía.</p>';
+      target.innerHTML = '<p class="empty-state">No tienes giras pendientes de bitácora.</p>';
       return;
     }
     target.innerHTML = pending.map((item) => {
@@ -575,17 +575,15 @@
           ? `Gira en curso hasta el ${formatDateTime(item.ends_at)}`
           : `Gira finalizada el ${formatDateTime(item.ends_at)}`;
       const reminder = now <= endsAt
-        ? 'La fotografía ya está habilitada para esta reserva.'
-        : 'Debes completar esta bitácora antes de reservar nuevamente.';
+        ? 'La bitácora digital ya está habilitada para esta reserva.'
+        : 'Debes completar la bitácora digital antes de reservar nuevamente.';
       return `<article class="vehicle-reservation-item is-photo-pending">
         <span class="vehicle-plate">${escapeHtml(vehicle?.plate || 'Vehículo')}</span>
         <div><h4>${escapeHtml(item.destination)}</h4><p>${timing}</p>
         <p>${reminder}</p></div>
-        <button class="primary-button compact-button" type="button" data-upload-trip-photo="${item.id}">Cargar fotografía</button>
+        <a class="primary-button compact-button" href="bitacora-vehicular.html">Completar bitácora</a>
       </article>`;
     }).join('');
-    target.querySelectorAll('[data-upload-trip-photo]').forEach((button) =>
-      button.addEventListener('click', () => openTripPhotoDialog(button.dataset.uploadTripPhoto)));
   }
 
   function renderAdminPendingPhotos() {

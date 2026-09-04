@@ -46,6 +46,7 @@
       <nav class="module-switch" aria-label="Tipo de reservación">
         <button type="button" id="showPrivateClassrooms" aria-selected="true">Aulas</button>
         <button type="button" id="showPrivateVehicles" aria-selected="false">Vehículos</button>
+        <a href="bitacora-vehicular.html">Bitácora vehicular</a>
         <a href="autorizaciones-equipos.html" id="equipmentAuthorizationNav">Autorización de equipos</a>
         <button type="button" id="showConserjeriaAdmin" aria-selected="false" hidden data-feature-disabled>Conserjería</button>
         <a href="tramites-vehiculos.html" id="vehicleProcessingNav" hidden>Trámite de giras</a>
@@ -229,6 +230,7 @@
         <div class="section-heading">
           <div><p class="eyebrow">Tu agenda</p><h2 id="myVehicleReservationsTitle">Mis próximas reservas de vehículos</h2></div>
           <div class="vehicle-heading-actions">
+            <a class="secondary-button compact-button" href="bitacora-vehicular.html">Completar bitácora</a>
             <a class="secondary-button compact-button" href="mis-giras.html">Ver historial de giras</a>
             <button class="icon-button" id="refreshVehicleReservations" type="button" aria-label="Actualizar">↻</button>
           </div>
@@ -241,13 +243,14 @@
       <section class="vehicle-panel trip-photo-panel" aria-labelledby="pendingTripPhotosTitle">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Bitácora fotográfica</p>
-            <h2 id="pendingTripPhotosTitle">Fotografías de bitácora de tus giras</h2>
-            <p>Puedes cargar una única fotografía desde que se confirma la reserva. Si la gira finaliza sin fotografía, no podrás reservar nuevamente hasta completarla.</p>
+            <p class="eyebrow">Control de la gira</p>
+            <h2 id="pendingTripPhotosTitle">Bitácora digital del vehículo</h2>
+            <p>Cuando inicie la gira, completa todos los datos, las dos fotografías y la firma desde la bitácora digital.</p>
           </div>
+          <a class="primary-button compact-button" href="bitacora-vehicular.html">Abrir bitácora</a>
         </div>
         <div class="vehicle-reservation-list" id="pendingTripPhotos">
-          <p class="empty-state">No tienes reservas pendientes de fotografía.</p>
+          <p class="empty-state">No tienes giras pendientes de bitácora.</p>
         </div>
         <p class="trip-photo-warning"><strong>Importante:</strong> Cualquier anomalía detectada en el vehículo, por favor documentarla y reportarla a la administración.</p>
       </section>
