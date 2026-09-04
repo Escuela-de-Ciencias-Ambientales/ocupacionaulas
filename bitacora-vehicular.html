@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
   <link rel="stylesheet" href="vehiculos.css?v=16" />
-  <link rel="stylesheet" href="bitacora-vehicular.css?v=1" />
+  <link rel="stylesheet" href="bitacora-vehicular.css?v=2" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#087a55" />
 </head>
@@ -29,25 +29,32 @@
 
   <main class="page vehicle-log-main">
     <section id="driverLogView">
-      <div class="log-intro"><div><p class="eyebrow">Transporte institucional</p><h1>Bitácora vehicular</h1><p>Seleccione su gira. El sistema cargará automáticamente el conductor, la placa y los datos de la reserva.</p></div><span class="connection-status" id="logConnectionStatus">Comprobando acceso…</span></div>
+      <div class="log-intro"><div><p class="eyebrow">Transporte institucional</p><h1>Bitácora vehicular</h1><p>Ingrese la cédula para cargar el nombre del conductor. Complete la información disponible de la gira.</p></div><span class="connection-status" id="logConnectionStatus">Comprobando acceso…</span></div>
       <div class="form-message" id="logMessage" role="status" aria-live="polite" hidden></div>
 
-      <section class="log-card reservation-picker">
-        <div class="step-heading"><span>1</span><div><p class="eyebrow">Gira reservada</p><h2>Seleccione la reserva</h2></div></div>
-        <label for="logReservation">Reserva de vehículo</label>
-        <select id="logReservation" required><option value="">Cargando reservas…</option></select>
-        <div class="reservation-identity" id="reservationIdentity" hidden></div>
+      <section class="log-card driver-lookup-card">
+        <div class="step-heading"><span>1</span><div><p class="eyebrow">Identificación</p><h2>Datos del conductor</h2></div></div>
+        <div class="driver-lookup-grid">
+          <div><label for="logNationalId">Número de cédula</label><input id="logNationalId" inputmode="numeric" autocomplete="off" placeholder="Ejemplo: 112340567" /></div>
+          <button class="primary-button" id="lookupLogDriver" type="button">Buscar nombre</button>
+          <div><label for="logDriverName">Nombre del conductor</label><input id="logDriverName" readonly placeholder="Se cargará al consultar la cédula" /></div>
+        </div>
+        <p class="lookup-help">La cédula debe pertenecer a una persona activa registrada en el sistema.</p>
       </section>
 
       <form id="vehicleLogForm" class="vehicle-log-form">
         <section class="log-card">
           <div class="step-heading"><span>2</span><div><p class="eyebrow">Control de recorrido</p><h2>Salida y regreso</h2></div></div>
           <div class="log-form-grid">
-            <div><label for="logTripSheet">Número de boleta de gira</label><input id="logTripSheet" maxlength="60" required /></div>
-            <div><label for="logDepartureMileage">Kilometraje inicial</label><input id="logDepartureMileage" type="number" min="0" step="1" required /></div>
-            <div><label for="logArrivalMileage">Kilometraje final</label><input id="logArrivalMileage" type="number" min="0" step="1" required /></div>
-            <div><label for="logDepartureFuel">Combustible inicial</label><select id="logDepartureFuel" required><option value="">Seleccione</option><option value="reserve">Reserva</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
-            <div><label for="logArrivalFuel">Combustible final</label><select id="logArrivalFuel" required><option value="">Seleccione</option><option value="reserve">Reserva</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
+            <div><label for="logTripSheet">Número de boleta de gira</label><input id="logTripSheet" maxlength="60" /></div>
+            <div><label for="logVehicle">Placa del vehículo</label><select id="logVehicle"><option value="">Seleccione</option></select></div>
+            <div><label for="logDepartureAt">Fecha y hora de salida</label><input id="logDepartureAt" type="datetime-local" /></div>
+            <div><label for="logArrivalAt">Fecha y hora de regreso</label><input id="logArrivalAt" type="datetime-local" /></div>
+            <div class="field-wide"><label for="logDestination">Destino de la gira</label><input id="logDestination" maxlength="240" /></div>
+            <div><label for="logDepartureMileage">Kilometraje inicial</label><input id="logDepartureMileage" type="number" min="0" step="1" /></div>
+            <div><label for="logArrivalMileage">Kilometraje final</label><input id="logArrivalMileage" type="number" min="0" step="1" /></div>
+            <div><label for="logDepartureFuel">Combustible inicial</label><select id="logDepartureFuel"><option value="">Seleccione</option><option value="reserve">Reserva</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
+            <div><label for="logArrivalFuel">Combustible final</label><select id="logArrivalFuel"><option value="">Seleccione</option><option value="reserve">Reserva</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
           </div>
         </section>
 
@@ -55,32 +62,32 @@
           <section class="log-card phase-card departure-phase">
             <div class="phase-heading"><span>↗</span><div><p class="eyebrow">Antes de salir</p><h2>Revisión de salida</h2></div></div>
             <div class="required-checklist">
-              <fieldset><legend>Vehículo limpio</legend><label><input type="radio" name="vehicle_clean_out" value="true" required /> Sí</label><label><input type="radio" name="vehicle_clean_out" value="false" required /> No</label></fieldset>
-              <fieldset><legend>Revisión de aceites</legend><label><input type="radio" name="oils_checked" value="true" required /> Sí</label><label><input type="radio" name="oils_checked" value="false" required /> No</label></fieldset>
-              <fieldset><legend>Revisión de coolant o agua</legend><label><input type="radio" name="coolant_checked" value="true" required /> Sí</label><label><input type="radio" name="coolant_checked" value="false" required /> No</label></fieldset>
-              <fieldset><legend>Próximo cambio de aceite</legend><label><input type="radio" name="oil_change_checked" value="true" required /> Sí</label><label><input type="radio" name="oil_change_checked" value="false" required /> No</label></fieldset>
-              <fieldset><legend>Herramientas básicas</legend><label><input type="radio" name="tools_checked" value="true" required /> Sí</label><label><input type="radio" name="tools_checked" value="false" required /> No</label></fieldset>
-              <fieldset><legend>Kit de seguridad</legend><label><input type="radio" name="safety_kit_checked" value="true" required /> Sí</label><label><input type="radio" name="safety_kit_checked" value="false" required /> No</label></fieldset>
-              <fieldset><legend>Documentos del vehículo al día</legend><label><input type="radio" name="documents_checked" value="true" required /> Sí</label><label><input type="radio" name="documents_checked" value="false" required /> No</label></fieldset>
-              <fieldset class="alert-choice"><legend>Golpes visibles al salir</legend><label><input type="radio" name="outbound_damage" value="true" required /> Sí</label><label><input type="radio" name="outbound_damage" value="false" required /> No</label></fieldset>
+              <fieldset><legend>Vehículo limpio</legend><label><input type="radio" name="vehicle_clean_out" value="true" /> Sí</label><label><input type="radio" name="vehicle_clean_out" value="false" /> No</label></fieldset>
+              <fieldset><legend>Revisión de aceites</legend><label><input type="radio" name="oils_checked" value="true" /> Sí</label><label><input type="radio" name="oils_checked" value="false" /> No</label></fieldset>
+              <fieldset><legend>Revisión de coolant o agua</legend><label><input type="radio" name="coolant_checked" value="true" /> Sí</label><label><input type="radio" name="coolant_checked" value="false" /> No</label></fieldset>
+              <fieldset><legend>Próximo cambio de aceite</legend><label><input type="radio" name="oil_change_checked" value="true" /> Sí</label><label><input type="radio" name="oil_change_checked" value="false" /> No</label></fieldset>
+              <fieldset><legend>Herramientas básicas</legend><label><input type="radio" name="tools_checked" value="true" /> Sí</label><label><input type="radio" name="tools_checked" value="false" /> No</label></fieldset>
+              <fieldset><legend>Kit de seguridad</legend><label><input type="radio" name="safety_kit_checked" value="true" /> Sí</label><label><input type="radio" name="safety_kit_checked" value="false" /> No</label></fieldset>
+              <fieldset><legend>Documentos del vehículo al día</legend><label><input type="radio" name="documents_checked" value="true" /> Sí</label><label><input type="radio" name="documents_checked" value="false" /> No</label></fieldset>
+              <fieldset class="alert-choice"><legend>Golpes visibles al salir</legend><label><input type="radio" name="outbound_damage" value="true" /> Sí</label><label><input type="radio" name="outbound_damage" value="false" /> No</label></fieldset>
             </div>
-            <label for="logDepartureNotes">Observaciones de salida</label><textarea id="logDepartureNotes" maxlength="1000" required placeholder="Escriba “Sin observaciones” cuando todo esté correcto"></textarea>
-            <div class="photo-control" data-photo-control="departure"><label for="logDeparturePhoto">Foto de salida</label><input id="logDeparturePhoto" type="file" accept="image/jpeg,image/webp,image/*" capture="environment" required /><div class="photo-preview" hidden><img alt="Vista previa de salida" /><span></span></div></div>
+            <label for="logDepartureNotes">Observaciones de salida</label><textarea id="logDepartureNotes" maxlength="1000" placeholder="Escriba “Sin observaciones” cuando todo esté correcto"></textarea>
+            <div class="photo-control" data-photo-control="departure"><label for="logDeparturePhoto">Foto de salida</label><input id="logDeparturePhoto" type="file" accept="image/jpeg,image/webp,image/*" capture="environment" /><div class="photo-preview" hidden><img alt="Vista previa de salida" /><span></span></div></div>
           </section>
 
           <section class="log-card phase-card return-phase">
             <div class="phase-heading"><span>↙</span><div><p class="eyebrow">Al finalizar</p><h2>Entrega del vehículo</h2></div></div>
             <div class="required-checklist compact">
-              <fieldset><legend>Vehículo se entrega limpio</legend><label><input type="radio" name="vehicle_clean_return" value="true" required /> Sí</label><label><input type="radio" name="vehicle_clean_return" value="false" required /> No</label></fieldset>
-              <fieldset class="alert-choice"><legend>Golpes nuevos</legend><label><input type="radio" name="new_damage" value="true" required /> Sí</label><label><input type="radio" name="new_damage" value="false" required /> No</label></fieldset>
+              <fieldset><legend>Vehículo se entrega limpio</legend><label><input type="radio" name="vehicle_clean_return" value="true" /> Sí</label><label><input type="radio" name="vehicle_clean_return" value="false" /> No</label></fieldset>
+              <fieldset class="alert-choice"><legend>Golpes nuevos</legend><label><input type="radio" name="new_damage" value="true" /> Sí</label><label><input type="radio" name="new_damage" value="false" /> No</label></fieldset>
             </div>
-            <label for="logReturnNotes">Observaciones de regreso</label><textarea id="logReturnNotes" maxlength="1000" required placeholder="Escriba “Sin observaciones” cuando todo esté correcto"></textarea>
-            <div class="photo-control" data-photo-control="return"><label for="logReturnPhoto">Foto de regreso</label><input id="logReturnPhoto" type="file" accept="image/jpeg,image/webp,image/*" capture="environment" required /><div class="photo-preview" hidden><img alt="Vista previa de regreso" /><span></span></div></div>
+            <label for="logReturnNotes">Observaciones de regreso</label><textarea id="logReturnNotes" maxlength="1000" placeholder="Escriba “Sin observaciones” cuando todo esté correcto"></textarea>
+            <div class="photo-control" data-photo-control="return"><label for="logReturnPhoto">Foto de regreso</label><input id="logReturnPhoto" type="file" accept="image/jpeg,image/webp,image/*" capture="environment" /><div class="photo-preview" hidden><img alt="Vista previa de regreso" /><span></span></div></div>
             <div class="signature-control"><div class="signature-heading"><label>Firma del conductor</label><button type="button" id="clearLogSignature">Limpiar</button></div><canvas id="logSignature" width="900" height="240" aria-label="Panel de firma táctil"></canvas><p>Firme con el dedo o el mouse.</p></div>
           </section>
         </div>
 
-        <div class="submit-bar"><div><strong>Todos los datos son obligatorios</strong><span>No se guardarán bitácoras incompletas.</span></div><button class="primary-button" id="submitVehicleLog" type="submit">Guardar bitácora completa</button></div>
+        <div class="submit-bar"><div><strong>Guarde la información disponible</strong><span>El panel administrativo indicará si la bitácora está completa o incompleta.</span></div><button class="primary-button" id="submitVehicleLog" type="submit">Guardar bitácora</button></div>
       </form>
     </section>
 
@@ -104,9 +111,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=5"></script>
-  <script src="bitacora-vehicular.js?v=1"></script>
+  <script src="bitacora-vehicular.js?v=2"></script>
   <script src="pwa-install.js?v=1"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>
 </html>
-

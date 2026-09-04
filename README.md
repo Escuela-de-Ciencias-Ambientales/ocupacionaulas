@@ -8,7 +8,7 @@ Sistema pequeño de consulta y reserva de aulas para la Escuela de Ciencias Ambi
 - Página pública limpia, dedicada únicamente a la ocupación académica.
 - Página independiente para el ingreso del personal docente.
 - Módulo responsive para que cada docente autorice préstamos de equipo a todo un curso o a un estudiante particular.
-- Bitácora vehicular digital vinculada a cada reserva, con controles obligatorios, dos fotografías comprimidas y firma táctil.
+- Bitácora vehicular digital identificada por cédula, con datos manuales, dos fotografías comprimidas y firma táctil.
 - Panel de control de bitácoras para asistencia administrativa y superadministración, con filtros por boleta, fecha y usuario.
 - Área privada de reservas disponible únicamente después de iniciar sesión.
 - Vista diaria de tramos disponibles y ocupados para cada aula dentro del área privada.
