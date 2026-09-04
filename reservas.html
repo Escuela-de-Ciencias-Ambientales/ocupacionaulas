@@ -162,6 +162,7 @@
             <h3>Crear una cuenta</h3>
             <p class="form-note account-limit-note">Máximo permitido: 50 cuentas docentes activas.</p>
              <label for="newUserName">Nombre completo</label><input id="newUserName" name="name" maxlength="100" required />
+             <label for="newUserNationalId">Número de cédula</label><input id="newUserNationalId" name="nationalId" inputmode="numeric" autocomplete="off" minlength="7" maxlength="20" required />
              <label for="newUserEmail">Correo electrónico</label><input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
              <label for="newUserUnit">Unidad institucional</label><select id="newUserUnit" name="unit" required><option value="">Selecciona la unidad</option><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select>
              <label for="newUserPassword">Contraseña temporal</label><input id="newUserPassword" name="password" type="password" minlength="8" title="Mínimo 8 caracteres, una mayúscula y un número" required />
@@ -641,7 +642,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
   <script src="config.js?v=5"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="reservas.js?v=29"></script>
+  <script src="reservas.js?v=30"></script>
   <script src="vehiculos-imagenes.js?v=1"></script>
   <script src="vehicle-locations.js?v=1"></script>
   <script src="vehiculos.js?v=21"></script>

@@ -42,7 +42,7 @@
     const search = $('usersSearch').value.trim().toLocaleLowerCase('es');
     const filter = $('usersStatusFilter').value;
     return state.users.filter((user) => {
-      const searchMatch = !search || `${user.full_name} ${user.email} ${user.unit || ''}`.toLocaleLowerCase('es').includes(search);
+      const searchMatch = !search || `${user.full_name} ${user.national_id || ''} ${user.email} ${user.unit || ''}`.toLocaleLowerCase('es').includes(search);
       const filterMatch = filter === 'all'
         || (filter === 'active' && user.active && !user.reservations_blocked)
         || (filter === 'blocked' && user.active && user.reservations_blocked)
@@ -82,12 +82,13 @@
           : '<span class="user-badge">Activo</span>';
       return `<tr class="${!user.active ? 'is-inactive' : user.reservations_blocked ? 'is-blocked' : ''}">
         <td data-label="Usuario"><div class="user-identity"><strong>${escapeHtml(user.full_name)}${self ? ' · Tú' : ''}</strong><span>${escapeHtml(user.email)}</span></div></td>
+        <td data-label="Cédula"><strong>${escapeHtml(user.national_id || 'Pendiente')}</strong></td>
         <td data-label="Unidad"><span class="user-badge">${escapeHtml(user.unit || 'Pendiente')}</span></td>
         <td data-label="Tipo de acceso"><span class="user-badge${user.role === 'admin' ? ' is-admin' : ''}">${escapeHtml(accessName(user))}</span></td>
         <td data-label="Estado"><div class="user-status-stack">${status}</div></td>
         <td data-label="Acciones"><div class="user-row-actions">${editButton}${blockButton}${activeButton}${protectedLabel}</div></td>
       </tr>`;
-    }).join('') : '<tr><td colspan="5">No hay usuarios que coincidan con los filtros.</td></tr>';
+    }).join('') : '<tr><td colspan="6">No hay usuarios que coincidan con los filtros.</td></tr>';
 
     $('usersPageIndicator').textContent = `Página ${state.page} de ${pages} · ${users.length} usuarios`;
     $('previousUsersPage').disabled = state.page <= 1;
@@ -96,7 +97,7 @@
 
   async function loadUsers() {
     const { data, error } = await state.client.from('profiles')
-      .select('id,full_name,email,unit,role,admin_scope,active,reservations_blocked,reservations_block_reason,created_at')
+      .select('id,full_name,national_id,email,unit,role,admin_scope,active,reservations_blocked,reservations_block_reason,created_at')
       .order('full_name');
     if (error) throw error;
     state.users = data || [];
@@ -109,6 +110,7 @@
     if (!user || !canEdit(user)) return;
     $('editedUserId').value = user.id;
     $('editedUserName').value = user.full_name;
+    $('editedUserNationalId').value = user.national_id || '';
     $('editedUserEmail').value = user.email;
     $('editedUserUnit').value = user.unit || 'Docencia';
     $('editedUserAccess').value = accessType(user);
@@ -143,6 +145,7 @@
         action: 'update',
         userId: editedId,
         fullName: $('editedUserName').value.trim(),
+        nationalId: $('editedUserNationalId').value.trim(),
         email: $('editedUserEmail').value.trim().toLowerCase(),
         unit: $('editedUserUnit').value,
         accessType: $('editedUserAccess').value

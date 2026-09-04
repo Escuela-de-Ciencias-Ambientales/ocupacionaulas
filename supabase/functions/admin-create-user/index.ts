@@ -18,6 +18,7 @@ function response(body: Record<string, unknown>, status = 200) {
 
 type RequestedUser = {
   fullName: string;
+  nationalId: string;
   email: string;
   password: string;
   unit: string;
@@ -27,6 +28,7 @@ type RequestedUser = {
 function normalizeUser(source: Record<string, unknown>): RequestedUser {
   return {
     fullName: String(source.fullName || '').trim(),
+    nationalId: String(source.nationalId || source.cedula || '').replace(/[^0-9]/g, ''),
     email: String(source.email || '').trim().toLowerCase(),
     password: String(source.password || ''),
     unit: String(source.unit || '').trim(),
@@ -39,6 +41,7 @@ function normalizeUser(source: Record<string, unknown>): RequestedUser {
 
 function validateUser(user: RequestedUser, allowEmptyPassword: boolean) {
   if (user.fullName.length < 3 || user.fullName.length > 100) return 'El nombre no es válido.';
+  if (user.nationalId && (user.nationalId.length < 7 || user.nationalId.length > 20)) return 'La cédula debe contener entre 7 y 20 dígitos.';
   if (!emailPattern.test(user.email)) return 'El correo debe tener el formato nombre.apellido.apellido@una.cr.';
   if ((!allowEmptyPassword || user.password) && !passwordPattern.test(user.password)) {
     return 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.';
@@ -90,11 +93,14 @@ Deno.serve(async (request) => {
     }
 
     const emails = new Set<string>();
+    const nationalIds = new Set<string>();
     for (const user of users) {
       const validation = validateUser(user, isBulk);
       if (validation) return response({ ok: false, error: `${user.email || 'Fila sin correo'}: ${validation}` }, 400);
       if (emails.has(user.email)) return response({ ok: false, error: `El correo ${user.email} está repetido.` }, 400);
       emails.add(user.email);
+      if (user.nationalId && nationalIds.has(user.nationalId)) return response({ ok: false, error: `La cédula ${user.nationalId} está repetida.` }, 400);
+      if (user.nationalId) nationalIds.add(user.nationalId);
     }
 
     const { count, error: countError } = await adminClient
@@ -113,10 +119,18 @@ Deno.serve(async (request) => {
     let createdCount = 0;
     let authorizedCount = 0;
     for (const user of users) {
+      if (user.nationalId) {
+        const { data: duplicateProfile } = await adminClient.from('profiles').select('id').eq('national_id', user.nationalId).maybeSingle();
+        if (duplicateProfile) {
+          results.push({ email: user.email, ok: false, error: 'La cédula ya está asignada a otro usuario.' });
+          continue;
+        }
+      }
       if (user.role === 'teacher') {
         const { error: registryError } = await adminClient.from('teacher_registry').upsert({
           email: user.email,
           full_name: user.fullName,
+          national_id: user.nationalId || null,
           unit: user.unit,
           active: true
         }, { onConflict: 'email' });
@@ -138,6 +152,7 @@ Deno.serve(async (request) => {
         email_confirm: true,
         user_metadata: {
           full_name: user.fullName,
+          national_id: user.nationalId || null,
           role: user.role === 'teacher' ? 'teacher' : 'admin',
           admin_scope: user.role === 'admin' ? 'superadmin'
             : user.role === 'reservation_admin' ? 'reservations'
@@ -150,6 +165,10 @@ Deno.serve(async (request) => {
       else {
         createdCount += 1;
         results.push({ email: user.email, ok: true, status: 'created', userId: created.user?.id });
+        if (created.user?.id && user.nationalId) {
+          const { error: idError } = await adminClient.from('profiles').update({ national_id: user.nationalId }).eq('id', created.user.id);
+          if (idError) return response({ ok: false, error: idError.message }, 400);
+        }
         if (user.role === 'teacher') {
           await adminClient.from('teacher_registry').update({ claimed_at: new Date().toISOString() }).eq('email', user.email);
         }

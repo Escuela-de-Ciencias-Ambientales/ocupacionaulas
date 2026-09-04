@@ -79,6 +79,7 @@ Deno.serve(async (request) => {
 
     if (action === 'update') {
       const fullName = String(payload.fullName || '').trim();
+      const nationalId = String(payload.nationalId || '').replace(/[^0-9]/g, '');
       const email = String(payload.email || '').trim().toLowerCase();
       const unit = String(payload.unit || '').trim();
       const nextRole = normalizedRole(payload.accessType);
@@ -86,6 +87,14 @@ Deno.serve(async (request) => {
 
       if (fullName.length < 3 || fullName.length > 100) {
         return response({ ok: false, error: 'El nombre completo no es válido.' }, 400);
+      }
+      if (nationalId.length < 7 || nationalId.length > 20) {
+        return response({ ok: false, error: 'La cédula debe contener entre 7 y 20 dígitos.' }, 400);
+      }
+      const { data: duplicateProfile } = await adminClient.from('profiles')
+        .select('id').eq('national_id', nationalId).neq('id', target.id).maybeSingle();
+      if (duplicateProfile) {
+        return response({ ok: false, error: 'La cédula ya está asignada a otro usuario.' }, 409);
       }
       if (!allowedUnits.has(unit)) {
         return response({ ok: false, error: 'Selecciona una unidad institucional válida.' }, 400);
@@ -119,13 +128,15 @@ Deno.serve(async (request) => {
           full_name: fullName,
           role: nextRole.role,
           admin_scope: nextRole.admin_scope,
-          unit
+          unit,
+          national_id: nationalId
         }
       });
       if (authError) return response({ ok: false, error: authError.message }, 400);
 
       const { error: profileError } = await adminClient.from('profiles').update({
         full_name: fullName,
+        national_id: nationalId,
         email,
         unit,
         role: nextRole.role,
@@ -140,6 +151,7 @@ Deno.serve(async (request) => {
         await adminClient.from('teacher_registry').upsert({
           email,
           full_name: fullName,
+          national_id: nationalId,
           unit,
           active: target.active,
           claimed_at: target.created_at

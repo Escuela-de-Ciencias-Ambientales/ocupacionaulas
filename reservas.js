@@ -657,16 +657,18 @@
     const button = elements.createUserForm.querySelector('button[type="submit"]');
     const form = new FormData(elements.createUserForm);
     const fullName = String(form.get('name')).trim();
+    const nationalId = String(form.get('nationalId')).replace(/[^0-9]/g, '');
     const email = String(form.get('email')).trim().toLowerCase();
     const password = String(form.get('password'));
     const unit = String(form.get('unit'));
     if (fullName.length < 3) return showCreateUserMessage('Ingresa el nombre completo del usuario.', 'error');
+    if (nationalId.length < 7 || nationalId.length > 20) return showCreateUserMessage('La cédula debe contener entre 7 y 20 dígitos.', 'error');
     if (!teacherEmailPattern.test(email)) return showCreateUserMessage('El correo debe tener el formato nombre.apellido.apellido@una.cr.', 'error');
     if (!strongPasswordPattern.test(password)) return showCreateUserMessage('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.', 'error');
     if (!allowedUnits.includes(unit)) return showCreateUserMessage('Selecciona la unidad institucional.', 'error');
     setBusy(button, true, 'Creando…');
     try {
-      const { data, error } = await state.client.functions.invoke('admin-create-user', { body: { fullName, email, password, unit, role: String(form.get('role')) } });
+      const { data, error } = await state.client.functions.invoke('admin-create-user', { body: { fullName, nationalId, email, password, unit, role: String(form.get('role')) } });
       if (error) throw error;
       if (!data?.ok) throw new Error(data?.error || 'No fue posible crear la cuenta.');
       elements.createUserForm.reset();
@@ -688,19 +690,24 @@
     const rows = await workbookRows(file);
     if (!rows.length) throw new Error('El archivo no contiene cuentas para crear.');
     const seen = new Set();
+    const seenNationalIds = new Set();
     return rows.map((source, index) => {
       const row = Object.fromEntries(Object.entries(source).map(([key, value]) => [normalizeHeader(key), String(value).trim()]));
       const fullName = row.nombre_completo || row.nombre || '';
+      const nationalId = (row.cedula || row.numero_de_cedula || '').replace(/[^0-9]/g, '');
       const email = (row.correo_electronico || row.correo || row.email || '').toLowerCase();
       const password = row.contrasena_temporal || row.contrasena || '';
       const unit = row.unidad || row.unidad_institucional || '';
       if (fullName.length < 3) throw new Error(`Revisa el nombre completo en la fila ${index + 2}.`);
+      if (nationalId && (nationalId.length < 7 || nationalId.length > 20)) throw new Error(`Revisa la cédula en la fila ${index + 2}.`);
       if (!teacherEmailPattern.test(email)) throw new Error(`Revisa el correo institucional en la fila ${index + 2}.`);
       if (password && !strongPasswordPattern.test(password)) throw new Error(`La contraseña de la fila ${index + 2} debe tener 8 caracteres, una mayúscula y un número.`);
       if (!allowedUnits.includes(unit)) throw new Error(`Selecciona una unidad válida en la fila ${index + 2}.`);
       if (seen.has(email)) throw new Error(`El correo ${email} está repetido en el archivo.`);
       seen.add(email);
-      return { fullName, email, password, unit, role: 'teacher' };
+      if (nationalId && seenNationalIds.has(nationalId)) throw new Error(`La cédula ${nationalId} está repetida en el archivo.`);
+      if (nationalId) seenNationalIds.add(nationalId);
+      return { fullName, nationalId, email, password, unit, role: 'teacher' };
     });
   }
 

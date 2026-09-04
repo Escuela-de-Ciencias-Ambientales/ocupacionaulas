@@ -37,11 +37,12 @@
 .users-table-wrap { overflow-x:auto; border:1px solid var(--reserve-line); border-radius:13px; }
 .users-table { width:100%; border-collapse:collapse; table-layout:fixed; }
 .users-table th { padding:12px 14px; color:#52615c; background:#f1f5f3; font-size:11px; letter-spacing:.05em; text-align:left; text-transform:uppercase; }
-.users-table th:nth-child(1) { width:27%; }
-.users-table th:nth-child(2) { width:13%; }
-.users-table th:nth-child(3) { width:17%; }
-.users-table th:nth-child(4) { width:18%; }
-.users-table th:nth-child(5) { width:25%; }
+.users-table th:nth-child(1) { width:23%; }
+.users-table th:nth-child(2) { width:12%; }
+.users-table th:nth-child(3) { width:11%; }
+.users-table th:nth-child(4) { width:16%; }
+.users-table th:nth-child(5) { width:15%; }
+.users-table th:nth-child(6) { width:23%; }
 .users-table td { padding:14px; border-top:1px solid var(--reserve-line); color:var(--reserve-ink); vertical-align:middle; overflow-wrap:anywhere; }
 .users-table tbody tr:first-child td { border-top:0; }
 .users-table tr.is-inactive { background:#f6f7f7; }
