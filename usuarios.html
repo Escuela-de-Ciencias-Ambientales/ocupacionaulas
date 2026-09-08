@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
-  <link rel="stylesheet" href="usuarios.css?v=4" />
+  <link rel="stylesheet" href="usuarios.css?v=5" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
@@ -126,6 +126,7 @@
       <p class="schedule-dialog-help">Seleccione el ciclo y agregue hasta tres cursos. Las asignaciones de ciclos anteriores se conservan.</p>
       <form id="academicCourseForm" class="academic-course-form">
         <div><label for="academicCourseCycle">Ciclo</label><select id="academicCourseCycle" required></select></div>
+        <div><label for="academicCourseCareer">Carrera</label><select id="academicCourseCareer"><option value="all">Todas las carreras</option><option value="gestion">Gestión Ambiental</option><option value="forestales">Ciencias Forestales</option><option value="otros">Generales u otros</option></select></div>
         <div><label for="academicCourseNrc">Curso disponible</label><select id="academicCourseNrc" required></select></div>
         <button class="primary-button compact-button" type="submit">Asignar curso</button>
       </form>
@@ -136,7 +137,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=1"></script>
-  <script src="usuarios.js?v=5"></script>
+  <script src="usuarios.js?v=6"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
   <script src="navigation-enhancements.js?v=1"></script>

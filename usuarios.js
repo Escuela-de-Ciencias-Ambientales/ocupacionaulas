@@ -137,12 +137,19 @@
     state.academics = data || { professors: [], courses: [] };
     renderAcademics();
   }
+  function courseCareer(course) {
+    const code = String(course?.course_code || '').trim().toUpperCase();
+    if (code.startsWith('AMQ')) return 'forestales';
+    if (code.startsWith('AME') || code.startsWith('AMD')) return 'gestion';
+    return 'otros';
+  }
   function fillAcademicCourseOptions() {
     if (!state.selectedAcademic) return;
     const cycleId = $('academicCourseCycle').value;
+    const career = $('academicCourseCareer').value;
     const assigned = (state.selectedAcademic.courses || []).filter((course) => course.cycle_id === cycleId);
     const assignedNrc = new Set(assigned.map((course) => course.nrc));
-    const available = (state.academics.courses || []).filter((course) => course.cycle_id === cycleId && !assignedNrc.has(course.nrc));
+    const available = (state.academics.courses || []).filter((course) => course.cycle_id === cycleId && !assignedNrc.has(course.nrc) && (career === 'all' || courseCareer(course) === career));
     $('academicCourseNrc').innerHTML = available.map((course) => `<option value="${escapeHtml(course.nrc)}">${escapeHtml(course.course_code)} · ${escapeHtml(course.course_name)} · NRC ${escapeHtml(course.nrc)}</option>`).join('') || '<option value="">No hay más cursos disponibles</option>';
     $('academicCourseForm').querySelector('button[type="submit"]').disabled = assigned.length >= 3 || !available.length;
     $('academicCourseList').innerHTML = (state.selectedAcademic.courses || []).map((course) => `<article class="academic-course-item"><div><strong>${escapeHtml(course.course_code)} · ${escapeHtml(course.course_name)}</strong><span>${escapeHtml(course.cycle_name)} · NRC ${escapeHtml(course.nrc)}${course.group_code ? ` · Grupo ${escapeHtml(course.group_code)}` : ''}</span></div><button class="danger-button" type="button" data-remove-academic-course="${course.id}">Quitar</button></article>`).join('') || '<p>Este académico todavía no tiene cursos asignados.</p>';
@@ -154,6 +161,7 @@
     $('academicCoursesTitle').textContent = `Cursos de ${state.selectedAcademic.full_name}`;
     const cycles = [...new Map((state.academics.courses || []).map((course) => [course.cycle_id, course.cycle_name])).entries()];
     $('academicCourseCycle').innerHTML = cycles.map(([idValue, name]) => `<option value="${idValue}">${escapeHtml(name)}</option>`).join('');
+    $('academicCourseCareer').value = 'all';
     fillAcademicCourseOptions();
     $('academicCoursesDialog').showModal();
   }
@@ -281,6 +289,7 @@
     $('usersStatusFilter').addEventListener('change', () => { state.page = 1; renderTable(); });
     $('academicsSearch').addEventListener('input', renderAcademics);
     $('academicCourseCycle').addEventListener('change', fillAcademicCourseOptions);
+    $('academicCourseCareer').addEventListener('change', fillAcademicCourseOptions);
     $('academicCourseForm').addEventListener('submit', assignAcademicCourse);
     $('closeAcademicCourses').addEventListener('click', () => $('academicCoursesDialog').close());
     $('refreshAcademics').addEventListener('click', async () => { await loadAcademics(); setMessage('Registro de académicos actualizado.', true); });
