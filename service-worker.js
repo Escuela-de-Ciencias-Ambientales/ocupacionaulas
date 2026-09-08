@@ -1,4 +1,4 @@
-const CACHE_NAME = "edeca-reservas-v46";
+const CACHE_NAME = "edeca-reservas-v49";
 const APP_SHELL = [
   "./index.html",
   "./ingreso.html",
@@ -18,6 +18,7 @@ const APP_SHELL = [
   "./sigep-brand.css",
   "./sigep-logo.png",
   "./navigation-enhancements.css",
+  "./visual-system.css",
   "./navigation-enhancements.js",
   "./tramites-vehiculos.html",
   "./usuarios.html",
