@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
-  <link rel="stylesheet" href="usuarios.css?v=3" />
+  <link rel="stylesheet" href="usuarios.css?v=4" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
@@ -56,6 +56,12 @@
       <div><span>Accesos eliminados</span><strong id="usersInactiveCount">—</strong></div>
     </section>
 
+    <section class="identity-sources" aria-label="Fuentes de usuarios del sistema">
+      <article><span class="identity-number">1</span><div><strong>Estudiantes</strong><p>Se administran únicamente desde Clientes de Bodega. No obtienen acceso a aulas ni vehículos.</p></div><a href="bodega-equipos.html?view=clients">Abrir clientes</a></article>
+      <article><span class="identity-number">2</span><div><strong>Académicos</strong><p>Un registro institucional alimenta aulas, vehículos y autorizaciones de equipos.</p></div><a href="#academicsPanel">Ver académicos</a></article>
+      <article><span class="identity-number">3</span><div><strong>Administración</strong><p>Adrián administra todo el sistema; Jenny, Marilyn y Dayanne mantienen sus alcances intermedios.</p></div></article>
+    </section>
+
     <section class="users-panel" aria-labelledby="usersTableTitle">
       <div class="users-panel-heading">
         <div><h2 id="usersTableTitle">Usuarios registrados</h2><p>La tabla muestra 15 usuarios por página.</p></div>
@@ -70,8 +76,8 @@
       <div class="form-message" id="usersPageMessage" role="status" aria-live="polite" hidden></div>
       <div class="users-table-wrap">
         <table class="users-table">
-          <thead><tr><th>Usuario</th><th>Cédula</th><th>Unidad</th><th>Tipo de acceso</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="usersTableBody"><tr><td colspan="6">Cargando usuarios…</td></tr></tbody>
+          <thead><tr><th>Usuario</th><th>Cédula</th><th>Unidad</th><th>Tipo de acceso</th><th>Servicios</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="usersTableBody"><tr><td colspan="7">Cargando usuarios…</td></tr></tbody>
         </table>
       </div>
       <div class="users-pagination">
@@ -130,7 +136,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=1"></script>
-  <script src="usuarios.js?v=4"></script>
+  <script src="usuarios.js?v=5"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
   <script src="navigation-enhancements.js?v=1"></script>

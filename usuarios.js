@@ -19,6 +19,10 @@
     : accessType(user) === 'operations_admin' ? 'Administrador operativo'
     : accessType(user) === 'reservation_admin' ? 'Administrador de reservas'
       : accessType(user) === 'conserjeria_admin' ? 'Administrador de conserjería' : 'Docente';
+  const serviceAccessName = (user) => accessType(user) === 'superadmin' ? 'Todos los módulos actuales y futuros'
+    : accessType(user) === 'operations_admin' ? 'Operación y trámite de servicios'
+      : accessType(user) === 'reservation_admin' ? 'Administración de reservas'
+        : accessType(user) === 'conserjeria_admin' ? 'Conserjería' : 'Aulas, vehículos y autorizaciones de equipos';
   const canEdit = (user) => isSuperadmin() || user.role === 'teacher' || user.id === state.profile?.id;
   const canManageAccess = (user) => isSuperadmin() || user.role === 'teacher';
 
@@ -85,10 +89,11 @@
         <td data-label="Cédula"><strong>${escapeHtml(user.national_id || 'Pendiente')}</strong></td>
         <td data-label="Unidad"><span class="user-badge">${escapeHtml(user.unit || 'Pendiente')}</span></td>
         <td data-label="Tipo de acceso"><span class="user-badge${user.role === 'admin' ? ' is-admin' : ''}">${escapeHtml(accessName(user))}</span></td>
+        <td data-label="Servicios"><small class="service-access">${escapeHtml(serviceAccessName(user))}</small></td>
         <td data-label="Estado"><div class="user-status-stack">${status}</div></td>
         <td data-label="Acciones"><div class="user-row-actions">${editButton}${blockButton}${activeButton}${protectedLabel}</div></td>
       </tr>`;
-    }).join('') : '<tr><td colspan="6">No hay usuarios que coincidan con los filtros.</td></tr>';
+    }).join('') : '<tr><td colspan="7">No hay usuarios que coincidan con los filtros.</td></tr>';
 
     $('usersPageIndicator').textContent = `Página ${state.page} de ${pages} · ${users.length} usuarios`;
     $('previousUsersPage').disabled = state.page <= 1;
