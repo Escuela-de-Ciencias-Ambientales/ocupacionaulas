@@ -1,98 +1,74 @@
-# Reservas de aulas · EDECA
+# SIGEP · Sistema Integrado de Gestión de Equipos y Préstamos — EDECA
 
-Sistema pequeño de consulta y reserva de aulas para la Escuela de Ciencias Ambientales de la Universidad Nacional. Admite hasta 50 cuentas docentes y conserva como referencia el horario académico del II Ciclo 2026.
+Sistema web de la Escuela de Ciencias Ambientales (EDECA), Universidad Nacional de Costa Rica, para reservar aulas y vehículos, llevar la bitácora vehicular digital, autorizar y controlar préstamos de equipo desde bodega, y (en pausa, ver más abajo) el registro de labores de conserjería.
 
-## Funciones incluidas
+Este README reemplaza la versión anterior, que solo describía el alcance original del sistema (aulas, bitácora y equipos) y no mencionaba los módulos de vehículos ni conserjería que ya forman parte del código en producción.
 
-- Consulta pública del horario académico fijo.
-- Página pública limpia, dedicada únicamente a la ocupación académica.
-- Página independiente para el ingreso del personal docente.
-- Módulo responsive para que cada docente autorice préstamos de equipo a todo un curso o a un estudiante particular.
-- Bitácora vehicular digital identificada por cédula, con datos manuales, dos fotografías comprimidas y firma táctil.
-- Panel de control de bitácoras para asistencia administrativa y superadministración, con filtros por boleta, fecha y usuario.
-- Área privada de reservas disponible únicamente después de iniciar sesión.
-- Vista diaria de tramos disponibles y ocupados para cada aula dentro del área privada.
-- Inicio de sesión individual con correo y contraseña.
-- Registro inicial únicamente para docentes autorizados previamente por la administración.
-- Campos de contraseña con control para mostrar u ocultar el texto.
-- Cambio de contraseña personal con validación de seguridad.
-- Creación de reservas por fecha, aula, hora de inicio, hora de finalización y actividad.
-- Reserva directa desde cualquier tramo disponible, con horario máximo hasta las 21:00.
-- Bloqueo de cruces con clases fijas y con otras reservas.
-- Lista personal de próximas reservas y cancelación por parte del propietario.
-- Acceso maestro para consultar y cancelar cualquier reserva.
-- Dos niveles administrativos: superadministrador y administrador de reservas.
-- El superadministrador controla ciclos, roles administrativos y cargas masivas de docentes.
-- El administrador de reservas puede crear docentes, gestionar reservas y editar la ocupación académica únicamente desde el calendario semanal.
-- Editor semanal visual para crear, modificar o eliminar cursos directamente en cada bloque del aula, incluyendo profesor, código, nombre del curso, grupo y NRC.
-- Creación individual de cuentas y carga masiva de docentes autorizados mediante Excel.
-- Diseño adaptable para computadora, tableta y teléfono.
-- Registro público de labores de conserjería mediante contraseña y códigos QR por aposento.
-- Panel privado de conserjería con indicadores, gráficos y exportación a Excel, restringido al alcance administrativo correspondiente.
-- Registro de cancelaciones y reglas de seguridad en la base de datos.
-- Ciclos configurables por la administración, incluidas las fechas reservables y la ventana de apertura del sistema.
-- Reservas cerradas por defecto: solo pueden abrirse después de cargar la ocupación académica prioritaria.
-- Carga y reemplazo del horario de clases mediante una plantilla Excel desde el panel maestro.
+## Módulos activos
 
-## Estructura
+- **Aulas** (`index.html`, `reservas.html`): horario público de ocupación académica y área privada de reservas docentes.
+- **Vehículos** (`reservas.html`, `tramites-vehiculos.html`, `bitacora-vehicular.html`): reserva de vehículos institucionales, trámite de giras y bitácora digital con fotos y firma táctil.
+- **Bodega de equipos** (`bodega-equipos.html`, `autorizaciones-equipos.html`, `solicitar-equipo.html`): autorización docente de préstamos, solicitud y control de devoluciones para estudiantes.
+- **Administración de usuarios** (`usuarios.html`) y **configuración del sistema** (`configuracion.html`, nuevo): gestión de cuentas y parámetros editables por el superadministrador sin tocar código.
 
-- `index.html`: página pública del horario académico, con acceso hacia el ingreso docente.
-- `autorizaciones-equipos.html`: autorización docente de préstamos por curso completo o estudiante individual.
-- `bitacora-vehicular.html`: formulario de bitácora y control administrativo de registros completos o pendientes.
+## Módulo en pausa
 
-### Prueba del módulo de equipos
+- **Conserjería** (`conserjeria-admin.js`, `conserjeria-publico.js`, `conserjeria.css`, `conserjeria-admin.css`): se desactivó intencionalmente y su botón de acceso permanece oculto en la interfaz (atributo `data-feature-disabled`). El código se conserva completo en el repositorio para no perder el trabajo hecho; reactivarlo es un cambio de configuración (ver `system_settings` más abajo), no una reconstrucción.
 
-La migración `202609010002_equipment_authorizations_test_data.sql` vincula temporalmente la cuenta docente de prueba `profe.prueba.primero@una.cr` con la cédula ficticia `999999999`, el NRC `TEST-001` y cinco estudiantes ficticios con cédulas de `900000001` a `900000005`. Estos datos deben sustituirse al cargar los padrones oficiales.
-- `ingreso.html`: página exclusiva para usuario y contraseña.
-- `reservas.html`: área privada de consulta y reservación.
-- `ingreso.css` y `ingreso.js`: presentación y autenticación de la página de acceso.
-- `reservas.css`: estilos del sistema de acceso y reservas.
-- `reservas.js`: autenticación, disponibilidad, reservas y administración.
-- `config.js`: conexión pública con Supabase.
-- `supabase/migrations/`: esquema, restricciones y políticas de seguridad.
-- `supabase/seed.sql`: ocupaciones académicas iniciales que bloquean reservas.
-- `plantillas/plantilla_ocupacion_aulas.xlsx`: plantilla para cargar las clases de cada nuevo ciclo.
-- `plantillas/plantilla_cuentas_docentes.xlsx`: plantilla para autorizar o crear docentes en lote.
-- `supabase/functions/admin-create-user/`: función segura para autorizar o crear cuentas.
-- `supabase/functions/register-teacher/`: registro inicial restringido a la lista administrativa.
-- `qr_codes_v2/`: códigos QR imprimibles de los aposentos configurados para conserjería.
-- `.github/workflows/pages.yml`: publicación automática en GitHub Pages.
+## Separación de personas en el sistema
+
+Este es un contrato que todo módulo nuevo debe respetar (ver también `docs/arquitectura-usuarios.md`):
+
+- **Estudiantes** (`academic_students`): existen únicamente dentro del módulo de bodega de equipos, como quienes reciben o autorizan préstamos. Un estudiante nunca es cuenta de acceso al sistema: no reserva aulas, no reserva vehículos y no escribe bitácoras. Esta separación está a nivel de esquema de base de datos, no solo de interfaz.
+- **Docentes** (`teacher_registry`): personal académico autorizado a reservar aulas, vehículos y autorizar préstamos de equipo para sus cursos o estudiantes.
+- **Administrativos** (`profiles`, con `role`/`admin_scope`): cuentas de personal UNA con acceso administrativo. Hay dos niveles — administración intermedia (por alcance: reservas u operaciones) y superadministración, con control total sobre todos los módulos, incluidos los parámetros del sistema.
+
+## Estructura del repositorio
+
+- `index.html` / `reservas.html`: horario público y área privada de aulas y vehículos.
+- `ingreso.html`: autenticación del personal.
+- `usuarios.html`: administración de cuentas.
+- `configuracion.html`: panel de parámetros del superadmin (nuevo — ver abajo).
+- `autorizaciones-equipos.html`, `solicitar-equipo.html`, `bodega-equipos.html`: módulo de préstamo de equipos.
+- `bitacora-vehicular.html`, `tramites-vehiculos.html`, `mis-giras.html`: módulo de vehículos y giras.
+- `design-tokens.css` (nuevo): variables de color, tipografía y espaciado centralizadas. Documenta la paleta que ya estaba en uso en `sigep-brand.css` y `visual-system.css`, como primer paso hacia un sistema de diseño único; no cambia ningún estilo visual por sí solo.
+- `config.js`: conexión pública con Supabase (URL y clave `anon`).
+- `supabase/migrations/`: esquema, restricciones y políticas de seguridad, en orden cronológico.
+- `supabase/functions/`: funciones de borde para operaciones que requieren la clave `service_role` (creación de cuentas, retención de datos, recibos de equipo).
+- `plantillas/`: plantillas Excel para carga masiva de docentes y horarios.
+- `qr_codes_v2/`: códigos QR impresos de los aposentos de conserjería (módulo en pausa).
+
+## Panel de configuración del superadministrador
+
+La tabla `public.system_settings` (migración `20260908230000_system_settings_panel.sql`) guarda parámetros editables desde `configuracion.html`, visible solo para el superadministrador. Valores iniciales cargados: hora máxima de reserva de aulas, límite semanal de reservas de vehículo, si conserjería está activa, días máximos de préstamo de equipo antes de vencerse, y el nombre público del sistema. Los módulos nuevos deben preferir leer de esta tabla en vez de codificar valores fijos.
 
 ## Configuración de Supabase
 
 1. Crear un proyecto de Supabase.
 2. Ejecutar, en orden, las migraciones de `supabase/migrations/`.
 3. Ejecutar `supabase/seed.sql`.
-4. Desplegar las funciones `admin-create-user` y `register-teacher`.
-5. En Authentication, desactivar el registro público de usuarios.
-6. Crear manualmente la primera cuenta administrativa.
-7. Ejecutar `supabase/bootstrap-admin.sql.example` con el correo real de esa cuenta.
+4. Desplegar las funciones en `supabase/functions/`.
+5. En Authentication → URL Configuration, la URL de redirección permitida debe ser `https://escuela-de-ciencias-ambientales.github.io/ocupacionaulas/` (el repositorio anterior, `reservas_aulas`, quedó retirado y ya no debe usarse).
+6. En Authentication, desactivar el registro público de usuarios.
+7. Crear manualmente la primera cuenta administrativa y ejecutar `supabase/bootstrap-admin.sql.example` con su correo real.
 8. Copiar la URL del proyecto y la clave pública `anon` en `config.js`.
-9. Agregar como URL permitida de autenticación:
-   `https://escuela-de-ciencias-ambientales.github.io/reservas_aulas/`
 
-La clave `anon` de Supabase está diseñada para utilizarse en el navegador. La clave `service_role` nunca debe guardarse en este repositorio ni en `config.js`; la función administrativa la recibe automáticamente en el entorno seguro de Supabase.
-
-## Flujo de cuentas
-
-La primera cuenta maestra queda configurada como superadministrador. Solo ese perfil puede crear otros superadministradores, administradores de reservas o realizar cargas masivas de docentes y horarios. El administrador de reservas puede crear cuentas docentes individuales, gestionar reservas y modificar el horario directamente en el calendario semanal, pero no puede consultar ni modificar listas masivas. Si una fila del Excel no contiene contraseña, el correo queda autorizado para que el profesor complete su registro inicial; si contiene una contraseña válida, la cuenta se crea inmediatamente.
-
-## Apertura de cada ciclo
-
-El administrador configura el nombre y las fechas del ciclo, así como la apertura y el cierre del sistema. Guardar la configuración deja las reservas cerradas. Después se carga la ocupación académica con `plantilla_ocupacion_aulas.xlsx`; esta operación reemplaza el horario fijo del ciclo y también mantiene el sistema cerrado. Solo entonces se habilita el botón **Abrir reservas**. Las clases cargadas siempre tienen prioridad sobre las solicitudes docentes.
+La clave `anon` está diseñada para usarse en el navegador. La clave `service_role` nunca debe guardarse en este repositorio ni en `config.js`; las funciones de borde la reciben automáticamente en el entorno seguro de Supabase.
 
 ## Seguridad
 
-La base de datos aplica políticas RLS. Un docente solo puede crear reservas a su nombre y cancelar las propias. Los administradores pueden gestionar reservas y ocupaciones académicas; únicamente el superadministrador puede cambiar roles o gestionar la autorización masiva. La restricción de exclusión de PostgreSQL impide reservas simultáneas incluso si dos personas intentan guardar al mismo tiempo. Las reglas también rechazan cruces entre el horario académico editado y reservas activas.
+La base de datos aplica políticas RLS por tabla, con una función `is_admin()` / `is_superadmin()` central para evitar duplicar lógica de permisos. Las funciones de borde verifican el rol de quien llama contra `profiles` usando la clave `service_role`, no confían en lo que envía el navegador. Un docente solo puede crear y cancelar sus propias reservas; solo el superadministrador puede cambiar roles, gestionar cargas masivas o editar los parámetros del sistema.
 
 ## Desarrollo local
 
-Sirve la carpeta mediante cualquier servidor estático. Por ejemplo:
+Sirve la carpeta mediante cualquier servidor estático, por ejemplo:
 
 ```text
 python -m http.server 8781
 ```
 
-Después abre `http://127.0.0.1:8781/`.
+Después abre `http://127.0.0.1:8781/`. Sin credenciales en `config.js`, la interfaz carga en modo de configuración y mantiene visible el horario base, pero desactiva el acceso y la creación de reservas.
 
-Sin credenciales en `config.js`, la interfaz carga en modo de configuración y mantiene visible el horario base, pero desactiva el acceso y la creación de reservas.
+## Publicación
+
+`.github/workflows/pages.yml` publica automáticamente en GitHub Pages con cada push a `main`.

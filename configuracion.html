@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Configuración del sistema | EDECA</title>
+  <meta name="description" content="Panel de parámetros editables por el superadministrador del sistema EDECA." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="design-tokens.css?v=1" />
+  <link rel="stylesheet" href="reservas.css?v=21" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#003C71" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="visual-system.css?v=3" />
+  <link rel="stylesheet" href="navigation-enhancements.css?v=3" />
+  <link rel="stylesheet" href="configuracion.css?v=1" />
+</head>
+<body>
+  <header class="private-header">
+    <div class="page private-header-row">
+      <a class="private-brand" href="index.html">
+        <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
+        <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
+      </a>
+      <div class="header-actions">
+        <a class="back-to-schedule" href="usuarios.html">Volver a usuarios</a>
+        <div class="header-account" id="configHeaderAccount" hidden>
+          <div class="header-account-identity">
+            <strong id="configCurrentName">Superadministrador</strong>
+            <span>Configuración del sistema</span>
+          </div>
+          <button class="text-button" id="configLogout" type="button">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page config-main">
+    <section class="config-intro">
+      <div>
+        <p class="eyebrow">Solo superadministrador</p>
+        <h1>Parámetros del sistema</h1>
+        <p>Estos valores controlan comportamiento del sistema sin necesidad de modificar código ni desplegar nada nuevo. Los cambios se guardan de inmediato y quedan registrados con fecha y usuario.</p>
+      </div>
+      <span class="connection-status" id="configConnectionStatus">Comprobando acceso…</span>
+    </section>
+
+    <p class="config-denied" id="configDenied" hidden>
+      Esta sección es exclusiva del superadministrador. Si creés que deberías tener acceso, contactá a quien administra el sistema.
+    </p>
+
+    <section class="config-panel" id="configPanel" hidden>
+      <p class="config-message" id="configMessage" hidden></p>
+      <div class="config-list" id="configList"></div>
+
+      <form class="config-add" id="configAddForm">
+        <p class="config-add-title">Agregar un parámetro nuevo</p>
+        <div class="config-add-fields">
+          <label>Clave
+            <input type="text" id="configNewKey" placeholder="por_ejemplo_asi" required pattern="[a-z0-9_]+" />
+          </label>
+          <label>Valor (texto, número, true/false, o JSON)
+            <input type="text" id="configNewValue" placeholder="&quot;texto&quot;, 42, true…" required />
+          </label>
+          <label>Descripción
+            <input type="text" id="configNewDescription" placeholder="Para qué se usa" />
+          </label>
+        </div>
+        <button type="submit" class="primary-button">Agregar parámetro</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=5"></script>
+  <script src="configuracion.js?v=1"></script>
+</body>
+</html>

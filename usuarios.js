@@ -333,7 +333,7 @@
       if (!state.session) { window.location.replace('ingreso.html?v=7'); return; }
       await loadProfile();
       await loadUsers();
-      if (isSuperadmin()) { $('academicsPanel').hidden = false; await loadAcademics(); }
+      if (isSuperadmin()) { $('academicsPanel').hidden = false; await loadAcademics(); $('usersConfigLink').hidden = false; }
       $('usersConnectionStatus').textContent = 'Acceso administrativo';
     } catch (error) {
       $('usersConnectionStatus').textContent = 'No disponible';

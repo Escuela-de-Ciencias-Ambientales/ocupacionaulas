@@ -1,0 +1,71 @@
+/*
+ * Sistema de diseño SIGEP — fuente única de verdad de color, tipografía y espaciado.
+ * Los valores se extrajeron de los estilos ya en uso (sigep-brand.css, visual-system.css,
+ * reservas.css, vehiculos.css) para no introducir ningún cambio visual: este archivo
+ * documenta y centraliza la paleta existente como variables CSS, para que los módulos
+ * nuevos y las hojas de estilo existentes puedan ir migrando a estas variables en vez
+ * de repetir literales hexadecimales.
+ *
+ * No modifica nada por sí solo: se carga antes que el resto del CSS y ninguna regla
+ * aquí gana especificidad sobre las hojas actuales.
+ */
+
+:root {
+  /* Marca EDECA / UNA */
+  --sigep-verde-oscuro: #073b2a;
+  --sigep-verde: #08784d;
+  --sigep-verde-fuerte: #087a55;
+  --sigep-verde-texto: #075238;
+  --sigep-verde-hover: #075c40;
+  --sigep-una-azul: #003c71;
+  --sigep-una-azul-alt: #034991;
+
+  /* Texto y superficies neutras */
+  --sigep-texto-principal: #102a3a;
+  --sigep-texto-secundario: #5b6f77;
+  --sigep-texto-terciario: #65716e;
+  --sigep-texto-oscuro-alt: #455463;
+  --sigep-fondo: #f6faf8;
+  --sigep-fondo-alt: #f1f5f3;
+  --sigep-fondo-suave: #f2f6f4;
+  --sigep-fondo-tarjeta: #fbfdfc;
+  --sigep-blanco: #fff;
+
+  /* Bordes y divisores */
+  --sigep-borde: #d7e2de;
+  --sigep-borde-suave: #dfe6e3;
+  --sigep-borde-fuerte: #b9cbc4;
+  --sigep-borde-alterno: #cad8d3;
+  --sigep-borde-neutro: #cfd9d5;
+
+  /* Estados */
+  --sigep-error: #c41720;
+  --sigep-error-fondo: #fff0f1;
+  --sigep-error-oscuro: #8f1c27;
+  --sigep-oscuro-contraste: #152238;
+  --sigep-oscuro-contraste-alt: #202827;
+  --sigep-verde-oscuro-alt: #273431;
+
+  /* Tipografía */
+  --sigep-fuente: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --sigep-texto-tamano-base: 1rem;
+  --sigep-texto-tamano-pequeno: 0.84rem;
+  --sigep-texto-tamano-grande: 1.25rem;
+
+  /* Espaciado (escala de 4px) */
+  --sigep-espacio-1: 4px;
+  --sigep-espacio-2: 8px;
+  --sigep-espacio-3: 12px;
+  --sigep-espacio-4: 16px;
+  --sigep-espacio-5: 20px;
+  --sigep-espacio-6: 24px;
+  --sigep-espacio-8: 32px;
+
+  /* Bordes redondeados */
+  --sigep-radio-sm: 8px;
+  --sigep-radio-md: 12px;
+  --sigep-radio-lg: 18px;
+
+  /* Sombras */
+  --sigep-sombra-boton: 0 7px 18px rgb(8 120 77 / 0.16);
+}

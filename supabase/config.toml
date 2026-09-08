@@ -1,4 +1,4 @@
-project_id = "reservas-aulas-edeca"
+project_id = "ocupacionaulas-edeca"
 
 [api]
 enabled = true
@@ -18,7 +18,7 @@ port = 54323
 [auth]
 enabled = true
 site_url = "http://127.0.0.1:8781"
-additional_redirect_urls = ["https://escuela-de-ciencias-ambientales.github.io/reservas_aulas/"]
+additional_redirect_urls = ["https://escuela-de-ciencias-ambientales.github.io/ocupacionaulas/"]
 jwt_expiry = 3600
 enable_signup = false
 
