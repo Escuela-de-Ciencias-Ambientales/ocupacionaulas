@@ -20,3 +20,9 @@ Fuente institucional procesada: `Anexo 1. UNA-DR-OFIC-2555-2026, EDECA Estudiant
 - Los nombres se almacenaron con capitalización legible.
 
 La importación no desactivó registros anteriores ni alteró préstamos, devoluciones, excepciones o autorizaciones existentes. El archivo con datos personales no se incorporó al repositorio.
+
+## Procedimiento para próximos ciclos
+
+En Bodega, abra **Clientes** y seleccione **Importar Excel semestral**. Elija el ciclo, cargue un archivo `.xlsx` con las mismas nueve columnas institucionales y revise el resumen antes de confirmar.
+
+La importación es idempotente: identifica a cada estudiante por su cédula, actualiza sus datos personales y reemplaza solamente sus matrículas del ciclo elegido. No elimina el registro permanente del estudiante, por lo que conserva préstamos activos, devoluciones, firmas, comprobantes, restricciones y trazabilidad histórica. Las materias sin NRC en el horario del ciclo se reportan y no se relacionan de manera artificial.

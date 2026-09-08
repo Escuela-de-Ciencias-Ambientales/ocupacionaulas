@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="bodega-equipos.css?v=1" />
     <link rel="stylesheet" href="student-view.css?v=1" />
-    <link rel="stylesheet" href="warehouse-enhancements.css?v=6" />
+    <link rel="stylesheet" href="warehouse-enhancements.css?v=7" />
     <link rel="stylesheet" href="sigep-brand.css?v=3" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=2" />
 </head>
@@ -78,7 +78,7 @@
         </section>
 
         <section id="clientsView" class="view" hidden>
-          <div class="page-heading"><div><p class="eyebrow">Personas registradas</p><h1>Clientes</h1><span>Estudiantes y sus préstamos activos.</span></div><button id="newClient">＋ Agregar estudiante</button></div>
+          <div class="page-heading"><div><p class="eyebrow">Personas registradas</p><h1>Clientes</h1><span>Estudiantes y sus préstamos activos.</span></div><div class="heading-actions"><button id="importStudents" class="secondary" type="button">⇧ Importar Excel semestral</button><button id="newClient" type="button">＋ Agregar estudiante</button></div></div>
           <input id="clientSearch" class="wide-search" type="search" placeholder="Buscar por nombre, cédula o carrera" />
           <div class="table-wrap"><table><thead><tr><th>Estudiante</th><th>Cédula</th><th>Correo</th><th>Teléfono</th><th>Carrera</th><th>Préstamos activos</th><th>Restricción</th><th></th></tr></thead><tbody id="clientRows"></tbody></table></div>
         </section>
@@ -132,6 +132,7 @@
       </form>
     </dialog>
     <dialog id="clientDialog"><form id="clientForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Clientes</p><h2 id="clientDialogTitle">Agregar estudiante</h2></div><button type="button" id="closeClient" class="icon-button">×</button></div><input id="clientId" type="hidden" /><label>Cédula<input id="clientNationalId" required inputmode="numeric" /></label><label>Nombre completo<input id="clientName" required /></label><label>Correo<input id="clientEmail" type="email" /></label><label>Teléfono<input id="clientPhone" type="tel" inputmode="tel" placeholder="Ej.: 8888-8888" /></label><label>Carrera<select id="clientCareer"><option>Ingeniería en Ciencias Forestales</option><option>Ingeniería en Gestión Ambiental</option></select></label><label class="check"><input id="clientActive" type="checkbox" checked /> Estudiante activo</label><button type="submit">Guardar estudiante</button></form></dialog>
+    <dialog id="studentImportDialog" class="student-import-dialog"><form id="studentImportForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Actualización semestral</p><h2>Importar estudiantes desde Excel</h2></div><button type="button" data-close-dialog="studentImportDialog" class="icon-button">×</button></div><p>Use un archivo con las mismas columnas del listado institucional. Los estudiantes se actualizan por cédula y no se eliminan préstamos ni historiales.</p><label>Ciclo académico<select id="studentImportCycle" required></select></label><label>Archivo Excel (.xlsx)<input id="studentImportFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required /></label><div id="studentImportPreview" class="import-preview">Seleccione un archivo para revisarlo antes de importar.</div><button id="confirmStudentImport" type="submit" disabled>Actualizar estudiantes y matrículas</button></form></dialog>
     <dialog id="professorDialog" class="professor-dialog"><form id="professorForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Docente autorizador</p><h2 id="professorDialogTitle">Agregar profesor</h2></div><button type="button" id="closeProfessor" class="icon-button">×</button></div><input id="professorId" type="hidden" /><label>Nombre completo<input id="professorName" required /></label><label>Cédula<input id="professorNationalId" required inputmode="numeric" /></label><label>Correo institucional (opcional)<input id="professorEmail" type="email" /></label><label class="check"><input id="professorActive" type="checkbox" checked /> Puede autorizar equipos</label><button type="submit">Guardar profesor</button></form></dialog>
     <dialog id="professorCoursesDialog" class="professor-dialog"><div class="professor-dialog-body"><div class="dialog-head"><div><p class="eyebrow">Cursos por ciclo</p><h2 id="professorCoursesTitle">Cursos asignados</h2></div><button type="button" data-close-dialog="professorCoursesDialog" class="icon-button">×</button></div><form id="assignCourseForm" class="inline-course-form"><label>Ciclo<select id="professorCycle"></select></label><label>Curso<select id="professorCourse"></select></label><button type="submit">Asignar curso</button></form><div id="professorCourseList" class="professor-course-list"></div></div></dialog>
     <dialog id="professorAuthorizationsDialog" class="professor-dialog wide-professor-dialog"><div class="professor-dialog-body"><div class="dialog-head"><div><p class="eyebrow">Historial</p><h2 id="professorAuthorizationsTitle">Autorizaciones</h2></div><button type="button" data-close-dialog="professorAuthorizationsDialog" class="icon-button">×</button></div><div id="professorAuthorizationList" class="authorization-list"></div></div></dialog>
@@ -142,8 +143,9 @@
     <dialog id="warehousePasswordDialog" class="password-dialog"><form id="warehousePasswordForm" method="dialog"><div class="dialog-head"><div><p class="eyebrow">Seguridad de la cuenta</p><h2>Cambiar contraseña</h2></div><button type="button" data-close-dialog="warehousePasswordDialog" class="icon-button">×</button></div><label>Nueva contraseña<input id="warehouseNewPassword" type="password" minlength="8" autocomplete="new-password" required /></label><label>Confirmar contraseña<input id="warehouseConfirmPassword" type="password" minlength="8" autocomplete="new-password" required /></label><button type="submit">Guardar contraseña</button></form></dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="config.js?v=5"></script>
-    <script src="bodega-equipos.js?v=12"></script>
+    <script src="bodega-equipos.js?v=13"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>
 </html>
