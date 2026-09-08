@@ -63,6 +63,7 @@
 .user-editor-dialog { width:min(680px,calc(100% - 28px)); }
 .user-editor-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; margin-top:14px; }
 .user-editor-grid .field-wide { grid-column:1 / -1; }
+.academics-panel{margin-top:24px}.academics-filter{grid-template-columns:minmax(260px,1fr);max-width:720px}.academics-table th:nth-child(1){width:25%}.academics-table th:nth-child(2){width:12%}.academics-table th:nth-child(3){width:15%}.academics-table th:nth-child(4){width:31%}.academics-table th:nth-child(5){width:17%}.academic-course-chips{display:flex;flex-wrap:wrap;gap:5px}.academic-course-chip{display:inline-flex;padding:5px 8px;border-radius:999px;background:#edf3f1;color:#315047;font-size:11px;font-weight:800}.academic-courses-dialog{width:min(800px,calc(100% - 28px));max-height:90vh}.academic-dialog-body{padding:24px}.academic-course-form{display:grid;grid-template-columns:180px minmax(260px,1fr) auto;gap:14px;align-items:end;margin:18px 0}.academic-course-form label{display:block;margin-bottom:7px;color:var(--reserve-ink);font-size:12px;font-weight:800;text-transform:uppercase}.academic-course-form select{width:100%;min-height:50px;padding:11px 13px;border:1px solid #cfd9d5;border-radius:10px;background:#fff;font:inherit}.academic-course-form button{width:auto;margin:0}.academic-course-list{display:grid;gap:9px;margin-top:18px}.academic-course-item{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 15px;border:1px solid var(--reserve-line);border-radius:12px}.academic-course-item div{display:grid;gap:3px}.academic-course-item span{color:var(--reserve-muted);font-size:13px}.academic-course-item button{width:auto;margin:0}
 
 @media (max-width:820px) {
   .users-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -75,6 +76,7 @@
   .users-table tr { padding:14px 15px; border:1px solid var(--reserve-line); border-radius:13px; background:#fff; }
   .users-table td { display:grid; grid-template-columns:112px minmax(0,1fr); gap:12px; padding:8px 0; border:0; }
   .users-table td::before { content:attr(data-label); color:var(--reserve-muted); font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+  .academic-course-form{grid-template-columns:1fr}
 }
 @media (max-width:560px) {
   .users-main { padding-top:24px; }

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="reservas.css?v=21" />
-  <link rel="stylesheet" href="usuarios.css?v=2" />
+  <link rel="stylesheet" href="usuarios.css?v=3" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
@@ -80,6 +80,15 @@
         <button class="secondary-button compact-button" id="nextUsersPage" type="button">Siguiente</button>
       </div>
     </section>
+
+    <section class="users-panel academics-panel" id="academicsPanel" aria-labelledby="academicsTitle" hidden>
+      <div class="users-panel-heading">
+        <div><p class="eyebrow">Registro maestro institucional</p><h2 id="academicsTitle">Académicos EDECA</h2><p>Esta lista autoriza el registro y sirve como referencia para aulas, vehículos y equipos. Cada profesor puede tener hasta tres cursos por ciclo.</p></div>
+        <button class="secondary-button compact-button" id="refreshAcademics" type="button">Actualizar</button>
+      </div>
+      <div class="users-filters academics-filter"><div><label for="academicsSearch">Buscar académico</label><input id="academicsSearch" type="search" placeholder="Nombre, cédula, correo o curso" /></div></div>
+      <div class="users-table-wrap"><table class="users-table academics-table"><thead><tr><th>Académico</th><th>Cédula</th><th>Estado de cuenta</th><th>Cursos asignados</th><th>Acciones</th></tr></thead><tbody id="academicsTableBody"><tr><td colspan="5">Cargando académicos…</td></tr></tbody></table></div>
+    </section>
   </main>
 
   <dialog class="schedule-dialog user-editor-dialog" id="userEditorDialog">
@@ -105,9 +114,23 @@
     </form>
   </dialog>
 
+  <dialog class="schedule-dialog academic-courses-dialog" id="academicCoursesDialog">
+    <div class="academic-dialog-body">
+      <div class="dialog-heading"><div><p class="eyebrow">Asignación académica</p><h2 id="academicCoursesTitle">Cursos del profesor</h2></div><button class="dialog-close" id="closeAcademicCourses" type="button" aria-label="Cerrar">×</button></div>
+      <p class="schedule-dialog-help">Seleccione el ciclo y agregue hasta tres cursos. Las asignaciones de ciclos anteriores se conservan.</p>
+      <form id="academicCourseForm" class="academic-course-form">
+        <div><label for="academicCourseCycle">Ciclo</label><select id="academicCourseCycle" required></select></div>
+        <div><label for="academicCourseNrc">Curso disponible</label><select id="academicCourseNrc" required></select></div>
+        <button class="primary-button compact-button" type="submit">Asignar curso</button>
+      </form>
+      <div class="form-message" id="academicCoursesMessage" role="status" aria-live="polite" hidden></div>
+      <div class="academic-course-list" id="academicCourseList"></div>
+    </div>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=1"></script>
-  <script src="usuarios.js?v=3"></script>
+  <script src="usuarios.js?v=4"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
   <script src="navigation-enhancements.js?v=1"></script>

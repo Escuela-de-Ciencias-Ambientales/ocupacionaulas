@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
-const emailPattern = /^[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr$/;
+const emailPattern = /^[^\s@]+@una\.cr$/iu;
 const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 const allowedUnits = new Set(['Docencia', 'Administrativo', 'LAA', 'PROCAME']);
 
@@ -42,7 +42,7 @@ function normalizeUser(source: Record<string, unknown>): RequestedUser {
 function validateUser(user: RequestedUser, allowEmptyPassword: boolean) {
   if (user.fullName.length < 3 || user.fullName.length > 100) return 'El nombre no es válido.';
   if (user.nationalId && (user.nationalId.length < 7 || user.nationalId.length > 20)) return 'La cédula debe contener entre 7 y 20 dígitos.';
-  if (!emailPattern.test(user.email)) return 'El correo debe tener el formato nombre.apellido.apellido@una.cr.';
+  if (!emailPattern.test(user.email)) return 'Ingrese un correo institucional @una.cr válido.';
   if ((!allowEmptyPassword || user.password) && !passwordPattern.test(user.password)) {
     return 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.';
   }

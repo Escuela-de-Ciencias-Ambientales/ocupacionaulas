@@ -403,7 +403,7 @@
             <div><strong>Ingreso a reservas</strong><span>Usa tu correo institucional y contraseña.</span></div>
           </div>
           <label for="loginEmail">Correo electrónico</label>
-          <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido.apellido@una.cr" pattern="[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
+          <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido@una.cr" pattern="[^@ ]+@una\.cr" title="Ingrese su correo institucional @una.cr" required />
           <label for="loginPassword">Contraseña</label>
           <input id="loginPassword" name="password" type="password" autocomplete="current-password" minlength="8" required />
           <button class="primary-button" type="submit">Ingresar</button>
@@ -498,7 +498,7 @@
           <label for="newUserName">Nombre completo</label>
           <input id="newUserName" name="name" maxlength="100" required />
           <label for="newUserEmail">Correo electrónico</label>
-          <input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido.apellido@una.cr" pattern="[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
+          <input id="newUserEmail" name="email" type="email" placeholder="nombre.apellido@una.cr" pattern="[^@ ]+@una\.cr" title="Ingrese su correo institucional @una.cr" required />
           <label for="newUserPassword">Contraseña temporal</label>
           <input id="newUserPassword" name="password" type="password" minlength="8" required />
           <label for="newUserRole">Tipo de acceso</label>

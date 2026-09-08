@@ -3,7 +3,7 @@
 
   const $ = (id) => document.getElementById(id);
   const config = window.RESERVAS_CONFIG || {};
-  const state = { client: null, session: null, profile: null, users: [], page: 1, pageSize: 15 };
+  const state = { client: null, session: null, profile: null, users: [], academics: { professors: [], courses: [] }, selectedAcademic: null, page: 1, pageSize: 15 };
 
   const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
@@ -105,6 +105,77 @@
     renderTable();
   }
 
+  function academicAccount(professor) {
+    return state.users.find((user) => String(user.email || '').toLocaleLowerCase('es') === String(professor.email || '').toLocaleLowerCase('es'));
+  }
+  function filteredAcademics() {
+    const search = $('academicsSearch').value.trim().toLocaleLowerCase('es');
+    return (state.academics.professors || []).filter((professor) => !search || `${professor.full_name} ${professor.national_id || ''} ${professor.email || ''} ${(professor.courses || []).map((course) => `${course.course_code} ${course.course_name} ${course.nrc}`).join(' ')}`.toLocaleLowerCase('es').includes(search));
+  }
+  function renderAcademics() {
+    const professors = filteredAcademics();
+    $('academicsTableBody').innerHTML = professors.length ? professors.map((professor) => {
+      const account = academicAccount(professor);
+      const courses = professor.courses || [];
+      return `<tr class="${professor.active ? '' : 'is-inactive'}">
+        <td data-label="Académico"><div class="user-identity"><strong>${escapeHtml(professor.full_name)}</strong><span>${escapeHtml(professor.email || 'Sin correo')}</span></div></td>
+        <td data-label="Cédula"><strong>${escapeHtml(professor.national_id || 'Pendiente')}</strong></td>
+        <td data-label="Estado de cuenta"><span class="user-badge${account ? '' : ' is-inactive'}">${account ? 'Cuenta registrada' : 'Pendiente de registro'}</span></td>
+        <td data-label="Cursos asignados"><div class="academic-course-chips">${courses.length ? courses.map((course) => `<span class="academic-course-chip">${escapeHtml(course.course_code)} · ${escapeHtml(course.cycle_name)}</span>`).join('') : '<span>Sin cursos asignados</span>'}</div></td>
+        <td data-label="Acciones"><div class="user-row-actions"><button class="secondary-button" type="button" data-academic-courses="${professor.id}">Editar cursos</button></div></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5">No hay académicos que coincidan con la búsqueda.</td></tr>';
+  }
+  async function loadAcademics() {
+    const { data, error } = await state.client.rpc('warehouse_professors_data');
+    if (error) throw error;
+    state.academics = data || { professors: [], courses: [] };
+    renderAcademics();
+  }
+  function fillAcademicCourseOptions() {
+    if (!state.selectedAcademic) return;
+    const cycleId = $('academicCourseCycle').value;
+    const assigned = (state.selectedAcademic.courses || []).filter((course) => course.cycle_id === cycleId);
+    const assignedNrc = new Set(assigned.map((course) => course.nrc));
+    const available = (state.academics.courses || []).filter((course) => course.cycle_id === cycleId && !assignedNrc.has(course.nrc));
+    $('academicCourseNrc').innerHTML = available.map((course) => `<option value="${escapeHtml(course.nrc)}">${escapeHtml(course.course_code)} · ${escapeHtml(course.course_name)} · NRC ${escapeHtml(course.nrc)}</option>`).join('') || '<option value="">No hay más cursos disponibles</option>';
+    $('academicCourseForm').querySelector('button[type="submit"]').disabled = assigned.length >= 3 || !available.length;
+    $('academicCourseList').innerHTML = (state.selectedAcademic.courses || []).map((course) => `<article class="academic-course-item"><div><strong>${escapeHtml(course.course_code)} · ${escapeHtml(course.course_name)}</strong><span>${escapeHtml(course.cycle_name)} · NRC ${escapeHtml(course.nrc)}${course.group_code ? ` · Grupo ${escapeHtml(course.group_code)}` : ''}</span></div><button class="danger-button" type="button" data-remove-academic-course="${course.id}">Quitar</button></article>`).join('') || '<p>Este académico todavía no tiene cursos asignados.</p>';
+    $('academicCoursesMessage').hidden = true;
+  }
+  function openAcademicCourses(id) {
+    state.selectedAcademic = (state.academics.professors || []).find((professor) => professor.id === Number(id));
+    if (!state.selectedAcademic) return;
+    $('academicCoursesTitle').textContent = `Cursos de ${state.selectedAcademic.full_name}`;
+    const cycles = [...new Map((state.academics.courses || []).map((course) => [course.cycle_id, course.cycle_name])).entries()];
+    $('academicCourseCycle').innerHTML = cycles.map(([idValue, name]) => `<option value="${idValue}">${escapeHtml(name)}</option>`).join('');
+    fillAcademicCourseOptions();
+    $('academicCoursesDialog').showModal();
+  }
+  async function assignAcademicCourse(event) {
+    event.preventDefault();
+    const button = $('academicCourseForm').querySelector('button[type="submit"]');
+    setBusy(button, true, 'Asignando…');
+    try {
+      const { error } = await state.client.rpc('warehouse_assign_professor_course', { p_teacher_id: state.selectedAcademic.id, p_cycle_id: $('academicCourseCycle').value, p_nrc: $('academicCourseNrc').value });
+      if (error) throw error;
+      await loadAcademics();
+      state.selectedAcademic = state.academics.professors.find((professor) => professor.id === state.selectedAcademic.id);
+      fillAcademicCourseOptions();
+      setMessage('Curso asignado correctamente.', true);
+    } catch (error) { $('academicCoursesMessage').textContent = error.message; $('academicCoursesMessage').hidden = false; }
+    finally { setBusy(button, false); fillAcademicCourseOptions(); }
+  }
+  async function removeAcademicCourse(id) {
+    if (!window.confirm('¿Deseas quitar este curso del profesor? El historial de autorizaciones no se eliminará.')) return;
+    const { error } = await state.client.rpc('warehouse_remove_professor_course', { p_assignment_id: Number(id) });
+    if (error) { $('academicCoursesMessage').textContent = error.message; $('academicCoursesMessage').hidden = false; return; }
+    await loadAcademics();
+    state.selectedAcademic = state.academics.professors.find((professor) => professor.id === state.selectedAcademic.id);
+    fillAcademicCourseOptions();
+    setMessage('Curso retirado. El historial institucional se conserva.', true);
+  }
+
   function openEditor(userId) {
     const user = state.users.find((item) => item.id === userId);
     if (!user || !canEdit(user)) return;
@@ -203,6 +274,11 @@
     });
     $('usersSearch').addEventListener('input', () => { state.page = 1; renderTable(); });
     $('usersStatusFilter').addEventListener('change', () => { state.page = 1; renderTable(); });
+    $('academicsSearch').addEventListener('input', renderAcademics);
+    $('academicCourseCycle').addEventListener('change', fillAcademicCourseOptions);
+    $('academicCourseForm').addEventListener('submit', assignAcademicCourse);
+    $('closeAcademicCourses').addEventListener('click', () => $('academicCoursesDialog').close());
+    $('refreshAcademics').addEventListener('click', async () => { await loadAcademics(); setMessage('Registro de académicos actualizado.', true); });
     $('refreshUsersTable').addEventListener('click', async () => {
       await loadUsers();
       setMessage('Lista de usuarios actualizada.', true);
@@ -217,6 +293,10 @@
       if (editButton) openEditor(editButton.dataset.editUser);
       const actionButton = event.target.closest('[data-user-action]');
       if (actionButton) manageAccess(actionButton.dataset.userId, actionButton.dataset.userAction);
+      const coursesButton = event.target.closest('[data-academic-courses]');
+      if (coursesButton) openAcademicCourses(coursesButton.dataset.academicCourses);
+      const removeCourseButton = event.target.closest('[data-remove-academic-course]');
+      if (removeCourseButton) removeAcademicCourse(removeCourseButton.dataset.removeAcademicCourse);
     });
   }
 
@@ -239,6 +319,7 @@
       if (!state.session) { window.location.replace('ingreso.html?v=7'); return; }
       await loadProfile();
       await loadUsers();
+      if (isSuperadmin()) { $('academicsPanel').hidden = false; await loadAcademics(); }
       $('usersConnectionStatus').textContent = 'Acceso administrativo';
     } catch (error) {
       $('usersConnectionStatus').textContent = 'No disponible';

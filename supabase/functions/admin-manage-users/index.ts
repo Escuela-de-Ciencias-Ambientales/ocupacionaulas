@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
-const teacherEmailPattern = /^[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr$/;
+const teacherEmailPattern = /^[^\s@]+@una\.cr$/iu;
 const adminEmailPattern = /^[a-z0-9._-]+@una\.cr$/;
 const allowedUnits = new Set(['Docencia', 'Administrativo', 'LAA', 'PROCAME']);
 

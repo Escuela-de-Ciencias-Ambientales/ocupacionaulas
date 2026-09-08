@@ -25,7 +25,7 @@
   const dayNames = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
   const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
   const dayMap = { DOMINGO: 0, LUNES: 1, MARTES: 2, MIERCOLES: 3, MIÉRCOLES: 3, JUEVES: 4, VIERNES: 5, SABADO: 6, SÁBADO: 6 };
-  const teacherEmailPattern = /^[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr$/;
+  const teacherEmailPattern = /^[^\s@]+@una\.cr$/iu;
   const strongPasswordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
   const allowedUnits = ['Docencia', 'Administrativo', 'LAA', 'PROCAME'];
 
@@ -663,7 +663,7 @@
     const unit = String(form.get('unit'));
     if (fullName.length < 3) return showCreateUserMessage('Ingresa el nombre completo del usuario.', 'error');
     if (nationalId.length < 7 || nationalId.length > 20) return showCreateUserMessage('La cédula debe contener entre 7 y 20 dígitos.', 'error');
-    if (!teacherEmailPattern.test(email)) return showCreateUserMessage('El correo debe tener el formato nombre.apellido.apellido@una.cr.', 'error');
+    if (!teacherEmailPattern.test(email)) return showCreateUserMessage('Ingrese un correo institucional @una.cr válido.', 'error');
     if (!strongPasswordPattern.test(password)) return showCreateUserMessage('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.', 'error');
     if (!allowedUnits.includes(unit)) return showCreateUserMessage('Selecciona la unidad institucional.', 'error');
     setBusy(button, true, 'Creando…');

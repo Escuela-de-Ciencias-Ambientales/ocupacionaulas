@@ -46,7 +46,7 @@
       <div class="message" id="loginMessage" role="status" aria-live="polite" hidden></div>
       <form id="loginForm">
         <label for="loginEmail">Correo electrónico</label>
-        <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido.apellido@una.cr" pattern="[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr" title="Usa el formato nombre.apellido.apellido@una.cr" required />
+        <input id="loginEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido@una.cr" pattern="[^@ ]+@una\.cr" title="Ingrese su correo institucional @una.cr" required />
         <label for="loginPassword">Contraseña</label>
         <input id="loginPassword" name="password" type="password" autocomplete="current-password" minlength="8" required />
         <button id="loginButton" type="submit">Ingresar a reservas</button>
@@ -55,7 +55,7 @@
         <label for="registerName">Nombre completo</label>
         <input id="registerName" name="name" type="text" autocomplete="name" minlength="3" maxlength="100" required />
         <label for="registerEmail">Correo electrónico</label>
-        <input id="registerEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido.apellido@una.cr" pattern="[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr" required />
+        <input id="registerEmail" name="email" type="email" autocomplete="username" placeholder="nombre.apellido@una.cr" pattern="[^@ ]+@una\.cr" title="Ingrese su correo institucional @una.cr" required />
         <label for="registerUnit">Unidad institucional</label>
         <select id="registerUnit" name="unit" required>
           <option value="">Selecciona tu unidad</option>

@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
-const emailPattern = /^[a-z0-9-]+\.[a-z0-9-]+\.[a-z0-9-]+@una\.cr$/;
+const emailPattern = /^[^\s@]+@una\.cr$/iu;
 const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 const allowedUnits = new Set(['Docencia', 'Administrativo', 'LAA', 'PROCAME']);
 
@@ -31,7 +31,7 @@ Deno.serve(async (request) => {
     const password = String(payload.password || '');
     const unit = String(payload.unit || '').trim();
     if (fullName.length < 3 || fullName.length > 100) return response({ ok: false, error: 'Ingresa tu nombre completo.' }, 400);
-    if (!emailPattern.test(email)) return response({ ok: false, error: 'Usa tu correo institucional nombre.apellido.apellido@una.cr.' }, 400);
+    if (!emailPattern.test(email)) return response({ ok: false, error: 'Ingrese un correo institucional @una.cr válido.' }, 400);
     if (!passwordPattern.test(password)) return response({ ok: false, error: 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.' }, 400);
     if (!allowedUnits.has(unit)) return response({ ok: false, error: 'Selecciona la unidad institucional a la que perteneces.' }, 400);
 
