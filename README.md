@@ -11,6 +11,10 @@ Este README reemplaza la versión anterior, que solo describía el alcance origi
 - **Bodega de equipos** (`bodega-equipos.html`, `autorizaciones-equipos.html`, `solicitar-equipo.html`): autorización docente de préstamos, solicitud y control de devoluciones para estudiantes.
 - **Administración de usuarios** (`usuarios.html`) y **configuración del sistema** (`configuracion.html`, nuevo): gestión de cuentas y parámetros editables por el superadministrador sin tocar código.
 
+## Pendiente rastreado para la siguiente entrega
+
+`.private-header` (el encabezado privado) está definido dos veces, en `reservas.css` y en `visual-system.css`, y cinco páginas (`index.html`, `ingreso.html`, `autorizaciones-equipos.html`, `bodega-equipos.html`, `solicitar-equipo.html`) ni siquiera cargan `reservas.css`, así que resuelven su encabezado con reglas propias en su CSS individual. Fusionar esto en un solo archivo de layout compartido es el trabajo que sigue; no se tocó en esta entrega porque requiere revisar visualmente cada página antes de quitar una regla, para no romper ningún diseño ya en producción.
+
 ## Módulo en pausa
 
 - **Conserjería** (`conserjeria-admin.js`, `conserjeria-publico.js`, `conserjeria.css`, `conserjeria-admin.css`): se desactivó intencionalmente y su botón de acceso permanece oculto en la interfaz (atributo `data-feature-disabled`). El código se conserva completo en el repositorio para no perder el trabajo hecho; reactivarlo es un cambio de configuración (ver `system_settings` más abajo), no una reconstrucción.
@@ -71,4 +75,8 @@ Después abre `http://127.0.0.1:8781/`. Sin credenciales en `config.js`, la inte
 
 ## Publicación
 
-`.github/workflows/pages.yml` publica automáticamente en GitHub Pages con cada push a `main`.
+`.github/workflows/pages.yml` publica automáticamente en GitHub Pages con cada push a `main`. Desde este cambio, el flujo también reemplaza automáticamente el número de versión (`?v=N`) de cada `.css`/`.js` local por el hash corto del commit publicado, así que ya no depende de que alguien recuerde subir el número a mano para que los navegadores dejen de usar una copia vieja en caché.
+
+## Utilidades compartidas (`shared-utils.js`)
+
+Nuevo archivo con el cliente único de Supabase, verificación de sesión/rol y helpers repetidos (`escapeHtml`, formato de fecha, lectura de `system_settings`). Ya está enlazado en las 10 páginas; por ahora solo `configuracion.js` lo usa en reemplazo de su boilerplate propio, como referencia para ir migrando el resto de los módulos sin tener que reescribirlos todos de una vez.

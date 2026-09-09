@@ -32,6 +32,11 @@ jobs:
           cp -r plantillas _site/
           cp -r icons _site/
           cp -r qr_codes_v2 _site/
+      - name: Forzar caché nueva en cada publicación
+        run: |
+          SHORT_SHA="${GITHUB_SHA::8}"
+          echo "Reemplazando ?v=N por ?v=$SHORT_SHA en archivos locales de _site/"
+          find _site -maxdepth 1 -name '*.html' -exec sed -i -E "s/\.(css|js)\?v=[0-9]+/.\1?v=${SHORT_SHA}/g" {} \;
       - name: Empaquetar sitio
         uses: actions/upload-pages-artifact@v3
         with:

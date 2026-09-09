@@ -2,10 +2,7 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const config = window.RESERVAS_CONFIG || {};
   const state = { client: null, session: null, profile: null, settings: [] };
-
-  const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
 
   function setMessage(text, isError = true) {
     const el = $('configMessage');
@@ -30,11 +27,11 @@
       row.className = 'config-row';
       row.innerHTML = `
         <div>
-          <div class="config-key">${setting.key}</div>
-          <div class="config-desc">${setting.description || 'Sin descripción.'}</div>
+          <div class="config-key">${Sigep.escapeHtml(setting.key)}</div>
+          <div class="config-desc">${Sigep.escapeHtml(setting.description || 'Sin descripción.')}</div>
         </div>
-        <input type="text" value="${displayValue(setting.value).replace(/"/g, '&quot;')}" data-setting-key="${setting.key}" />
-        <button type="button" data-save-key="${setting.key}">Guardar</button>
+        <input type="text" value="${Sigep.escapeHtml(displayValue(setting.value))}" data-setting-key="${Sigep.escapeHtml(setting.key)}" />
+        <button type="button" data-save-key="${Sigep.escapeHtml(setting.key)}">Guardar</button>
       `;
       list.appendChild(row);
     });
@@ -76,16 +73,6 @@
     await loadSettings();
   }
 
-  async function loadProfile() {
-    const { data, error } = await state.client
-      .from('profiles')
-      .select('role,admin_scope,active,full_name')
-      .eq('id', state.session.user.id)
-      .single();
-    if (error) throw error;
-    state.profile = data;
-  }
-
   function bindEvents() {
     $('configAddForm').addEventListener('submit', addSetting);
     $('configList').addEventListener('click', (event) => {
@@ -100,23 +87,18 @@
 
   async function initialize() {
     bindEvents();
-    if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
+    try {
+      state.client = Sigep.getClient();
+    } catch (error) {
       $('configConnectionStatus').textContent = 'Configuración pendiente';
       $('configConnectionStatus').classList.add('is-offline');
       return;
     }
     try {
-      state.client = window.RESERVAS_SUPABASE_CLIENT || window.supabase.createClient(
-        config.supabaseUrl,
-        config.supabaseAnonKey,
-        { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
-      );
-      window.RESERVAS_SUPABASE_CLIENT = state.client;
-      const { data } = await state.client.auth.getSession();
-      state.session = data.session;
-      if (!state.session) { window.location.replace('ingreso.html?v=7'); return; }
-      await loadProfile();
-      if (!isSuperadmin()) {
+      state.session = await Sigep.requireSession();
+      if (!state.session) return;
+      state.profile = await Sigep.loadProfile(state.session.user.id);
+      if (!Sigep.isSuperadmin(state.profile)) {
         $('configDenied').hidden = false;
         $('configConnectionStatus').textContent = 'Acceso restringido';
         return;
