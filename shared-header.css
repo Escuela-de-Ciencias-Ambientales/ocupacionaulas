@@ -1,0 +1,134 @@
+/* ==========================================================================
+   shared-header.css
+   Fuente única de verdad para el "encabezado privado" (logo de la escuela,
+   nombre del usuario en sesión y botón de cerrar sesión) usado en:
+   bitacora-vehicular.html, configuracion.html, mis-giras.html, reservas.html,
+   tramites-vehiculos.html y usuarios.html.
+
+   Antes estas reglas estaban duplicadas en reservas.css y visual-system.css
+   (con valores ligeramente distintos que se combinaban en cascada). Este
+   archivo reproduce el resultado visual EXACTO que ya se veía en pantalla —
+   no es una fusión "limpia" de valores, es la unión de ambas fuentes tal como
+   el navegador ya las combinaba, para no cambiar nada a simple vista.
+
+   Decisiones no obvias:
+   - Los colores de fondo/borde de `.private-header` y el look tipo botón de
+     `.back-to-schedule` venían de visual-system.css (se cargaba después de
+     reservas.css) y ya eran los que realmente se veían; se mantienen tal cual.
+   - `.back-to-schedule:hover` combina el subrayado de reservas.css con el
+     cambio de borde/fondo de visual-system.css: ambas reglas coexistían
+     porque el navegador combina las declaraciones de :hover propiedad por
+     propiedad, no reemplaza el bloque completo.
+   - `.text-button` recibe aquí SOLO su apariencia base (color/peso) más el
+     color rojo cuando el id contiene "Logout" (igual que antes). El
+     padding/tamaño de fuente extra que reservas.css le daba a `.text-button`
+     se dejó acotado a `.header-account .text-button` (ver más abajo) porque
+     `.text-button` también se reutiliza en index.html fuera del encabezado
+     privado (en `.account-strip`) y esa página nunca cargó reservas.css, así
+     que agregarle ese padding/tamaño ahora habría sido un cambio visual, no
+     una migración neutra.
+   - bitacora-vehicular.html arma su encabezado con `<header class="site-header">`
+     y `.header-inner` / `.brand` en vez de `.private-header` / `.private-brand`.
+     Esas clases de esa página se dejaron intactas en bitacora-vehicular.css
+     porque `.site-header` también la usa autorizaciones-equipos.html con un
+     encabezado público completamente distinto (sin cuenta de usuario); unificar
+     `.site-header` habría arriesgado esa otra página. Solo se migraron aquí las
+     clases internas 100% compartidas sin colisión: `.header-actions`,
+     `.header-account`, `.header-account-identity`, `.back-to-schedule`,
+     `.text-button`.
+   - El encabezado de bodega-equipos.html usa un juego de clases paralelo con
+     prefijo `sigep-` (`.sigep-private-header`, `.sigep-header-account`, etc.)
+     definido en sigep-brand.css, con proporciones de logo distintas (logo tipo
+     rótulo ancho). Es equivalente en función pero no en medidas exactas, así
+     que se dejó fuera de este archivo para no forzar una fusión riesgosa.
+   ========================================================================== */
+
+.private-header {
+  min-height: 98px;
+  border-bottom: 1px solid var(--ui-line);
+  background: var(--ui-surface);
+  box-shadow: 0 5px 18px rgba(7, 59, 42, .05);
+}
+.private-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 98px;
+  gap: 20px;
+}
+.private-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--reserve-ink, var(--ui-ink));
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: .015em;
+  text-decoration: none;
+}
+.private-brand img { width: 72px; height: 72px; object-fit: contain; }
+.private-brand span { color: var(--ui-ink); font-size: clamp(1.05rem, 2vw, 1.45rem); font-weight: 800; letter-spacing: .035em; line-height: 1.08; }
+
+.header-actions,
+.header-account { display: flex; align-items: center; }
+.header-actions { justify-content: flex-end; gap: 18px; }
+.header-account { gap: 12px; padding-left: 18px; border-left: 1px solid var(--reserve-line, var(--ui-line)); }
+.header-account-identity { display: grid; gap: 1px; }
+.header-account strong { max-width: 220px; overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.header-account span { color: var(--reserve-muted, var(--ui-muted)); font-size: 11px; font-weight: 700; }
+
+.account-password-link { justify-self: start; margin-top: 3px; padding: 0; border: 0; color: var(--reserve-green, var(--ui-green)); background: transparent; font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.account-password-link:hover, .account-password-link:focus-visible { color: #055d40; }
+
+.back-to-schedule {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--ui-control-line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--ui-green-dark);
+  background: var(--ui-surface);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .005em;
+  text-decoration: none;
+}
+.back-to-schedule:hover, .back-to-schedule:focus-visible { border-color: var(--ui-green); background: var(--ui-soft); text-decoration: underline; }
+
+/* Look base de los botones de texto del encabezado (p. ej. "Cerrar sesión").
+   El id de todos los botones de cerrar sesión existentes contiene "Logout",
+   así que en la práctica siempre terminan en rojo (--ui-red); se conserva la
+   regla de color verde base por si algún .text-button futuro no es de logout. */
+.text-button { color: var(--ui-green); font-weight: 800; }
+.text-button[id*="Logout"] { color: var(--ui-red); }
+/* El reset de borde/cursor y el padding/tamaño extra solo aplican dentro del
+   encabezado privado (ver nota arriba sobre por qué no se pusieron en el
+   selector `.text-button` general): en index.html hay otro `.text-button`
+   (dentro de `.account-strip`) que hoy conserva la apariencia nativa del
+   `<button>` del navegador, y no debía cambiar. */
+.header-account .text-button { border: 0; padding: 8px 10px; background: transparent; font-size: 13px; font-weight: 800; cursor: pointer; }
+.header-account .text-button:hover, .header-account .text-button:focus-visible { text-decoration: underline; }
+
+@media (max-width: 700px) {
+  .private-header { min-height: 82px; }
+  .private-header-row { min-height: 82px; }
+  .private-brand img { width: 58px; height: 58px; }
+}
+
+@media (max-width: 640px) {
+  /* min-height no se repite aquí: la regla de 700px de más arriba (82px) ya
+     gana siempre sobre el valor original de 80px de este breakpoint, porque
+     en los archivos originales esa regla se cargaba después. Se omite para
+     no depender del orden de las reglas dentro de este mismo archivo. */
+  .private-header-row { align-items: flex-start; flex-direction: column; padding: 12px 0 14px; }
+  .private-brand { max-width: 260px; font-size: 18px; line-height: 1.08; }
+  .private-brand img { width: 60px; height: 60px; }
+  .header-actions { width: 100%; justify-content: space-between; gap: 10px; }
+  .header-account { margin-left: auto; padding-left: 10px; }
+  .header-account strong { max-width: 120px; }
+  .back-to-schedule { max-width: 135px; text-align: left; }
+}
+
+@media print {
+  .private-header { box-shadow: none; }
+}

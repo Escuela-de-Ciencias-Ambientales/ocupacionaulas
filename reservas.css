@@ -12,20 +12,8 @@
 body { min-height:100vh; margin:0; color:var(--reserve-ink); background:#f4f7f6; font-family:"Source Sans 3",Arial,sans-serif; }
 .page { width:min(1180px,calc(100% - 32px)); margin:0 auto; }
 .panel { border:1px solid var(--reserve-line); border-radius:18px; background:#fff; }
-.private-header { border-bottom:1px solid var(--reserve-line); background:#fff; }
-.private-header-row { display:flex; align-items:center; justify-content:space-between; min-height:94px; gap:20px; }
-.private-brand { display:flex; align-items:center; gap:14px; color:var(--reserve-ink); font-size:23px; font-weight:800; line-height:1.08; letter-spacing:.015em; text-decoration:none; }
-.private-brand img { width:72px; height:72px; object-fit:contain; }
-.header-actions,.header-account { display:flex; align-items:center; }
-.header-actions { justify-content:flex-end; gap:18px; }
-.header-account { gap:12px; padding-left:18px; border-left:1px solid var(--reserve-line); }
-.header-account-identity { display:grid; gap:1px; }
-.header-account strong { max-width:220px; overflow:hidden; font-size:14px; text-overflow:ellipsis; white-space:nowrap; }
-.header-account span { color:var(--reserve-muted); font-size:11px; font-weight:700; }
-.account-password-link { justify-self:start; margin-top:3px; padding:0; border:0; color:var(--reserve-green); background:transparent; font:inherit; font-size:11px; font-weight:800; cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
-.account-password-link:hover,.account-password-link:focus-visible { color:#055d40; }
-.back-to-schedule { color:var(--reserve-green); font-size:14px; font-weight:800; text-decoration:none; }
-.back-to-schedule:hover,.back-to-schedule:focus-visible { text-decoration:underline; }
+/* El encabezado privado (.private-header y clases relacionadas) se movió a
+   shared-header.css, que ahora se carga antes que este archivo. */
 .private-main {
   --section-gap:32px;
   display:flex;
@@ -55,7 +43,6 @@ body { min-height:100vh; margin:0; color:var(--reserve-ink); background:#f4f7f6;
 
 .session-button,
 .primary-button,
-.text-button,
 .icon-button,
 .danger-button {
   border: 0;
@@ -346,8 +333,8 @@ body { min-height:100vh; margin:0; color:var(--reserve-ink); background:#f4f7f6;
 .account-strip > strong { color: var(--reserve-ink); font-size: 18px; }
 .account-actions { gap: 10px; }
 
-.text-button { padding: 8px 10px; color: var(--reserve-red); background: transparent; font-size: 13px; font-weight: 800; }
-.text-button:hover, .text-button:focus-visible { text-decoration: underline; }
+/* El estilo de .text-button dentro del encabezado privado se movió a
+   shared-header.css (regla .header-account .text-button). */
 
 .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px 24px; }
 .booking-form .field-grid > div { display:grid; gap:7px; min-width:0; }
@@ -620,16 +607,10 @@ body { min-height:100vh; margin:0; color:var(--reserve-ink); background:#f4f7f6;
 
 @media (max-width: 640px) {
   .private-main { --section-gap:24px; }
-  .private-header-row { min-height:80px; align-items:flex-start; flex-direction:column; padding:12px 0 14px; }
-  .private-brand { max-width:260px; font-size:18px; line-height:1.08; }
-  .private-brand img { width:60px;height:60px; }
-  .header-actions { width:100%; justify-content:space-between; gap:10px; }
-  .header-account { margin-left:auto; padding-left:10px; }
-  .header-account strong { max-width:120px; }
+  /* Reglas móviles del encabezado privado: ver shared-header.css */
   .visit-counter-panel { align-items:stretch; flex-direction:column; padding:20px; }
   .visit-counter-stats { width:100%; }
   .visit-counter-stats div { min-width:0; }
-  .back-to-schedule { max-width:135px; text-align:left; }
   .private-main { padding-top:28px; }
   .private-intro { align-items:flex-start; flex-direction:column; }
   .cycle-banner,.cycle-actions { align-items:flex-start; flex-direction:column; }

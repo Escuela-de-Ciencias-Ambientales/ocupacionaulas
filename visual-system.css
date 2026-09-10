@@ -75,7 +75,10 @@ form button[type="submit"]:hover { border-color: var(--ui-green-dark); backgroun
 #equipmentForm > button:hover,
 .page-heading > button:not(.secondary):hover,
 dialog form > button[type="submit"]:hover { border-color: var(--ui-green-dark); background: var(--ui-green-dark); }
-.secondary-button, .page-heading .secondary, .back-to-schedule, .manage-users-link {
+/* .back-to-schedule y .text-button/.account-password-link (encabezado
+   privado) se movieron a shared-header.css; el resto de estas clases
+   (botones sin relación con el encabezado) conserva su estilo aquí. */
+.secondary-button, .page-heading .secondary, .manage-users-link {
   min-height: 44px;
   padding: 10px 16px;
   border: 1px solid var(--ui-control-line);
@@ -86,9 +89,8 @@ dialog form > button[type="submit"]:hover { border-color: var(--ui-green-dark); 
   letter-spacing: .005em;
   text-decoration: none;
 }
-.secondary-button:hover, .page-heading .secondary:hover, .back-to-schedule:hover, .manage-users-link:hover { border-color: var(--ui-green); background: var(--ui-soft); }
-.text-button, .account-password-link { color: var(--ui-green); font-weight: 800; }
-.danger-button, .text-button[id*="Logout"], .sigep-logout { color: var(--ui-red); }
+.secondary-button:hover, .page-heading .secondary:hover, .manage-users-link:hover { border-color: var(--ui-green); background: var(--ui-soft); }
+.danger-button, .sigep-logout { color: var(--ui-red); }
 button:focus-visible, a:focus-visible { outline: 4px solid rgba(0, 60, 113, .2); outline-offset: 3px; }
 
 .panel,
@@ -113,7 +115,10 @@ table { color: var(--ui-ink); }
 th { color: var(--ui-muted); background: #f6f9f7; font-size: .76rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 td, th { border-color: var(--ui-line); }
 
-.private-header,
+/* .private-header, .private-header-row y .private-brand se movieron a
+   shared-header.css. .access-header, .site-header, .sigep-site-header y
+   .sigep-private-header quedan fuera del alcance de esa consolidación (son
+   encabezados con marcado/propósito distinto) y siguen viviendo aquí. */
 .access-header,
 .site-header,
 .sigep-site-header,
@@ -123,9 +128,9 @@ td, th { border-color: var(--ui-line); }
   background: var(--ui-surface);
   box-shadow: 0 5px 18px rgba(7, 59, 42, .05);
 }
-.private-brand img, .access-header .brand img { width: 72px; height: 72px; object-fit: contain; }
-.private-brand span, .access-header .brand span { color: var(--ui-ink); font-size: clamp(1.05rem, 2vw, 1.45rem); font-weight: 800; letter-spacing: .035em; line-height: 1.08; }
-.private-header-row, .sigep-private-header-row { min-height: 98px; }
+.access-header .brand img { width: 72px; height: 72px; object-fit: contain; }
+.access-header .brand span { color: var(--ui-ink); font-size: clamp(1.05rem, 2vw, 1.45rem); font-weight: 800; letter-spacing: .035em; line-height: 1.08; }
+.sigep-private-header-row { min-height: 98px; }
 .access-header { position: sticky; top: 0; z-index: 9000; width: 100%; height: 98px; margin: 0; padding: 10px max(20px, calc((100% - 1120px) / 2)); }
 .global-module-navigation, .sigep-global-navigation { border-bottom: 1px solid var(--ui-line); background: #f6faf8; }
 .global-module-navigation { position: sticky; top: 98px; z-index: 8999; box-shadow: 0 8px 20px rgba(7, 59, 42, .08); }
@@ -141,15 +146,15 @@ dialog::backdrop { background: rgba(6, 29, 23, .66); backdrop-filter: blur(2px);
   body { font-size: 15px; }
   h1 { font-size: clamp(2rem, 10vw, 2.65rem); }
   h2 { font-size: clamp(1.35rem, 7vw, 1.75rem); }
-  .private-header, .access-header, .site-header, .sigep-site-header, .sigep-private-header { min-height: 82px; }
-  .private-header-row, .sigep-private-header-row { min-height: 82px; }
+  .access-header, .site-header, .sigep-site-header, .sigep-private-header { min-height: 82px; }
+  .sigep-private-header-row { min-height: 82px; }
   .access-header { height: 82px; padding: 8px 14px; }
-  .private-brand img, .access-header .brand img { width: 58px; height: 58px; }
+  .access-header .brand img { width: 58px; height: 58px; }
   .global-module-navigation { top: 82px; }
   .panel, .vehicle-panel, .users-panel, .trip-history-panel, .log-card, .identity-card, .authorization-card { padding: 18px; }
 }
 
 @media print {
   body { color: #000; background: #fff; }
-  .private-header, .site-header, .sigep-site-header, .sigep-private-header { box-shadow: none; }
+  .site-header, .sigep-site-header, .sigep-private-header { box-shadow: none; }
 }
