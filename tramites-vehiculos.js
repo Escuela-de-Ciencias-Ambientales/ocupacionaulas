@@ -2,12 +2,11 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const config = window.RESERVAS_CONFIG || {};
   const state = { client: null, session: null, profile: null, reservations: [], vehicles: [], profiles: [], tab: 'pending', teacherFilter: '' };
   const canProcess = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
-  const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
-  const escapeHtml = (value = '') => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+  const isSuperadmin = () => Sigep.isSuperadmin(state.profile);
+  const escapeHtml = (value) => Sigep.escapeHtml(value ?? '');
   const formatDateTime = (value) => new Intl.DateTimeFormat('es-CR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   const processingStatus = (item) => item.processing_status || 'pending';
   const vehicleLabel = (item) => {
@@ -198,13 +197,11 @@
 
   async function init() {
     try {
-      state.client = window.RESERVAS_SUPABASE_CLIENT || window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } });
-      window.RESERVAS_SUPABASE_CLIENT = state.client;
-      const { data: { session } } = await state.client.auth.getSession();
-      if (!session) { window.location.replace('ingreso.html?v=7'); return; }
+      state.client = Sigep.getClient();
+      const session = await Sigep.requireSession();
+      if (!session) return;
       state.session = session;
-      const { data: profile, error } = await state.client.from('profiles').select('id,full_name,email,role,admin_scope').eq('id', session.user.id).single();
-      if (error) throw error;
+      const profile = await Sigep.loadProfile(session.user.id);
       state.profile = profile;
       if (!canProcess()) { window.location.replace('reservas.html?modulo=vehiculos'); return; }
       ensureModuleNavigation();

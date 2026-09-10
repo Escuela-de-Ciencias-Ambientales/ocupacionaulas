@@ -83,14 +83,12 @@
 
   const isAdmin = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations'].includes(state.profile?.admin_scope);
-  const isSuperadmin = () => isAdmin() && state.profile?.admin_scope === 'superadmin';
+  const isSuperadmin = () => Sigep.isSuperadmin(state.profile);
   const isConserjeriaAdmin = () => state.profile?.role === 'admin'
     && String(state.profile?.email || '').toLowerCase() !== 'adrian.delgado.torres@una.cr'
     && ['superadmin', 'operations', 'conserjeria'].includes(state.profile?.admin_scope);
 
-  function escapeHtml(value) {
-    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
-  }
+  const escapeHtml = (value) => Sigep.escapeHtml(value ?? '');
   function roomDisplayName(code) {
     const name = roomDisplayNames[code] || `Aula ${code}`;
     const capacity = roomCapacities[code];
@@ -834,12 +832,15 @@
 
   async function initialize() {
     elements.bookingStart.value = '08:00'; elements.bookingEnd.value = '09:00'; elements.bookingDate.value = localDateString(); elements.editorWeek.value = localDateString(); populateRoomSelects(); bindEvents();
-    if (!isConfigured || !window.supabase?.createClient) { elements.connectionStatus.textContent = 'Configuración pendiente'; elements.connectionStatus.classList.add('is-offline'); showMessage('El sistema está instalado. Falta conectar el proyecto de Supabase.', 'error'); return; }
     try {
-      state.client = window.RESERVAS_SUPABASE_CLIENT || window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
-      window.RESERVAS_SUPABASE_CLIENT = state.client;
-      elements.connectionStatus.textContent = 'Sistema disponible'; const { data } = await state.client.auth.getSession(); state.session = data.session;
-      if (!state.session) { window.location.replace('ingreso.html?v=7'); return; }
+      state.client = Sigep.getClient();
+    } catch (error) {
+      elements.connectionStatus.textContent = 'Configuración pendiente'; elements.connectionStatus.classList.add('is-offline'); showMessage('El sistema está instalado. Falta conectar el proyecto de Supabase.', 'error'); return;
+    }
+    try {
+      elements.connectionStatus.textContent = 'Sistema disponible';
+      state.session = await Sigep.requireSession();
+      if (!state.session) return;
       await loadProfile(); await loadRooms(); await reloadAll();
       state.client.auth.onAuthStateChange(async (_event, session) => { state.session = session; if (session) { await loadProfile(); await reloadAll(); } else window.location.replace('ingreso.html?v=7'); });
     } catch (error) { elements.connectionStatus.textContent = 'Conexión no disponible'; elements.connectionStatus.classList.add('is-offline'); showMessage(`No fue posible conectar con el sistema: ${error.message}`, 'error'); }

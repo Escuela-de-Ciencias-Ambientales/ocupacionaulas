@@ -1,6 +1,5 @@
 (() => {
   'use strict';
-  const config = window.RESERVAS_CONFIG || {};
   const emailPattern = /^[^\s@]+@una\.cr$/iu;
   const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
   const loginForm = document.getElementById('loginForm');
@@ -40,16 +39,15 @@
   loginTab.addEventListener('click', () => setMode('login'));
   registerTab.addEventListener('click', () => setMode('register'));
 
-  if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
+  let client;
+  try {
+    client = Sigep.getClient();
+  } catch (error) {
     loginButton.disabled = true;
     registerButton.disabled = true;
     showMessage('El acceso está en proceso de configuración. Intenta nuevamente más tarde.');
     return;
   }
-
-  const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-  });
 
   client.auth.getSession().then(({ data }) => {
     if (data.session) window.location.replace(safeReturnPage);

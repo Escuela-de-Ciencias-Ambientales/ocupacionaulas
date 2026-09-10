@@ -2,7 +2,6 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const config = window.RESERVAS_CONFIG || {};
   const state = {
     client: null, session: null, profile: null, cycle: null, vehicles: [], events: [],
     reservations: [], calendarEvents: [], history: [], maintenance: [], services: [], teachers: [], profiles: [], vehicleId: null,
@@ -13,10 +12,10 @@
   const weekdays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   const isAdmin = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations'].includes(state.profile?.admin_scope);
-  const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
+  const isSuperadmin = () => Sigep.isSuperadmin(state.profile);
   const canProcessVehicles = () => state.profile?.role === 'admin'
     && ['superadmin', 'operations', 'reservations', 'conserjeria'].includes(state.profile?.admin_scope);
-  const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+  const escapeHtml = Sigep.escapeHtml;
   const pad = (value) => String(value).padStart(2, '0');
   const localDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   const localDateTime = (date) => `${localDate(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
@@ -719,10 +718,9 @@
   async function loadVehicleModule() {
     try {
       $('vehicleConnectionStatus').textContent = 'Conectando…';
-      if (!state.client) state.client = window.RESERVAS_SUPABASE_CLIENT || window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } });
-      window.RESERVAS_SUPABASE_CLIENT = state.client;
-      const { data: { session } } = await state.client.auth.getSession();
-      if (!session) { window.location.replace('ingreso.html?v=7'); return; }
+      if (!state.client) state.client = Sigep.getClient();
+      const session = await Sigep.requireSession();
+      if (!session) return;
       state.session = session;
       const { data: profile, error } = await state.client.from('profiles').select('id,full_name,email,unit,role,admin_scope,active,reservations_blocked,reservations_block_reason').eq('id', session.user.id).single();
       if (error) throw error;

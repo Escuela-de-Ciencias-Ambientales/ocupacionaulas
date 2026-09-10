@@ -2,12 +2,11 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const config = window.RESERVAS_CONFIG || {};
   const state = { client:null, session:null, profile:null, vehicles:[], trips:[], page:1, pageSize:12, selected:null };
   const statusNames = { pending_approval:'Pendiente de aprobación', confirmed:'Confirmada', suspended_maintenance:'Suspendida temporalmente', cancelled:'Cancelada', rejected:'Rechazada' };
   const fuelNames = { quarter:'¼', half:'½', three_quarters:'¾', full:'Lleno' };
   const conditionNames = { clean:'Limpio', dirty:'Sucio', other:'Otro' };
-  const escapeHtml = (value='') => String(value).replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+  const escapeHtml = Sigep.escapeHtml;
   const formatDateTime = (value) => new Intl.DateTimeFormat('es-CR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));
   const vehicleFor = (id) => state.vehicles.find((vehicle) => String(vehicle.id) === String(id));
   const isCompleted = (trip) => new Date(trip.ends_at) < new Date();
@@ -169,18 +168,17 @@
   }
   async function initialize(){
     bindEvents();
-    if(!config.supabaseUrl||!config.supabaseAnonKey||!window.supabase?.createClient){$('tripHistoryStatus').textContent='Configuración pendiente';return;}
+    try{ state.client=Sigep.getClient(); }catch(error){ $('tripHistoryStatus').textContent='Configuración pendiente'; return; }
     try{
-      state.client=window.RESERVAS_SUPABASE_CLIENT||window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}});
-      const {data:{session}}=await state.client.auth.getSession();if(!session){window.location.replace('ingreso.html?v=7');return;}state.session=session;
-      const [profileResult,vehiclesResult,tripsResult]=await Promise.all([
-        state.client.from('profiles').select('id,full_name,role,admin_scope,active').eq('id',session.user.id).single(),
+      const session=await Sigep.requireSession();if(!session)return;state.session=session;
+      const [profile,vehiclesResult,tripsResult]=await Promise.all([
+        Sigep.loadProfile(session.user.id),
         state.client.from('vehicles').select('*').eq('active',true).order('plate'),
         state.client.from('vehicle_reservations').select('*').eq('user_id',session.user.id).order('starts_at',{ascending:false}).limit(5000)
       ]);
-      const error=profileResult.error||vehiclesResult.error||tripsResult.error;if(error)throw error;
-      if(!profileResult.data?.active){await state.client.auth.signOut();window.location.replace('ingreso.html?v=7');return;}
-      state.profile=profileResult.data;state.vehicles=vehiclesResult.data||[];state.trips=tripsResult.data||[];
+      const error=vehiclesResult.error||tripsResult.error;if(error)throw error;
+      if(!profile?.active){await state.client.auth.signOut();window.location.replace('ingreso.html?v=7');return;}
+      state.profile=profile;state.vehicles=vehiclesResult.data||[];state.trips=tripsResult.data||[];
       $('tripHeaderAccount').hidden=false;$('tripCurrentName').textContent=state.profile.full_name;
       $('tripCurrentRole').textContent=state.profile.role==='admin'
         ? (state.profile.admin_scope==='superadmin'?'Superadministrador':state.profile.admin_scope==='conserjeria'?'Administrador de conserjería':'Administrador de reservas')

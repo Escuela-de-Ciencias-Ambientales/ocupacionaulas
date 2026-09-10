@@ -2,13 +2,10 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const config = window.RESERVAS_CONFIG || {};
   const state = { client: null, session: null, profile: null, users: [], academics: { professors: [], courses: [] }, selectedAcademic: null, page: 1, pageSize: 15 };
 
-  const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-  }[char]));
-  const isSuperadmin = () => state.profile?.role === 'admin' && state.profile?.admin_scope === 'superadmin';
+  const escapeHtml = Sigep.escapeHtml;
+  const isSuperadmin = () => Sigep.isSuperadmin(state.profile);
   const accessType = (user) => {
     if (user.role !== 'admin') return 'teacher';
     if (user.admin_scope === 'superadmin') return 'superadmin';
@@ -265,18 +262,15 @@
   }
 
   async function loadProfile() {
-    const { data, error } = await state.client.from('profiles')
-      .select('id,full_name,email,role,admin_scope,active')
-      .eq('id', state.session.user.id)
-      .single();
-    if (error || !data?.active || data.role !== 'admin' || !['superadmin', 'operations', 'reservations'].includes(data.admin_scope)) {
+    const profile = await Sigep.loadProfile(state.session.user.id).catch(() => null);
+    if (!profile?.active || profile.role !== 'admin' || !['superadmin', 'operations', 'reservations'].includes(profile.admin_scope)) {
       await state.client.auth.signOut();
       window.location.replace('ingreso.html?v=7');
       throw new Error('Se requiere acceso administrativo.');
     }
-    state.profile = data;
+    state.profile = { id: state.session.user.id, email: state.session.user.email, ...profile };
     $('usersHeaderAccount').hidden = false;
-    $('usersCurrentName').textContent = data.full_name;
+    $('usersCurrentName').textContent = profile.full_name;
     $('usersCurrentRole').textContent = isSuperadmin() ? 'Superadministrador' : 'Administrador de reservas';
   }
 
@@ -316,21 +310,16 @@
 
   async function initialize() {
     bindEvents();
-    if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
+    try {
+      state.client = Sigep.getClient();
+    } catch (error) {
       $('usersConnectionStatus').textContent = 'Configuración pendiente';
       $('usersConnectionStatus').classList.add('is-offline');
       return;
     }
     try {
-      state.client = window.RESERVAS_SUPABASE_CLIENT || window.supabase.createClient(
-        config.supabaseUrl,
-        config.supabaseAnonKey,
-        { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
-      );
-      window.RESERVAS_SUPABASE_CLIENT = state.client;
-      const { data } = await state.client.auth.getSession();
-      state.session = data.session;
-      if (!state.session) { window.location.replace('ingreso.html?v=7'); return; }
+      state.session = await Sigep.requireSession();
+      if (!state.session) return;
       await loadProfile();
       await loadUsers();
       if (isSuperadmin()) { $('academicsPanel').hidden = false; await loadAcademics(); $('usersConfigLink').hidden = false; }
