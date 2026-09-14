@@ -1,7 +1,10 @@
-const CACHE_NAME = "edeca-reservas-v49";
+const CACHE_NAME = "edeca-reservas-v50";
 const APP_SHELL = [
   "./index.html",
   "./ingreso.html",
+  "./bitacora-vehiculo.html",
+  "./bitacora-vehiculo.css",
+  "./bitacora-vehiculo.js",
   "./reservas.html",
   "./autorizaciones-equipos.html",
   "./autorizaciones-equipos.css",
