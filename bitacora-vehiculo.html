@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bitácora de vehículo | EDECA</title>
-  <meta name="description" content="Registro de bitácora de vehículos institucionales EDECA." />
+  <title>Reporte de vehículo | EDECA</title>
+  <meta name="description" content="Reporte operativo de vehículos institucionales EDECA." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -20,7 +20,7 @@
   <header class="private-header public-logbook-header">
     <div class="page private-header-row">
       <a class="private-brand" href="index.html"><img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" /><span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span></a>
-      <span class="public-logbook-label">Bitácora de vehículo</span>
+      <span class="public-logbook-label">Reporte de vehículo</span>
     </div>
   </header>
 
@@ -28,12 +28,12 @@
     <section class="public-logbook-card" aria-labelledby="logbookTitle">
       <div class="public-logbook-heading">
         <p class="eyebrow">Registro institucional</p>
-        <h1 id="logbookTitle">Bitácora de vehículo</h1>
+        <h1 id="logbookTitle">Reporte de vehículo</h1>
         <p id="publicLogbookVehicle">Verificando el código QR…</p>
       </div>
 
       <section id="publicLogbookAccess">
-        <p class="public-logbook-help">Ingresa tu cédula para habilitar el registro. No necesitas iniciar sesión.</p>
+        <p class="public-logbook-help">Ingresa tu cédula para habilitar el reporte. No necesitas iniciar sesión.</p>
         <form id="publicLogbookAccessForm" class="public-logbook-form" novalidate>
           <label for="publicLogbookIdNumber">Cédula</label>
           <input id="publicLogbookIdNumber" inputmode="numeric" autocomplete="off" maxlength="15" placeholder="Sin guiones" required />
@@ -42,7 +42,7 @@
       </section>
 
       <section id="publicLogbookFormPanel" hidden>
-        <p class="public-logbook-identity">Registro habilitado para <strong id="publicLogbookTeacher"></strong>.</p>
+        <p class="public-logbook-identity">Reporte habilitado para <strong id="publicLogbookTeacher"></strong>.</p>
         <form id="publicLogbookForm" class="public-logbook-form public-logbook-grid" novalidate>
           <div class="field-wide"><label for="publicTripSheetNumber">Número de gira</label><input id="publicTripSheetNumber" maxlength="60" required /></div>
           <div><label for="publicDepartureMileage">Kilometraje de salida</label><input id="publicDepartureMileage" type="number" min="0" inputmode="numeric" required /></div>
@@ -50,18 +50,10 @@
           <div><label for="publicDepartureFuel">Combustible de salida</label><select id="publicDepartureFuel" required><option value="">Selecciona</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
           <div><label for="publicArrivalFuel">Combustible de llegada</label><select id="publicArrivalFuel" required><option value="">Selecciona</option><option value="quarter">¼</option><option value="half">½</option><option value="three_quarters">¾</option><option value="full">Lleno</option></select></div>
           <div><label for="publicVehicleCondition">Estado del vehículo</label><select id="publicVehicleCondition" required><option value="">Selecciona</option><option value="clean">Limpio</option><option value="dirty">Sucio</option><option value="other">Otro</option></select></div>
-          <div><label for="publicFuelingMileage">Kilometraje al abastecer</label><input id="publicFuelingMileage" type="number" min="0" inputmode="numeric" /></div>
-          <div class="field-wide"><label for="publicServiceStation">Estación de servicio o gasolinera</label><input id="publicServiceStation" maxlength="160" /></div>
-          <div><label for="publicFuelLiters">Litros de combustible</label><input id="publicFuelLiters" type="number" min="0" step="0.01" inputmode="decimal" /></div>
-          <div><label for="publicFuelType">Tipo de combustible</label><select id="publicFuelType"><option value="">No indicado</option><option value="diesel">Diésel</option><option value="regular">Gasolina regular</option><option value="super">Gasolina súper</option><option value="other">Otro</option></select></div>
-          <div><label for="publicInvoiceAmount">Monto de factura</label><input id="publicInvoiceAmount" type="number" min="0" step="0.01" inputmode="decimal" /></div>
-          <div><label for="publicInvoiceDate">Fecha de factura</label><input id="publicInvoiceDate" type="date" /></div>
-          <div><label for="publicInvoiceNumber">Número de factura</label><input id="publicInvoiceNumber" maxlength="80" /></div>
-          <div><label for="publicVoucherAuthorization">Autorización del voucher</label><input id="publicVoucherAuthorization" maxlength="80" /></div>
           <div class="field-wide"><label for="publicLogbookObservations">Observaciones o anomalías</label><textarea id="publicLogbookObservations" maxlength="2000" rows="4" placeholder="Indica cualquier situación relevante."></textarea></div>
-          <div class="field-wide"><label class="trip-photo-input" for="publicLogbookPhoto"><span>Tomar o seleccionar fotografía de la bitácora</span><input id="publicLogbookPhoto" type="file" accept="image/*" capture="environment" required /></label><img id="publicLogbookPhotoPreview" class="trip-photo-preview" alt="Vista previa de la fotografía de bitácora" hidden /></div>
+          <div class="field-wide"><label class="trip-photo-input" for="publicLogbookPhoto"><span>Tomar o seleccionar fotografía del vehículo</span><input id="publicLogbookPhoto" type="file" accept="image/*" capture="environment" required /></label><img id="publicLogbookPhotoPreview" class="trip-photo-preview" alt="Vista previa de la fotografía del vehículo" hidden /></div>
           <p class="field-wide form-note">La imagen se comprime antes de guardarse y queda disponible únicamente para la administración.</p>
-          <button class="primary-button field-wide" type="submit" id="publicLogbookSubmit">Enviar bitácora</button>
+          <button class="primary-button field-wide" type="submit" id="publicLogbookSubmit">Enviar reporte</button>
         </form>
       </section>
       <div class="vehicle-message" id="publicLogbookMessage" role="status" aria-live="polite" hidden></div>
@@ -69,6 +61,6 @@
   </main>
 
   <script src="config.js?v=1"></script>
-  <script src="bitacora-vehiculo.js?v=1"></script>
+  <script src="bitacora-vehiculo.js?v=2"></script>
 </body>
 </html>

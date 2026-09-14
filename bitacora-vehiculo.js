@@ -65,16 +65,14 @@
     event.preventDefault(); showMessage('');
     const file = $('publicLogbookPhoto').files[0]; const button = $('publicLogbookSubmit'); setBusy(button, true, 'Procesando fotografía…');
     try {
-      const photoBase64 = await compressPhoto(file); button.textContent = 'Enviando bitácora…';
+      const photoBase64 = await compressPhoto(file); button.textContent = 'Enviando reporte…';
       await request('submit', {
         token: state.token, tripSheetNumber: $('publicTripSheetNumber').value, departureMileage: numberValue('publicDepartureMileage'), arrivalMileage: numberValue('publicArrivalMileage'),
         departureFuelLevel: $('publicDepartureFuel').value, arrivalFuelLevel: $('publicArrivalFuel').value, vehicleCondition: $('publicVehicleCondition').value,
-        fuelingMileage: numberValue('publicFuelingMileage'), serviceStationLocation: $('publicServiceStation').value, fuelLiters: numberValue('publicFuelLiters'), fuelType: $('publicFuelType').value,
-        invoiceAmount: numberValue('publicInvoiceAmount'), invoiceDate: $('publicInvoiceDate').value, invoiceNumber: $('publicInvoiceNumber').value,
-        voucherAuthorizationNumber: $('publicVoucherAuthorization').value, observations: $('publicLogbookObservations').value, photoBase64
+        observations: $('publicLogbookObservations').value, photoBase64
       });
       sessionStorage.removeItem(storageKey); state.token = null; $('publicLogbookForm').reset(); $('publicLogbookPhotoPreview').hidden = true; $('publicLogbookFormPanel').hidden = true; $('publicLogbookAccess').hidden = false;
-      showMessage('Bitácora registrada correctamente. Gracias.', 'success');
+      showMessage('Reporte registrado correctamente. Gracias.', 'success');
     } catch (error) { showMessage(error.message); if (/venció|utilizado|no válido/i.test(error.message)) { sessionStorage.removeItem(storageKey); $('publicLogbookFormPanel').hidden = true; $('publicLogbookAccess').hidden = false; } }
     finally { setBusy(button, false); }
   }
