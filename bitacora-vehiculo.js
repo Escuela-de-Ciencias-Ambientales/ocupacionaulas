@@ -4,84 +4,43 @@
   const config = window.RESERVAS_CONFIG || {};
   const plate = (new URLSearchParams(window.location.search).get('vehiculo') || '').trim().toUpperCase().replace(/\s+/g, '');
   const storageKey = `edeca_public_vehicle_logbook_${plate}`;
-  const state = { token: null, vehicle: null, photoUrl: null };
+  const state = { token: null, vehicle: null, previewUrls: [], signed: false };
 
-  function showMessage(text, kind = 'error') {
-    const target = $('publicLogbookMessage');
-    target.textContent = text;
-    target.hidden = !text;
-    target.className = `vehicle-message is-${kind}`;
-  }
-  function setBusy(button, busy, label) {
-    if (busy) { button.dataset.label = button.textContent; button.textContent = label; button.disabled = true; }
-    else { button.textContent = button.dataset.label || button.textContent; button.disabled = false; }
-  }
-  function request(action, body = {}) {
-    return fetch(`${config.supabaseUrl}/functions/v1/vehicle-public-logbook-api`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', apikey: config.supabaseAnonKey },
-      body: JSON.stringify({ action, vehiclePlate: plate, ...body })
-    }).then(async (res) => {
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.ok) throw new Error(data.error || 'No fue posible procesar la solicitud.');
-      return data;
-    });
-  }
-  function saveAccess(data) {
-    state.token = data.token; state.vehicle = data.vehicle;
-    sessionStorage.setItem(storageKey, JSON.stringify({ token: data.token, teacherName: data.teacherName, vehicle: data.vehicle, expiresAt: Date.now() + 14 * 60_000 }));
-    $('publicLogbookTeacher').textContent = data.teacherName;
-    $('publicLogbookVehicle').textContent = `${data.vehicle.plate} · ${data.vehicle.displayName}`;
-    $('publicLogbookAccess').hidden = true; $('publicLogbookFormPanel').hidden = false;
-  }
-  function restoreAccess() {
-    try {
-      const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
-      if (saved?.token && saved.expiresAt > Date.now()) saveAccess(saved);
-    } catch { sessionStorage.removeItem(storageKey); }
-  }
-  function numberValue(id) {
-    const raw = $(id).value.trim(); return raw === '' ? null : Number(raw);
-  }
+  function showMessage(text, kind = 'error') { const target = $('publicLogbookMessage'); target.textContent = text; target.hidden = !text; target.className = `vehicle-message is-${kind}`; }
+  function setBusy(button, busy, label) { if (busy) { button.dataset.label = button.textContent; button.textContent = label; button.disabled = true; } else { button.textContent = button.dataset.label || button.textContent; button.disabled = false; } }
+  function request(action, body = {}) { return fetch(`${config.supabaseUrl}/functions/v1/vehicle-public-logbook-api`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: config.supabaseAnonKey }, body: JSON.stringify({ action, vehiclePlate: plate, ...body }) }).then(async (res) => { const data = await res.json().catch(() => ({})); if (!res.ok || !data.ok) throw new Error(data.error || 'No fue posible procesar la solicitud.'); return data; }); }
+  function saveAccess(data) { state.token = data.token; state.vehicle = data.vehicle; sessionStorage.setItem(storageKey, JSON.stringify({ token: data.token, teacherName: data.teacherName, vehicle: data.vehicle, expiresAt: Date.now() + 14 * 60_000 })); $('publicLogbookTeacher').textContent = data.teacherName; $('publicLogbookVehicle').textContent = `${data.vehicle.plate} · ${data.vehicle.displayName}`; $('publicVehiclePlate').value = `${data.vehicle.plate} · ${data.vehicle.displayName}`; $('publicLogbookAccess').hidden = true; $('publicLogbookFormPanel').hidden = false; }
+  function restoreAccess() { try { const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null'); if (saved?.token && saved.expiresAt > Date.now()) saveAccess(saved); } catch { sessionStorage.removeItem(storageKey); } }
+  function numberValue(id) { const raw = $(id).value.trim(); return raw === '' ? null : Number(raw); }
+  function optionalText(id) { return $(id).value.trim() || null; }
+  function optionalDate(id) { return $(id).value ? new Date($(id).value).toISOString() : null; }
+  function radioValue(name) { const checked = document.querySelector(`input[name="${name}"]:checked`); return checked ? checked.value === 'true' : null; }
+  function signatureData() { return state.signed ? $('publicSignature').toDataURL('image/png') : null; }
+
   async function compressPhoto(file) {
     if (!file?.type.startsWith('image/')) throw new Error('Selecciona una imagen válida.');
     const image = await new Promise((resolve, reject) => { const item = new Image(); item.onload = () => resolve(item); item.onerror = () => reject(new Error('No fue posible leer la fotografía.')); item.src = URL.createObjectURL(file); });
-    const maxSide = 1600; const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
-    const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(image.naturalWidth * scale)); canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-    canvas.getContext('2d', { alpha: false }).drawImage(image, 0, 0, canvas.width, canvas.height);
-    let quality = .82; let blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
-    while (blob && blob.size > 950000 && quality > .45) { quality -= .1; blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality)); }
-    if (!blob || blob.size > 1_048_576) throw new Error('No fue posible comprimir la imagen a menos de 1 MB. Intenta con otra fotografía.');
-    const buffer = await blob.arrayBuffer(); const bytes = new Uint8Array(buffer); let binary = ''; bytes.forEach((item) => { binary += String.fromCharCode(item); }); return btoa(binary);
+    let scale = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight)); let width = Math.max(1, Math.round(image.naturalWidth * scale)); let height = Math.max(1, Math.round(image.naturalHeight * scale)); const canvas = document.createElement('canvas'); let quality = .8; let blob;
+    do { canvas.width = width; canvas.height = height; canvas.getContext('2d', { alpha: false }).drawImage(image, 0, 0, width, height); blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality)); if (blob?.size <= 400000) break; width = Math.max(720, Math.round(width * .82)); height = Math.max(540, Math.round(height * .82)); quality = Math.max(.45, quality - .08); } while (quality > .45 || width > 720);
+    if (!blob || blob.size > 400000) throw new Error('No fue posible comprimir la fotografía para el reporte. Intenta con otra imagen.');
+    const bytes = new Uint8Array(await blob.arrayBuffer()); let binary = ''; bytes.forEach((item) => { binary += String.fromCharCode(item); }); return btoa(binary);
   }
-  async function verify(event) {
-    event.preventDefault(); showMessage('');
-    if (!/^[A-Z0-9-]{3,20}$/.test(plate)) { showMessage('Este QR no corresponde a un vehículo institucional.'); return; }
-    const button = event.currentTarget.querySelector('button'); setBusy(button, true, 'Verificando…');
-    try { const data = await request('verify', { idNumber: $('publicLogbookIdNumber').value }); saveAccess(data); }
-    catch (error) { showMessage(error.message); }
-    finally { setBusy(button, false); }
-  }
+
+  function setPhotoPreview(inputId, previewId) { const input = $(inputId); input.addEventListener('change', () => { const preview = $(previewId); const file = input.files[0]; if (!file) { preview.hidden = true; return; } const url = URL.createObjectURL(file); state.previewUrls.push(url); preview.querySelector('img').src = url; preview.querySelector('span').textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)} MB antes de comprimir`; preview.hidden = false; }); }
+  function initializeSignature() { const canvas = $('publicSignature'); const context = canvas.getContext('2d'); let drawing = false; context.lineWidth = 4; context.lineCap = 'round'; context.strokeStyle = '#172b2d'; const point = (event) => { const rect = canvas.getBoundingClientRect(); return { x: (event.clientX - rect.left) * (canvas.width / rect.width), y: (event.clientY - rect.top) * (canvas.height / rect.height) }; }; canvas.addEventListener('pointerdown', (event) => { drawing = true; state.signed = true; canvas.setPointerCapture(event.pointerId); const p = point(event); context.beginPath(); context.moveTo(p.x, p.y); }); canvas.addEventListener('pointermove', (event) => { if (!drawing) return; const p = point(event); context.lineTo(p.x, p.y); context.stroke(); }); ['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => canvas.addEventListener(name, () => { drawing = false; })); $('publicClearSignature').addEventListener('click', () => { context.clearRect(0, 0, canvas.width, canvas.height); state.signed = false; }); }
+
+  async function verify(event) { event.preventDefault(); showMessage(''); if (!/^[A-Z0-9-]{3,20}$/.test(plate)) { showMessage('Este QR no corresponde a un vehículo institucional.'); return; } const button = event.currentTarget.querySelector('button'); setBusy(button, true, 'Verificando…'); try { saveAccess(await request('verify', { idNumber: $('publicLogbookIdNumber').value })); } catch (error) { showMessage(error.message); } finally { setBusy(button, false); } }
   async function submit(event) {
-    event.preventDefault(); showMessage('');
-    const file = $('publicLogbookPhoto').files[0]; const button = $('publicLogbookSubmit'); setBusy(button, true, 'Procesando fotografía…');
+    event.preventDefault(); showMessage(''); const departure = numberValue('publicDepartureMileage'); const arrival = numberValue('publicArrivalMileage'); const departureAt = optionalDate('publicDepartureAt'); const arrivalAt = optionalDate('publicArrivalAt');
+    if (departure !== null && arrival !== null && arrival < departure) { showMessage('El kilometraje final no puede ser menor al inicial.'); return; }
+    if (departureAt && arrivalAt && new Date(arrivalAt) < new Date(departureAt)) { showMessage('El regreso no puede ser anterior a la salida.'); return; }
+    const button = $('publicLogbookSubmit'); setBusy(button, true, 'Procesando fotografías…');
     try {
-      const photoBase64 = await compressPhoto(file); button.textContent = 'Enviando reporte…';
-      await request('submit', {
-        token: state.token, tripSheetNumber: $('publicTripSheetNumber').value, departureMileage: numberValue('publicDepartureMileage'), arrivalMileage: numberValue('publicArrivalMileage'),
-        departureFuelLevel: $('publicDepartureFuel').value, arrivalFuelLevel: $('publicArrivalFuel').value, vehicleCondition: $('publicVehicleCondition').value,
-        observations: $('publicLogbookObservations').value, photoBase64
-      });
-      sessionStorage.removeItem(storageKey); state.token = null; $('publicLogbookForm').reset(); $('publicLogbookPhotoPreview').hidden = true; $('publicLogbookFormPanel').hidden = true; $('publicLogbookAccess').hidden = false;
-      showMessage('Reporte registrado correctamente. Gracias.', 'success');
-    } catch (error) { showMessage(error.message); if (/venció|utilizado|no válido/i.test(error.message)) { sessionStorage.removeItem(storageKey); $('publicLogbookFormPanel').hidden = true; $('publicLogbookAccess').hidden = false; } }
-    finally { setBusy(button, false); }
+      const departureFile = $('publicDeparturePhoto').files[0]; const returnFile = $('publicReturnPhoto').files[0]; const [departurePhotoBase64, returnPhotoBase64] = await Promise.all([departureFile ? compressPhoto(departureFile) : null, returnFile ? compressPhoto(returnFile) : null]); button.textContent = 'Enviando reporte…';
+      await request('submit', { token: state.token, tripSheetNumber: optionalText('publicTripSheetNumber'), departureAt, arrivalAt, destination: optionalText('publicDestination'), departureMileage: departure, arrivalMileage: arrival, departureFuelLevel: $('publicDepartureFuel').value || null, arrivalFuelLevel: $('publicArrivalFuel').value || null, vehicleCondition: $('publicVehicleCondition').value || null, departureNotes: optionalText('publicDepartureNotes'), returnNotes: optionalText('publicReturnNotes'), departurePhotoBase64, returnPhotoBase64, signatureData: signatureData(), vehicleCleanOut: radioValue('vehicle_clean_out'), oilsChecked: radioValue('oils_checked'), coolantChecked: radioValue('coolant_checked'), oilChangeChecked: radioValue('oil_change_checked'), toolsChecked: radioValue('tools_checked'), safetyKitChecked: radioValue('safety_kit_checked'), documentsChecked: radioValue('documents_checked'), outboundDamage: radioValue('outbound_damage'), vehicleCleanReturn: radioValue('vehicle_clean_return'), newDamage: radioValue('new_damage') });
+      sessionStorage.removeItem(storageKey); state.token = null; $('publicLogbookForm').reset(); $('publicLogbookFormPanel').hidden = true; $('publicLogbookAccess').hidden = false; $('publicDeparturePhotoPreview').hidden = true; $('publicReturnPhotoPreview').hidden = true; $('publicClearSignature').click(); showMessage('Reporte registrado correctamente. Gracias.', 'success'); window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) { showMessage(error.message); if (/venció|utilizado|no válido/i.test(error.message)) { sessionStorage.removeItem(storageKey); $('publicLogbookFormPanel').hidden = true; $('publicLogbookAccess').hidden = false; } } finally { setBusy(button, false); }
   }
-  function previewPhoto() { const file = $('publicLogbookPhoto').files[0]; if (state.photoUrl) URL.revokeObjectURL(state.photoUrl); if (!file) { $('publicLogbookPhotoPreview').hidden = true; return; } state.photoUrl = URL.createObjectURL(file); $('publicLogbookPhotoPreview').src = state.photoUrl; $('publicLogbookPhotoPreview').hidden = false; }
-  function init() {
-    if (!config.supabaseUrl || !config.supabaseAnonKey) { $('publicLogbookVehicle').textContent = 'La bitácora no está configurada.'; return; }
-    if (!/^[A-Z0-9-]{3,20}$/.test(plate)) { $('publicLogbookVehicle').textContent = 'Código QR de vehículo no válido.'; $('publicLogbookAccess').hidden = true; return; }
-    $('publicLogbookVehicle').textContent = `Vehículo ${plate}`; restoreAccess();
-    $('publicLogbookAccessForm').addEventListener('submit', verify); $('publicLogbookForm').addEventListener('submit', submit); $('publicLogbookPhoto').addEventListener('change', previewPhoto);
-  }
+  function init() { if (!config.supabaseUrl || !config.supabaseAnonKey) { $('publicLogbookVehicle').textContent = 'El reporte no está configurado.'; return; } if (!/^[A-Z0-9-]{3,20}$/.test(plate)) { $('publicLogbookVehicle').textContent = 'Código QR de vehículo no válido.'; $('publicLogbookAccess').hidden = true; return; } $('publicLogbookVehicle').textContent = `Vehículo ${plate}`; initializeSignature(); setPhotoPreview('publicDeparturePhoto', 'publicDeparturePhotoPreview'); setPhotoPreview('publicReturnPhoto', 'publicReturnPhotoPreview'); restoreAccess(); $('publicLogbookAccessForm').addEventListener('submit', verify); $('publicLogbookForm').addEventListener('submit', submit); }
   init();
 })();

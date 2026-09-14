@@ -66,6 +66,14 @@ function oneOf(value: unknown, choices: readonly string[]) {
   return typeof value === 'string' && choices.includes(value) ? value : null;
 }
 
+function nullableBoolean(value: unknown) {
+  return typeof value === 'boolean' ? value : null;
+}
+
+function signature(value: unknown) {
+  return typeof value === 'string' && /^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(value) && value.length <= 450_000 ? value : null;
+}
+
 function decodePhoto(value: unknown) {
   if (typeof value !== 'string' || !value || value.length > 1_400_000 || !/^[A-Za-z0-9+/]+={0,2}$/.test(value)) return null;
   try {
@@ -150,42 +158,56 @@ Deno.serve(async (request) => {
       return response(origin, { ok: false, error: 'El acceso venció o ya fue utilizado. Escanea el QR nuevamente.' }, 401);
     }
 
-    const tripSheetNumber = text(payload.tripSheetNumber, 60);
+    const tripSheetNumber = text(payload.tripSheetNumber, 60) || 'Sin boleta';
     const departureMileage = integer(payload.departureMileage);
     const arrivalMileage = integer(payload.arrivalMileage);
-    const departureFuelLevel = oneOf(payload.departureFuelLevel, ['quarter', 'half', 'three_quarters', 'full']);
-    const arrivalFuelLevel = oneOf(payload.arrivalFuelLevel, ['quarter', 'half', 'three_quarters', 'full']);
+    const departureFuelLevel = oneOf(payload.departureFuelLevel, ['reserve', 'quarter', 'half', 'three_quarters', 'full']);
+    const arrivalFuelLevel = oneOf(payload.arrivalFuelLevel, ['reserve', 'quarter', 'half', 'three_quarters', 'full']);
     const vehicleCondition = oneOf(payload.vehicleCondition, ['clean', 'dirty', 'other']);
-    const photoBytes = decodePhoto(payload.photoBase64);
-    if (!tripSheetNumber || departureMileage === null || arrivalMileage === null || arrivalMileage < departureMileage
-      || !departureFuelLevel || !arrivalFuelLevel || !vehicleCondition || !photoBytes) {
-      return response(origin, { ok: false, error: 'Completa número de gira, kilometrajes, combustible, estado y fotografía.' }, 400);
+    const departurePhotoBytes = decodePhoto(payload.departurePhotoBase64);
+    const returnPhotoBytes = decodePhoto(payload.returnPhotoBase64);
+    const departureAt = typeof payload.departureAt === 'string' && !Number.isNaN(Date.parse(payload.departureAt)) ? payload.departureAt : null;
+    const arrivalAt = typeof payload.arrivalAt === 'string' && !Number.isNaN(Date.parse(payload.arrivalAt)) ? payload.arrivalAt : null;
+    if (arrivalMileage !== null && departureMileage !== null && arrivalMileage < departureMileage) {
+      return response(origin, { ok: false, error: 'El kilometraje final no puede ser menor al inicial.' }, 400);
+    }
+    if (arrivalAt && departureAt && Date.parse(arrivalAt) < Date.parse(departureAt)) {
+      return response(origin, { ok: false, error: 'El regreso no puede ser anterior a la salida.' }, 400);
     }
 
     const logbookId = crypto.randomUUID();
-    const photoPath = `public-logbooks/${session.id}/${logbookId}.jpg`;
-    const { error: uploadError } = await admin.storage.from('vehicle-trip-photos').upload(photoPath, photoBytes, {
-      contentType: 'image/jpeg', cacheControl: '3600', upsert: false
-    });
-    if (uploadError) return response(origin, { ok: false, error: 'No fue posible guardar la fotografía.' }, 500);
+    const uploads: string[] = [];
+    const uploadPhoto = async (kind: 'departure' | 'return', bytes: Uint8Array | null) => {
+      if (!bytes) return null;
+      const path = `public-logbooks/${session.id}/${logbookId}-${kind}.jpg`;
+      const { error: uploadError } = await admin.storage.from('vehicle-trip-photos').upload(path, bytes, { contentType: 'image/jpeg', cacheControl: '3600', upsert: false });
+      if (uploadError) throw new Error('No fue posible guardar una de las fotografías.');
+      uploads.push(path); return path;
+    };
+    let departurePhotoPath: string | null = null;
+    let returnPhotoPath: string | null = null;
+    try { departurePhotoPath = await uploadPhoto('departure', departurePhotoBytes); returnPhotoPath = await uploadPhoto('return', returnPhotoBytes); }
+    catch (error) { if (uploads.length) await admin.storage.from('vehicle-trip-photos').remove(uploads); return response(origin, { ok: false, error: error instanceof Error ? error.message : 'No fue posible guardar las fotografías.' }, 500); }
 
     const insert = await admin.from('vehicle_public_logbooks').insert({
       id: logbookId, session_id: session.id, vehicle_id: session.vehicle_id, teacher_registry_id: session.teacher_registry_id,
       trip_sheet_number: tripSheetNumber, departure_mileage: departureMileage, arrival_mileage: arrivalMileage,
+      departure_at: departureAt, arrival_at: arrivalAt, destination: text(payload.destination, 240) || null,
       departure_fuel_level: departureFuelLevel, arrival_fuel_level: arrivalFuelLevel, vehicle_condition: vehicleCondition,
-      fueling_mileage: integer(payload.fuelingMileage), service_station_location: text(payload.serviceStationLocation, 160) || null,
-      fuel_liters: decimal(payload.fuelLiters), fuel_type: oneOf(payload.fuelType, ['diesel', 'regular', 'super', 'other']),
-      invoice_amount: decimal(payload.invoiceAmount), invoice_date: /^\d{4}-\d{2}-\d{2}$/.test(String(payload.invoiceDate || '')) ? payload.invoiceDate : null,
-      invoice_number: text(payload.invoiceNumber, 80) || null, voucher_authorization_number: text(payload.voucherAuthorizationNumber, 80) || null,
-      observations: text(payload.observations, 2000) || null, photo_path: photoPath, photo_bytes: photoBytes.length
+      vehicle_clean_out: nullableBoolean(payload.vehicleCleanOut), oils_checked: nullableBoolean(payload.oilsChecked), coolant_checked: nullableBoolean(payload.coolantChecked),
+      oil_change_checked: nullableBoolean(payload.oilChangeChecked), tools_checked: nullableBoolean(payload.toolsChecked), safety_kit_checked: nullableBoolean(payload.safetyKitChecked),
+      documents_checked: nullableBoolean(payload.documentsChecked), outbound_damage: nullableBoolean(payload.outboundDamage), vehicle_clean_return: nullableBoolean(payload.vehicleCleanReturn), new_damage: nullableBoolean(payload.newDamage),
+      departure_notes: text(payload.departureNotes, 1000) || null, return_notes: text(payload.returnNotes, 1000) || null,
+      departure_photo_path: departurePhotoPath, return_photo_path: returnPhotoPath, signature_data: signature(payload.signatureData),
+      observations: null, photo_path: departurePhotoPath, photo_bytes: departurePhotoBytes?.length || returnPhotoBytes?.length || null
     });
     if (insert.error) {
-      await admin.storage.from('vehicle-trip-photos').remove([photoPath]);
-      return response(origin, { ok: false, error: 'No fue posible registrar la bitácora. Verifica los datos e intenta nuevamente.' }, 400);
+      if (uploads.length) await admin.storage.from('vehicle-trip-photos').remove(uploads);
+      return response(origin, { ok: false, error: 'No fue posible registrar el reporte. Verifica los datos e intenta nuevamente.' }, 400);
     }
     const { error: consumeError } = await admin.from('vehicle_public_logbook_sessions').update({ used_at: new Date().toISOString() }).eq('id', session.id).is('used_at', null);
     if (consumeError) console.error('vehicle-public-logbook-api session consume:', consumeError.message);
-    return response(origin, { ok: true, message: 'Bitácora registrada correctamente.' });
+    return response(origin, { ok: true, message: 'Reporte registrado correctamente.' });
   } catch (error) {
     console.error('vehicle-public-logbook-api:', error instanceof Error ? error.message : 'unexpected error');
     return response(origin, { ok: false, error: 'Ocurrió un error inesperado. Intenta nuevamente.' }, 500);
