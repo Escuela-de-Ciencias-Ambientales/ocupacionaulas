@@ -28,7 +28,7 @@
   }
   function render(filter = "") {
     const list = (context.equipment || []).filter((x) =>
-      x.name.toLowerCase().includes(filter.toLowerCase()),
+      `${x.name} ${x.requires_direction ? 'GNSS Trimble TDC6' : ''}`.toLowerCase().includes(filter.toLowerCase()),
     );
     $("equipmentList").innerHTML =
       list

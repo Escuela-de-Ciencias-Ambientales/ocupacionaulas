@@ -1,0 +1,43 @@
+-- Prueba integral de RPC existentes; no envía correos y revierte los datos.
+begin;
+do $test$
+declare commoncat bigint; specialcat bigint; commonunit bigint; specialunit bigint; extraunit bigint; borrower public.teacher_registry; student public.academic_students; authority public.teacher_registry; deputy public.teacher_registry; result jsonb; req bigint; assignment bigint; authid uuid; signature text:='data:image/png;base64,'||repeat('A',100); denied boolean;
+begin
+select t.* into authority from public.equipment_direction_roles d join public.teacher_registry t on t.id=d.teacher_registry_id where d.role='director';
+select t.* into deputy from public.equipment_direction_roles d join public.teacher_registry t on t.id=d.teacher_registry_id where d.role='deputy';
+select * into borrower from public.teacher_registry where active order by id limit 1;
+insert into public.equipment_catalog(name) values('TEST common RPC rollback') returning id into commoncat;
+insert into public.equipment_catalog(name,requires_direction_approval) values('TEST GNSS RPC rollback',true) returning id into specialcat;
+insert into public.equipment_units(catalog_id,consecutive_code) values(commoncat,'TEST-RPC-COMMON') returning id into commonunit;
+insert into public.equipment_units(catalog_id,consecutive_code,brand,model) values(specialcat,'TEST-RPC-SPECIAL','Trimble','TDC6') returning id into specialunit;
+insert into public.equipment_units(catalog_id,consecutive_code,brand,model) values(specialcat,'TEST-RPC-EXTRA','Trimble','TDC6') returning id into extraunit;
+result:=public.create_equipment_loan_request(borrower.national_id,'academic',null,now()+interval '1 day',jsonb_build_array(jsonb_build_object('id',commoncat,'quantity',1)),signature);req:=(result->>'request_id')::bigint;
+perform set_config('request.jwt.claim.sub',(select user_id::text from public.warehouse_staff where active limit 1),true);
+perform public.warehouse_update_request(req,'approved');
+denied:=false;begin perform public.warehouse_deliver_request(req,jsonb_build_array(commonunit,extraunit));exception when invalid_parameter_value then denied:=true;end;
+if not denied then raise exception 'FAIL unrequested GNSS bypass';end if;
+perform public.warehouse_deliver_request(req,jsonb_build_array(commonunit));
+select a.id into assignment from public.loan_request_unit_assignments a join public.student_loan_request_items i on i.id=a.request_item_id where i.request_id=req;
+result:=public.warehouse_return_units(req,jsonb_build_array(jsonb_build_object('assignment_id',assignment,'note','Test')),'Persona de prueba');
+if not (result->>'complete')::boolean then raise exception 'FAIL ordinary full return';end if;
+perform public.public_authorize_direction_equipment(authority.national_id,borrower.id,'academic',specialcat,1,now()+interval '2 days','Prueba mixta',signature);
+result:=public.create_equipment_loan_request(borrower.national_id,'academic',null,now()+interval '1 day',jsonb_build_array(jsonb_build_object('id',commoncat,'quantity',1),jsonb_build_object('id',specialcat,'quantity',1)),signature);req:=(result->>'request_id')::bigint;
+perform public.warehouse_update_request(req,'approved');perform public.warehouse_deliver_request(req,jsonb_build_array(commonunit,specialunit));
+select a.id into assignment from public.loan_request_unit_assignments a join public.student_loan_request_items i on i.id=a.request_item_id where i.request_id=req and a.equipment_unit_id=commonunit;
+result:=public.warehouse_return_units(req,jsonb_build_array(jsonb_build_object('assignment_id',assignment)),'Persona de prueba');
+if (result->>'complete')::boolean then raise exception 'FAIL partial return';end if;
+select a.id into assignment from public.loan_request_unit_assignments a join public.student_loan_request_items i on i.id=a.request_item_id where i.request_id=req and a.equipment_unit_id=specialunit;
+result:=public.warehouse_return_units(req,jsonb_build_array(jsonb_build_object('assignment_id',assignment)),'Persona de prueba');
+if not (result->>'complete')::boolean then raise exception 'FAIL mixed full return';end if;
+select * into student from public.academic_students where active and not public.student_has_outstanding_equipment(id) order by id limit 1;
+insert into public.equipment_authorizations(teacher_registry_id,scope,student_id,reason,reason_detail,signature_data) values(authority.id,'individual',student.id,'other','Prueba integral',signature) returning id into authid;
+denied:=false;begin perform public.create_equipment_loan_request(student.national_id,'student',authid,now()+interval '1 day',jsonb_build_array(jsonb_build_object('id',specialcat,'quantity',1)),signature);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL student RPC missing direction';end if;
+perform public.public_authorize_direction_equipment(deputy.national_id,student.id,'student',specialcat,1,now()+interval '2 days','Prueba Subdirección',signature);
+result:=public.create_equipment_loan_request(student.national_id,'student',authid,now()+interval '1 day',jsonb_build_array(jsonb_build_object('id',specialcat,'quantity',1)),signature);req:=(result->>'request_id')::bigint;
+perform public.warehouse_update_request(req,'approved');perform public.warehouse_deliver_request(req,jsonb_build_array(specialunit));
+select a.id into assignment from public.loan_request_unit_assignments a join public.student_loan_request_items i on i.id=a.request_item_id where i.request_id=req;
+result:=public.warehouse_return_units(req,jsonb_build_array(jsonb_build_object('assignment_id',assignment)),'Persona de prueba');
+if not (result->>'complete')::boolean then raise exception 'FAIL student return';end if;
+end $test$;
+rollback;
