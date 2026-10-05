@@ -11,9 +11,18 @@ Este README reemplaza la versión anterior, que solo describía el alcance origi
 - **Bodega de equipos** (`bodega-equipos.html`, `autorizaciones-equipos.html`, `solicitar-equipo.html`): autorización docente de préstamos, solicitud y control de devoluciones para estudiantes.
 - **Administración de usuarios** (`usuarios.html`) y **configuración del sistema** (`configuracion.html`, nuevo): gestión de cuentas y parámetros editables por el superadministrador sin tocar código.
 
-## Pendiente rastreado para la siguiente entrega
+## Contexto y continuidad del proyecto
 
-`.private-header` (el encabezado privado) está definido dos veces, en `reservas.css` y en `visual-system.css`, y cinco páginas (`index.html`, `ingreso.html`, `autorizaciones-equipos.html`, `bodega-equipos.html`, `solicitar-equipo.html`) ni siquiera cargan `reservas.css`, así que resuelven su encabezado con reglas propias en su CSS individual. Fusionar esto en un solo archivo de layout compartido es el trabajo que sigue; no se tocó en esta entrega porque requiere revisar visualmente cada página antes de quitar una regla, para no romper ningún diseño ya en producción.
+Antes de modificar la aplicación, consultar estos registros y la [arquitectura de usuarios](docs/arquitectura-usuarios.md):
+
+- [AVANCE.md](AVANCE.md): trabajo existente, evidencia y diferencias entre resultados locales y producción.
+- [PENDIENTES.md](PENDIENTES.md): tareas abiertas y condiciones para cerrarlas.
+- [DECISIONES.md](DECISIONES.md): requisitos acordados, criterios técnicos y supuestos pendientes.
+- [IDEAS.md](IDEAS.md): propuestas futuras que todavía no están autorizadas para implementación.
+
+Actualizar estos archivos después de cada cambio. El encabezado privado ya se unificó en `shared-header.css` mediante el commit `8736479`; la nota anterior que lo indicaba como pendiente quedó superada.
+
+El trabajo actual es la aprobación adicional de Dirección/Subdirección para GNSS Trimble y la carga del inventario corregido. Las modificaciones de octubre en la aplicación local Django no se consideran aplicadas a este sitio ni a Supabase.
 
 ## Módulo en pausa
 
