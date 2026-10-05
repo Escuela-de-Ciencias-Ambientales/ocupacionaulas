@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nueva contraseña | Reservaciones EDECA</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="design-tokens.css?v=1" />
+  <link rel="stylesheet" href="shared-header.css?v=1" />
+  <link rel="stylesheet" href="ingreso.css?v=6" />
+  <link rel="stylesheet" href="field-labels.css?v=1" />
+  <link rel="icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <header class="access-header">
+    <a class="brand" href="index.html" aria-label="Volver al horario de ocupación">
+      <img src="logo-edeca.png" alt="Escuela de Ciencias Ambientales" />
+      <span>ESCUELA DE CIENCIAS<br />AMBIENTALES - UNA</span>
+    </a>
+    <img class="una-logo" src="logo-una.png" alt="Universidad Nacional, Costa Rica" />
+  </header>
+  <main class="access-main">
+    <section class="access-copy">
+      <p class="eyebrow">Seguridad de la cuenta</p>
+      <h1>Nueva contraseña</h1>
+      <p>Defina una contraseña nueva para recuperar el acceso a los servicios EDECA.</p>
+      <a href="ingreso.html">← Volver al ingreso</a>
+    </section>
+    <section class="login-panel" aria-labelledby="resetTitle">
+      <div class="lock-mark" aria-hidden="true">EDECA</div>
+      <h2 id="resetTitle">Cambiar contraseña</h2>
+      <p id="resetDescription">Validando el enlace seguro…</p>
+      <div class="message" id="resetMessage" role="status" aria-live="polite" hidden></div>
+      <form id="resetForm" hidden>
+        <label for="newPassword">Nueva contraseña</label>
+        <input id="newPassword" name="password" type="password" autocomplete="new-password" minlength="8" pattern="(?=.*[A-Z])(?=.*[0-9]).{8,}" title="Mínimo 8 caracteres, una mayúscula y un número" required />
+        <label for="confirmPassword">Confirme la nueva contraseña</label>
+        <input id="confirmPassword" name="passwordConfirm" type="password" autocomplete="new-password" minlength="8" required />
+        <p class="password-help">Mínimo 8 caracteres, una letra mayúscula y un número.</p>
+        <button id="resetButton" type="submit">Guardar nueva contraseña</button>
+      </form>
+      <a id="loginLink" href="ingreso.html" hidden>Volver al ingreso</a>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=3"></script>
+  <script src="shared-utils.js?v=1"></script>
+  <script src="password-toggle.js?v=2"></script>
+  <script src="restablecer-contrasena.js?v=1"></script>
+  <script src="field-labels.js?v=1"></script>
+</body>
+</html>

@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="design-tokens.css?v=1" />
   <link rel="stylesheet" href="shared-header.css?v=1" />
-  <link rel="stylesheet" href="ingreso.css?v=5" />
+  <link rel="stylesheet" href="ingreso.css?v=6" />
   <link rel="stylesheet" href="field-labels.css?v=1" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#003C71" />
@@ -53,6 +53,7 @@
         <label for="loginPassword">Contraseña</label>
         <input id="loginPassword" name="password" type="password" autocomplete="current-password" minlength="8" required />
         <button id="loginButton" type="submit">Ingresar a reservas</button>
+        <button class="text-button" id="forgotPasswordButton" type="button">¿Olvidó su contraseña?</button>
       </form>
       <form id="registerForm" hidden>
         <label for="registerName">Nombre completo</label>
@@ -75,6 +76,12 @@
         <p class="password-help">Mínimo 8 caracteres, una letra mayúscula y un número.</p>
         <button id="registerButton" type="submit">Crear mi cuenta</button>
       </form>
+      <form id="recoveryForm" hidden>
+        <label for="recoveryEmail">Correo electrónico</label>
+        <input id="recoveryEmail" name="email" type="email" autocomplete="email" placeholder="nombre.apellido@una.cr" pattern="[^@ ]+@una\.cr" title="Ingrese su correo institucional @una.cr" required />
+        <button id="recoveryButton" type="submit">Enviar enlace de recuperación</button>
+        <button class="text-button" id="backToLoginButton" type="button">← Volver al ingreso</button>
+      </form>
       <small>El registro solo funciona si tu correo fue autorizado previamente por la administración.</small>
     </section>
   </main>
@@ -83,7 +90,7 @@
   <script src="config.js?v=3"></script>
   <script src="shared-utils.js?v=1"></script>
   <script src="password-toggle.js?v=2"></script>
-  <script src="ingreso.js?v=9"></script>
+  <script src="ingreso.js?v=10"></script>
   <script src="field-labels.js?v=1"></script>
   <script src="pwa-install.js?v=1"></script>
   <script src="navigation-enhancements.js?v=1"></script>
