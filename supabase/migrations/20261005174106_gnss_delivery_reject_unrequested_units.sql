@@ -29,4 +29,3 @@ begin
  return jsonb_build_object('ok',true,'request_id',p_request_id,'receipt_token',req.receipt_token);
 end $function$
 ;
-
