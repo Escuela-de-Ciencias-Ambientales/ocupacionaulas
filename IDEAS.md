@@ -25,3 +25,11 @@ Estas ideas son una lista de posibilidades, no compromisos ni autorización para
 5. Implementar, probar y registrar el resultado en AVANCE.md.
 
 No convertir recomendaciones históricas de hardware en selecciones de compra vigentes sin una evaluación actual.
+
+## Seguimiento posterior al cambio GNSS
+
+- Evaluar autenticación adicional de autoridades si la institución desea reforzar el proceso actual de cédula y firma.
+- Añadir conciliación asistida de unidades agrupadas y los equipos anteriores cuando bodega confirme identificación física.
+- Evaluar avisos de aprobación pendientes y filtros del historial si crece el volumen; requieren definir canal y destinatarios.
+
+Estas propuestas no forman parte del alcance publicado ni habilitan envíos automáticos.

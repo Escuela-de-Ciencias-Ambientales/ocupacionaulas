@@ -10,25 +10,25 @@ Estados: **pendiente**, **en revisión**, **terminado** y **bloqueado**. Marcar 
 | --- | --- | --- | --- |
 | P-01 | Terminado | Recuperar contexto previo y crear registros de continuidad | Chats relevantes y documentos existentes revisados; cuatro archivos de seguimiento creados |
 | P-02 | En revisión | Reproducir la pantalla con etiquetas Django | Identificar la ruta y recurso causante; verificar la vista real con el diseño original |
-| P-03 | Pendiente | Consultar esquema y migraciones actuales de Supabase | Comparar producción con el repositorio sin sobrescribir migraciones más recientes |
-| P-04 | Pendiente | Vincular Dirección y Subdirección al padrón maestro | Encontrar las dos personas por identificación; confirmar cargos y acceso sin duplicar registros |
-| P-05 | Pendiente | Definir alcance y vigencia de la autorización especial | Documentar criterio adoptado y su relación con la autorización docente |
-| P-06 | Pendiente | Añadir asignación administrable de cargos e historial | Elegir académicos existentes; solo administración autorizada cambia cargos; historial conservado |
-| P-07 | Pendiente | Añadir aprobación de GNSS al flujo docente existente | Uno de los cargos puede aprobar, con firma y trazabilidad; otros usuarios no pueden hacerlo |
-| P-08 | Pendiente | Mostrar autorización al seleccionar Trimble | Identificar TDC6 por marca/modelo; mostrar autorizado o faltante; mantener estética |
-| P-09 | Pendiente | Bloquear préstamo y entrega sin aprobación | Comprobar servidor y pantalla, incluyendo caminos manuales y edición de préstamos |
-| P-10 | Pendiente | Incorporar o adaptar solicitudes de académicos | Usar el padrón existente; los profesores solicitan y Dirección/Subdirección autoriza Trimble |
-| P-11 | Pendiente | Separar control de GNSS de autorizaciones docentes comunes | Pendientes e historial propios con filtros y estados legibles |
+| P-03 | Terminado | Consultar esquema y migraciones actuales de Supabase | Comparar producción con el repositorio sin sobrescribir migraciones más recientes |
+| P-04 | Implementado; cargos provisionales | Vincular Dirección y Subdirección al padrón maestro | Encontrar las dos personas por identificación; confirmar cargos y acceso sin duplicar registros |
+| P-05 | Terminado | Definir alcance y vigencia de la autorización especial | Documentar criterio adoptado y su relación con la autorización docente |
+| P-06 | Terminado | Añadir asignación administrable de cargos e historial | Elegir académicos existentes; solo administración autorizada cambia cargos; historial conservado |
+| P-07 | Terminado | Añadir aprobación de GNSS al flujo docente existente | Uno de los cargos puede aprobar, con firma y trazabilidad; otros usuarios no pueden hacerlo |
+| P-08 | Terminado | Mostrar autorización al seleccionar Trimble | Identificar TDC6 por marca/modelo; mostrar autorizado o faltante; mantener estética |
+| P-09 | Terminado | Bloquear préstamo y entrega sin aprobación | Comprobar servidor y pantalla, incluyendo caminos manuales y edición de préstamos |
+| P-10 | Terminado | Incorporar o adaptar solicitudes de académicos | Usar el padrón existente; los profesores solicitan y Dirección/Subdirección autoriza Trimble |
+| P-11 | Terminado | Separar control de GNSS de autorizaciones docentes comunes | Pendientes e historial propios con filtros y estados legibles |
 
 ## Inventario corregido
 
 | ID | Estado | Trabajo | Condición para cerrar |
 | --- | --- | --- | --- |
-| I-01 | Terminado solo en local | Leer Excel corregido y expandir cantidades | Resultado local: 496 filas y 625 unidades, incluidos 15 Trimble TDC6 |
-| I-02 | Pendiente | Comparar inventario real de Supabase con el Excel | Reportar coincidencias, códigos en conflicto, faltantes y equipos en préstamo |
-| I-03 | Pendiente | Revisar cantidades agrupadas y activos/series repetidos | Conservar originales; determinar representación por unidad o kit sin inventar activos |
-| I-04 | Pendiente | Crear importación compatible con catálogo y unidades actuales | Validación previa, operación transaccional y repetición sin duplicados |
-| I-05 | Pendiente | Cargar a la base de producción | Respaldo/exportación previa, conciliación de unidades y verificación de disponibilidad |
+| I-01 | Terminado en producción | Leer Excel corregido y expandir cantidades | Resultado local: 496 filas y 625 unidades, incluidos 15 Trimble TDC6 |
+| I-02 | Terminado | Comparar inventario real de Supabase con el Excel | Reportar coincidencias, códigos en conflicto, faltantes y equipos en préstamo |
+| I-03 | Terminado | Revisar cantidades agrupadas y activos/series repetidos | Conservar originales; determinar representación por unidad o kit sin inventar activos |
+| I-04 | Terminado | Crear importación compatible con catálogo y unidades actuales | Validación previa, operación transaccional y repetición sin duplicados |
+| I-05 | Terminado | Cargar a la base de producción | Respaldo/exportación previa, conciliación de unidades y verificación de disponibilidad |
 
 El informe local contiene 153 incidencias de unidades; son anotaciones generadas al expandir grupos o conservar identificadores repetidos. No equivalen a 153 filas incorrectas ni confirman errores en Supabase.
 
@@ -52,3 +52,11 @@ El informe local contiene 153 incidencias de unidades; son anotaciones generadas
 - Revisar los 80 códigos de materias generales/externas no asociables al horario EDECA y los 20 estudiantes sin matrícula EDECA vinculada.
 - Mantener Conserjería en pausa mientras no exista una instrucción de reactivarla.
 - Corregir notas antiguas de documentación que describan como pendiente un cambio ya incorporado; verificar por código e historial.
+
+## Estado después de implementar
+
+La funcionalidad y la carga están implementadas en Supabase. Antes de cerrar publicación: verificar GitHub Pages con los nuevos recursos y registrar el resultado. Los criterios anteriores son requisitos de cierre; la evidencia actual y los límites de pruebas están en AVANCE.md.
+
+Pendientes que requieren uso institucional: confirmar quién ocupa cada cargo (ambas personas ya pueden aprobar); revisar con bodega los lotes sin identificación individual y los 35 equipos preexistentes conservados. Verificar el primer comprobante real de académico durante una entrega autorizada; no se enviaron correos de prueba.
+
+La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicada. Si vuelve a ocurrir, registrar la URL completa y la versión de recursos servidos.

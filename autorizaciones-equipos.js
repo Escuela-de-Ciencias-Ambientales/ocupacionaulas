@@ -44,7 +44,7 @@
   function signatureData() { if (!state.signatureDrawn) throw new Error('Firme en el recuadro antes de autorizar.'); return el('teacherSignature').toDataURL('image/png'); }
 
   async function loadCourses(event) {
-    event.preventDefault(); clearMessage();
+    event.preventDefault(); clearMessage(); el('authorizationArea').hidden=true;el('directionPanel').hidden=true;el('directionForm').hidden=true;state.directionBorrower=null;clearSignature();
     const nationalId = cleanId(el('teacherId').value);
     if (nationalId.length < 7) return message('Revise el número de cédula.');
     const button = el('loadCoursesButton'); busy(button, true, 'Cargando…');
@@ -53,6 +53,11 @@
     if (error) return message(friendly(error));
     if (!data?.found) return message('No se encontró un profesor activo con esa cédula. Solicite a la administración que revise el registro docente.');
     state.teacherNationalId = nationalId;
+    const direction=await state.client.rpc('public_equipment_direction_context',{p_national_id:nationalId});
+    if(direction.error)return message(direction.error.message);
+    el('directionPanel').hidden=!direction.data?.can_authorize;
+    el('directionEquipment').innerHTML=(direction.data?.equipment||[]).map(x=>`<option value="${x.id}">${Sigep.escapeHtml(x.name)}</option>`).join('');
+    el('directionUntil').value=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'America/Costa_Rica'}).format(new Date(Date.now()+7*86400000));
     state.courses = data.courses || [];
     el('teacherName').textContent = data.teacher_name;
     const select = el('courseSelect');
@@ -62,7 +67,7 @@
     el('authorizationArea').hidden = false;
     requestAnimationFrame(resizeSignature);
     el('authorizeCourseButton').disabled = !state.courses.length;
-    message(state.courses.length ? `${state.courses.length} curso(s) cargado(s). Ya puede autorizar con un solo clic.` : 'No hay cursos asociados a su nombre en el ciclo actual.', !!state.courses.length);
+    message(direction.data?.can_authorize ? 'Puede autorizar GNSS Trimble en el apartado de Dirección o Subdirección de esta página.' : state.courses.length ? `${state.courses.length} curso(s) cargado(s). Ya puede autorizar con un solo clic.` : 'No hay cursos asociados a su nombre en el ciclo actual.', !!state.courses.length || !!direction.data?.can_authorize);
   }
 
   async function authorizeCourse(event) {
@@ -105,6 +110,25 @@
     el('studentSearchForm').reset(); el('individualForm').hidden = true; state.student = null;
     clearSignature();
   }
+
+
+  async function findDirectionBorrower(event){
+    event.preventDefault(); state.directionBorrower=null; el('directionForm').hidden=true;
+    const kind=el('directionKind').value;
+    const {data,error}=await state.client.rpc('public_direction_find_borrower',{p_director_national_id:state.teacherNationalId,p_national_id:cleanId(el('directionBorrowerId').value),p_kind:kind});
+    if(error)return message(error.message); if(!data?.found)return message('Persona no encontrada en el padrón seleccionado.');
+    state.directionBorrower={...data,kind};el('directionBorrowerName').textContent=data.full_name;el('directionForm').hidden=false;
+  }
+  async function authorizeDirection(event){
+    event.preventDefault(); if(!state.directionBorrower)return message('Busque al solicitante.');
+    let signature;try{signature=signatureData()}catch(e){return message(e.message)}
+    const button=el('authorizeDirectionButton');busy(button,true,'Autorizando…');
+    const {error}=await state.client.rpc('public_authorize_direction_equipment',{p_director_national_id:state.teacherNationalId,p_borrower_id:state.directionBorrower.id,p_kind:state.directionBorrower.kind,p_catalog_id:Number(el('directionEquipment').value),p_quantity:Number(el('directionQuantity').value),p_valid_until:new Date(`${el('directionUntil').value}T23:59:59-06:00`).toISOString(),p_reason:el('directionReason').value.trim(),p_signature_data:signature});
+    busy(button,false);if(error)return message(error.message);message('Autorización GNSS Trimble registrada. El solicitante ya puede seleccionar el equipo dentro de la cantidad y fecha autorizadas.',true);clearSignature();el('directionForm').hidden=true;state.directionBorrower=null;
+  }
+  el('directionSearchForm').addEventListener('submit',findDirectionBorrower);
+  el('directionForm').addEventListener('submit',authorizeDirection);
+  el('directionKind').addEventListener('change',()=>{state.directionBorrower=null;el('directionForm').hidden=true});
 
   async function init() {
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) return message('La conexión está pendiente de configuración.');

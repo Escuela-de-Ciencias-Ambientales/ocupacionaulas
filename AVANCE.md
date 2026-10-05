@@ -51,3 +51,18 @@ El usuario mostró una pantalla con etiquetas Django literales (`{% ... %}` y `{
 ## Próximo trabajo
 
 Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DECISIONES.md](DECISIONES.md) antes de modificar datos o pantallas.
+
+## Implementación online — 5 de octubre de 2026
+
+- Migración `20261005173403_equipment_gnss_direction_authorizations` aplicada a Supabase; no se sustituyó el esquema previo.
+- Dirección y Subdirección vinculadas a las dos personas existentes en `teacher_registry`, sin duplicar padrón ni crear cuentas nuevas. Asignación provisional: Vanessa en Dirección y Manfred en Subdirección, editable por superadministración.
+- Aprobación individual con cédula, motivo y firma, usando el proceso docente existente. Cada aprobación cubre una solicitud, un tipo de Trimble, una cantidad máxima y una fecha límite; cualquiera de los dos cargos puede emitirla.
+- Bloqueo en servidor al solicitar, asignar, entregar y editar cantidad o devolución. Los estudiantes conservan el requisito de visto bueno docente; académicos usan el mismo formulario de solicitud y su padrón maestro.
+- Panel separado «Autorizaciones GNSS» con cargos, selección de académicos, aprobaciones, revocación e historial de cargos y firmas. Se conserva el diseño institucional.
+- Excel corregido conciliado: 496 filas, 625 unidades importadas, 15 Trimble TDC6. Se conservaron las 35 unidades y las cuatro solicitudes previas, incluido el préstamo activo: total 660 unidades, 659 disponibles. Activos/series compartidos se conservaron en observaciones, sin inventar identificadores por unidad.
+- Respaldo privado previo fuera del repositorio público. Importación transaccional probada y repetida sin duplicación.
+- Servicio `send-equipment-receipt` versión 6 desplegado para resolver solicitantes académicos. No se enviaron correos de prueba a personas reales.
+- Pruebas SQL transaccionales aprobadas y revertidas: estudiantes y académicos, permisos, ambos cargos, cambio de autoridad, consumo único, cantidades, revocación, entrega, extensión de fecha y consultas de firmas/dashboard. Validación JavaScript y vistas con datos sintéticos aprobadas.
+- Las pruebas con ROLLBACK quedaron registradas por la herramienta de migración remota como entradas sin cambios efectivos; sus archivos locales documentan ese alcance.
+- La ruta pública reportada cargó el acceso institucional correctamente; no se reprodujeron las etiquetas Django. No se afirma una causa de aquella captura.
+- Frontend listo para publicar; la integración y la comprobación final de GitHub Pages se registrarán al finalizar.

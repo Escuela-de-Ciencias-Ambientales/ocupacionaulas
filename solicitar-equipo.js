@@ -34,20 +34,21 @@
       list
         .map(
           (x) =>
-            `<div class="equipment"><div><strong>${x.name}</strong><small>${x.available} disponibles</small></div><div class="quantity"><button type="button" data-id="${x.id}" data-delta="-1" aria-label="Quitar ${x.name}">−</button><output id="qty-${x.id}">${quantities[x.id] || 0}</output><button type="button" data-id="${x.id}" data-delta="1" aria-label="Agregar ${x.name}">+</button></div></div>`,
+            `<div class="equipment"><div><strong>${Sigep.escapeHtml(x.name)}</strong><small>${x.available} disponibles</small>${x.requires_direction?`<small>${x.direction_quantity?`Dirección: hasta ${x.direction_quantity} equipo(s), devolución hasta ${new Date(x.direction_valid_until).toLocaleDateString("es-CR")}`:"GNSS Trimble: requiere autorización de Dirección o Subdirección. No se permite solicitar hasta obtenerla."}</small>`:""}</div><div class="quantity"><button type="button" data-id="${x.id}" data-delta="-1" aria-label="Quitar ${Sigep.escapeHtml(x.name)}">−</button><output id="qty-${x.id}">${quantities[x.id] || 0}</output><button type="button" data-id="${x.id}" data-delta="1" ${x.requires_direction&&!x.direction_quantity?"disabled":""} aria-label="Agregar ${Sigep.escapeHtml(x.name)}">+</button></div></div>`,
         )
         .join("") || '<p style="padding:16px">No se encontraron equipos.</p>';
   }
   async function identify(e) {
     e.preventDefault();
     $("message").hidden = true;
+    $("requestArea").hidden=true; context=null; quantities={}; clearSignature();
     const id = clean($("nationalId").value);
-    const { data, error } = await client.rpc("student_loan_context", {
+    const { data, error } = await client.rpc("public_equipment_loan_context", {
       p_national_id: id,
     });
     if (error) return msg(error.message);
     if (!data?.found)
-      return msg("No encontramos un estudiante registrado con esa cédula.");
+      return msg("No encontramos un estudiante o académico registrado con esa cédula.");
     if (data.blocked_by_outstanding_loan)
       return msg(
         `Tiene un préstamo de equipo pendiente${data.outstanding_request_number ? ` (${data.outstanding_request_number})` : ""}. Por favor, diríjase a la bodega para solventar la situación.`,
@@ -59,6 +60,7 @@
     context = { ...data, nationalId: id };
     quantities = {};
     $("studentName").textContent = data.full_name;
+    $("borrowerLabel").textContent=data.kind==="academic"?"Académico":"Estudiante";
     $("authorization").textContent = `Autorizado: ${data.authorization_label}`;
     $("requestArea").hidden = false;
     requestAnimationFrame(resizeSignature);
@@ -75,9 +77,11 @@
       .filter(([, q]) => q > 0)
       .map(([id, quantity]) => ({ id: Number(id), quantity }));
     if (!items.length) return msg("Seleccione al menos un equipo.");
+    if(items.some(i=>{const x=context.equipment.find(x=>x.id===i.id);return x.requires_direction&&(!x.direction_quantity||i.quantity>x.direction_quantity||new Date(`${$("returnAt").value}T23:59:59-06:00`)>new Date(x.direction_valid_until))})) return msg("GNSS Trimble: requiere autorización vigente de Dirección o Subdirección para la cantidad y fecha de devolución.");
     if (!signatureDrawn) return msg("Firme en el recuadro antes de enviar la solicitud.");
-    const { data, error } = await client.rpc("create_student_loan_request", {
+    const { data, error } = await client.rpc("create_equipment_loan_request", {
       p_national_id: context.nationalId,
+      p_kind: context.kind,
       p_authorization_id: context.authorization_id,
       p_expected_return_at: new Date(`${$("returnAt").value}T23:59:59-06:00`).toISOString(),
       p_items: items,
@@ -97,7 +101,7 @@
       item = context.equipment.find((x) => String(x.id) === id);
     quantities[id] = Math.max(
       0,
-      Math.min(item.available, (quantities[id] || 0) + Number(b.dataset.delta)),
+      Math.min(item.available, item.requires_direction?item.direction_quantity:20, (quantities[id] || 0) + Number(b.dataset.delta)),
     );
     render($("search").value);
   });
