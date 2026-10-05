@@ -70,3 +70,5 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Corregir Regresar superpuesto al enlace de autorización en Bodega; validado en escritorio y móvil.
 
 - [x] Añadir lista filtrada por nombre en autorización GNSS, manteniendo cédula y selección explícita.
+
+- [x] Colocar Autorizar GNSS después de la firma; verificado bloqueo sin firma y envío simulado firmado.

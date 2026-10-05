@@ -111,15 +111,16 @@
       <section class="panel" id="directionPanel" hidden style="grid-column:1/-1">
  <div class="panel-heading"><span class="panel-number">GNSS</span><div><h2>Autorización de Dirección o Subdirección</h2><p>Una aprobación para una solicitud individual, de estudiantes o académicos. Los estudiantes también necesitan el visto bueno docente.</p></div></div>
  <form id="directionSearchForm"><label>Solicitante<select id="directionKind"><option value="student">Estudiante</option><option value="academic">Académico</option></select></label><label>Buscar por nombre<input id="directionBorrowerSearch" type="search" autocomplete="off" maxlength="100" placeholder="Escriba el nombre o los apellidos" aria-describedby="directionSearchStatus"></label><p id="directionSearchStatus" role="status">Escriba al menos 2 letras y seleccione una persona de la lista.</p><ul id="directionSearchResults" class="direction-search-results" aria-label="Solicitantes encontrados" hidden></ul><label>Cédula<input id="directionBorrowerId" inputmode="numeric" required maxlength="20"></label><button class="primary-action" type="submit">Buscar solicitante por cédula</button></form>
- <form id="directionForm" hidden><article class="student-result"><strong id="directionBorrowerName"></strong></article><label>Equipo<select id="directionEquipment" required></select></label><label>Cantidad máxima<input id="directionQuantity" type="number" min="1" max="20" value="1" required></label><label>Fecha límite de devolución<input id="directionUntil" type="date" required></label><label>Motivo<input id="directionReason" minlength="3" maxlength="500" required></label><p>Firme en el recuadro de esta página antes de autorizar.</p><button class="primary-action" id="authorizeDirectionButton" type="submit">Autorizar GNSS Trimble</button></form>
+ <form id="directionForm" hidden><article class="student-result"><strong id="directionBorrowerName"></strong></article><label>Equipo<select id="directionEquipment" required></select></label><label>Cantidad máxima<input id="directionQuantity" type="number" min="1" max="20" value="1" required></label><label>Fecha límite de devolución<input id="directionUntil" type="date" required></label><label>Motivo<input id="directionReason" minlength="3" maxlength="500" required></label><p>Firme en el recuadro de esta página antes de autorizar.</p></form>
  </section>
       <section class="signature-panel" id="signaturePanel">
-        <div><p class="step">Paso final · Firma del profesor</p><h2>Firme para confirmar la autorización</h2><p>Puede firmar con el dedo en el teléfono o con el mouse.</p></div>
+        <div><p class="step">Paso final · Firma de quien autoriza</p><h2>Firme para confirmar la autorización</h2><p>Puede firmar con el dedo en el teléfono o con el mouse.</p></div>
         <div class="signature-box">
           <canvas id="teacherSignature" aria-label="Área para firma táctil"></canvas>
           <div class="signature-actions"><span id="signatureStatus">Firma pendiente</span><button id="clearSignature" type="button">Limpiar firma</button></div>
         </div>
       </section>
+      <div class="direction-submit"><button class="primary-action" id="authorizeDirectionButton" type="submit" form="directionForm">Autorizar GNSS Trimble</button></div>
     </div>
   </main>
 
