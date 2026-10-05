@@ -21,7 +21,10 @@ input:focus,select:focus { border-color:var(--green); outline:3px solid rgba(8,1
 button { width:100%; min-height:50px; margin-top:20px; border:0; border-radius:11px; color:#fff; background:var(--red); font:inherit; font-weight:800; cursor:pointer; }
 button:hover,button:focus-visible { background:var(--red-dark); }
 button:disabled { cursor:not-allowed; opacity:.55; }
+.text-button { min-height:40px; margin-top:10px; color:var(--green); background:transparent; }
+.text-button:hover,.text-button:focus-visible { color:#075c40; background:#eff7f3; }
 .access-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:20px 0; padding:5px; border-radius:12px; background:#f1f5f3; }
+.access-tabs[hidden] { display:none; }
 .tab-button { min-height:42px; margin:0; color:var(--muted); background:transparent; }
 .tab-button:hover,.tab-button:focus-visible { color:var(--ink); background:#fff; }
 .tab-button.is-active { color:#fff; background:var(--green); box-shadow:0 4px 12px rgba(8,122,85,.18); }

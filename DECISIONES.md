@@ -79,3 +79,10 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Bloqueo completo separado del bloqueo anterior de reservas; solo superadministración aplica el nuevo control con motivo e historial.
 - Contraseña inicial ingresada por superadministración, enviada a Auth y limpiada del formulario al cerrar; no se devuelve en detalles ni se almacena en el historial.
 - Las pruebas de creación y ban de Auth usan un proveedor simulado; las transacciones reales de datos se revierten. No se envían correos ni se crean cuentas institucionales de prueba.
+
+## Recuperación y cambio de contraseña
+
+- Las contraseñas continúan administradas exclusivamente por Supabase Auth; no se guardan copias ni tokens de recuperación en tablas propias.
+- La recuperación se inicia con correo institucional y siempre muestra una respuesta neutra. El enlace abre una página propia de EDECA y solo permite cambiar la contraseña cuando Supabase valida la sesión temporal.
+- El remitente institucional acordado para correos de autenticación es `bodegaedeca@gmail.com`. El SMTP de Auth y el correo de comprobantes son integraciones separadas aunque utilicen la misma cuenta.
+- Las personas con sesión activa mantienen la opción existente de cambiar la contraseña sin solicitar correo.

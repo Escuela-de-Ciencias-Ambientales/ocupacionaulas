@@ -80,3 +80,10 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Panel superadministrador: detalle de cuentas registradas, registro individual, bloqueo con motivo, baja y reactivación preservando historial.
 - [x] Validar permisos, bloqueo de cuentas inactivas, ausencia de duplicados del padrón, auditoría y vista móvil.
 - [ ] Verificar la primera alta institucional real durante su uso por superadministración; no se creó una cuenta real de prueba.
+
+## Recuperación de contraseña
+
+- [x] Incorporar solicitud de enlace, pantalla de nueva contraseña y cierre de la sesión temporal.
+- [x] Declarar la URL publicada de restablecimiento para Supabase Auth.
+- [ ] Confirmar en Authentication > Emails > SMTP Settings que el remitente de Auth sea `bodegaedeca@gmail.com`; el SMTP de comprobantes no configura automáticamente el SMTP de Auth.
+- [ ] Tras publicar, solicitar un enlace únicamente para una cuenta institucional de prueba autorizada y verificar remitente, enlace, vencimiento y cambio efectivo.

@@ -114,3 +114,10 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Reforzadas políticas de escritura de aulas/vehículos para cuentas inactivas y el RPC autenticado de bitácora. Administración intermedia conserva sus permisos anteriores y no puede revertir un bloqueo integral.
 - Servicio admin-manage-users versión 6 desplegado con JWT obligatorio. No se registraron ni bloquearon personas reales; pruebas SQL con ROLLBACK y pruebas de Edge/UI con datos sintéticos aprobadas.
 - Edición de académico conserva el identificador del padrón al cambiar correo, manteniendo relaciones de cargos y cursos.
+
+## Recuperación de contraseña institucional — 5 de octubre de 2026
+
+- La pantalla de ingreso incorpora “¿Olvidó su contraseña?” y solicita únicamente el correo institucional. La respuesta es deliberadamente genérica para no revelar si una dirección tiene cuenta.
+- Supabase Auth genera el enlace de recuperación y lo dirige a una nueva pantalla EDECA donde se valida la sesión temporal y se define la contraseña nueva con las mismas reglas del registro.
+- Al completar el cambio se cierra la sesión temporal y la persona vuelve a ingresar normalmente. El cambio voluntario de contraseña dentro de la sesión se conserva sin duplicar credenciales.
+- La URL publicada de restablecimiento quedó declarada entre las redirecciones permitidas del proyecto. El canal SMTP de Auth debe usar `bodegaedeca@gmail.com`; esta configuración es independiente de la función que ya envía comprobantes desde esa cuenta.
