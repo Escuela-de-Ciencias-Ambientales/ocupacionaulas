@@ -40,3 +40,5 @@ Estas propuestas no forman parte del alcance publicado ni habilitan envíos auto
 - Evaluar detección de cambios concurrentes entre operadores para evitar sobrescrituras de registros desactualizados.
 
 Estas mejoras quedan propuestas; la implementación actual guarda explícitamente una fila por vez.
+
+- Evaluar integrar Regresar en las barras de otros módulos si se reportan superposiciones; fuera del alcance de esta corrección.

@@ -11,5 +11,11 @@
     const sameApp = referrer && (location.protocol === 'file:' ? referrer.startsWith('file:') : new URL(referrer).origin === location.origin);
     if (sameApp && history.length > 1) history.back(); else location.href = fallback;
   });
-  document.body.appendChild(button);
+  const warehouseToolbar = page === 'bodega-equipos.html' && document.querySelector('.sigep-module-toolbar');
+  if (warehouseToolbar) {
+    button.classList.add('warehouse-back-button');
+    warehouseToolbar.appendChild(button);
+  } else {
+    document.body.appendChild(button);
+  }
 })();
