@@ -72,3 +72,7 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Añadir lista filtrada por nombre en autorización GNSS, manteniendo cédula y selección explícita.
 
 - [x] Colocar Autorizar GNSS después de la firma; verificado bloqueo sin firma y envío simulado firmado.
+
+- [x] Restringir autorizaciones a sesión institucional, eliminar acceso público y cerrar RPC anónimos y versiones sin firma.
+- [ ] Las autoridades actuales deben completar su registro institucional existente para utilizar autorización GNSS autenticada.
+- Las pruebas GNSS anteriores por cédula sin sesión describen el flujo sustituido; usar equipment_authorization_session.sql para el contrato de identidad vigente.

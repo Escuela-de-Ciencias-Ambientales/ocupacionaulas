@@ -46,3 +46,6 @@ Estas mejoras quedan propuestas; la implementación actual guarda explícitament
 - Considerar extender búsqueda por nombre a autorizaciones docentes individuales en una solicitud futura.
 
 - La firma compartida mantiene una sola acción GNSS después del recuadro; no se propone duplicar firmas para este cambio.
+
+- El acceso con cuenta para autorizaciones deja de ser una propuesta: implementado por instrucción del usuario.
+- Evaluar verificación de propiedad del correo durante el registro institucional en una revisión posterior del alta de cuentas.
