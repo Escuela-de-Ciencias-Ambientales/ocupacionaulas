@@ -53,3 +53,10 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Asignación inicial provisional de los cargos indicada arriba; el usuario confirmó identidades, no el orden de cargos. No afecta al permiso de aprobación, que es equivalente para ambos.
 - Inventario importado por unidades; cantidades agrupadas generan sufijos de unidad en el código, conservando activo/serie original compartido en observaciones. No se borran equipos previos ni se inventan activos.
 - Nuevas tablas con RLS y acceso directo revocado; acceso únicamente mediante RPC explícitos. Los avisos del asesor sobre RLS sin políticas y RPC con SECURITY DEFINER corresponden a este diseño intencional. Advertencias previas de otros módulos quedan fuera de este cambio.
+
+## Edición directa del inventario
+
+- Una fila por unidad; todos sus atributos visibles como controles editables, con guardado explícito por fila para evitar escrituras accidentales mientras se escribe.
+- Catálogo compartido y RPC existentes; los borradores no modifican Supabase hasta Guardar.
+- Tabla compacta con desplazamiento horizontal, código fijo y cabecera fija. Observaciones se amplían al enfocar el campo.
+- Se protegen atributos operativos de unidades prestadas en la interfaz; no se alteran sus asignaciones ni historial.

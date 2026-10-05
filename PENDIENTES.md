@@ -60,3 +60,9 @@ La funcionalidad y la carga están implementadas en Supabase y el frontend fue p
 Pendientes que requieren uso institucional: confirmar quién ocupa cada cargo (ambas personas ya pueden aprobar); revisar con bodega los lotes sin identificación individual y los 35 equipos preexistentes conservados. Verificar el primer comprobante real de académico durante una entrega autorizada; no se enviaron correos de prueba.
 
 La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicada. Si vuelve a ocurrir, registrar la URL completa y la versión de recursos servidos.
+
+## Inventario en tabla editable
+
+- Implementado: edición directa de atributos por fila, filtros, paginación, guardado y descarte sin ventana de edición.
+- Verificado con datos sintéticos: persistencia del guardado mediante el RPC simulado, errores y conservación de borradores; formato compacto en escritorio y móvil.
+- Publicación y recursos servidos: verificar al completar la integración en GitHub Pages. No se realizaron cambios de prueba en el inventario real.

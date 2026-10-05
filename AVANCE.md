@@ -73,3 +73,13 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Se corrigió una vía preexistente en `warehouse_deliver_request` que aceptaba unidades adicionales fuera de los tipos solicitados. Ahora rechaza unidades ajenas o repetidas antes de modificar inventario; migración `20261005174106_gnss_delivery_reject_unrequested_units` aplicada.
 - Recuento después de todas las pruebas: 660 unidades, 659 disponibles, cuatro solicitudes anteriores y cero autorizaciones de prueba. La restricción alcanza exactamente las 15 unidades Trimble TDC6 del Excel.
 - Revisión visual de escritorio y móvil (390 px) aprobada; los Trimble pueden buscarse por «GNSS» o «Trimble», aunque su categoría original diga «recolector de datos portátil».
+
+## Inventario en tabla editable — 5 de octubre de 2026
+
+- Se reemplazaron las tarjetas por tipo por una tabla de equipos individuales, con filtro por tipo, búsqueda y páginas de 25/50/100 filas.
+- Código, tipo, activo, marca, modelo, serie, uso, estado, observaciones y habilitación se editan en su propia fila; Guardar y Descartar funcionan sin ventanas. Agregar equipo conserva el formulario existente.
+- Se reutiliza `warehouse_save_equipment_unit` y sus permisos/validaciones; no se modifica el esquema ni se vuelve a importar inventario.
+- Los borradores permanecen al filtrar, cambiar de página o guardar otra fila. Un error conserva los valores y se muestra en la fila. Borradores temporales en memoria: una recarga los descarta.
+- Tipo, estado y habilitación de unidades con préstamo activo quedan protegidos en la tabla; la devolución se registra mediante el flujo de préstamos.
+- Verificación con datos sintéticos: guardado, descarte, error por identificador repetido, búsqueda, filtro, paginación, conservación de borradores y ausencia de diálogo. Filas normales de aproximadamente 45 px.
+- Revisión visual móvil (390 px): el documento no se desborda; las columnas se desplazan dentro de la tabla. Sintaxis JavaScript y revisión de diferencias aprobadas. Publicación mediante el flujo de GitHub Pages al integrar este cambio.
