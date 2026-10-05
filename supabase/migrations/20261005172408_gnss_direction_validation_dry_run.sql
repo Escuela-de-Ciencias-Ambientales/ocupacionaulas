@@ -1,0 +1,3 @@
+-- Registro remoto de validación transaccional con ROLLBACK.
+-- La prueba no dejó cambios de esquema ni registros funcionales.
+-- La implementación efectiva corresponde a 20261005173403.

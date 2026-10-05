@@ -44,3 +44,12 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - 2026-10-05: se corrigió la suposición de que la copia local era el sistema vigente. El destino es GitHub Pages + Supabase.
 - 2026-10-05: se recuperó la decisión previa de padrón único; se descarta trasladar la lista local de personas como un padrón nuevo.
 - 2026-10-05: las cifras de 625 unidades y 26 pruebas se clasifican como resultados locales, no como evidencia de carga o pruebas de producción.
+
+## Decisiones aplicadas en la versión online
+
+- Aprobación previa individual, igual al flujo público docente por cédula y firma; no se exige una cuenta nueva a las autoridades. La comprobación compara la cédula contra el cargo vigente en servidor. Este flujo identifica por cédula y firma y no autentica una sesión de Dirección.
+- La aprobación se vincula automáticamente al crear la solicitud y no se reutiliza. Cantidad y fecha máxima explícitas, dentro del límite actual de 90 días; no afecta a equipos comunes.
+- Cambiar un cargo requiere superadministración y elegir del padrón activo. El antiguo titular deja de emitir aprobaciones; las anteriores conservan nombre/cargo y vigencia hasta revocación o vencimiento.
+- Asignación inicial provisional de los cargos indicada arriba; el usuario confirmó identidades, no el orden de cargos. No afecta al permiso de aprobación, que es equivalente para ambos.
+- Inventario importado por unidades; cantidades agrupadas generan sufijos de unidad en el código, conservando activo/serie original compartido en observaciones. No se borran equipos previos ni se inventan activos.
+- Nuevas tablas con RLS y acceso directo revocado; acceso únicamente mediante RPC explícitos. Los avisos del asesor sobre RLS sin políticas y RPC con SECURITY DEFINER corresponden a este diseño intencional. Advertencias previas de otros módulos quedan fuera de este cambio.

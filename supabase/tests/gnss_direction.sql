@@ -1,0 +1,60 @@
+-- Ejecutar tras la migración. Todos los datos de prueba se revierten.
+begin;
+do $test$
+declare cat bigint; unitid bigint; teacher public.teacher_registry; otherteacher public.teacher_registry; student public.academic_students; ordinary uuid; grantid uuid; req bigint; itemid bigint; result jsonb; signature text:='data:image/png;base64,'||repeat('A',100); denied boolean; directorid text;
+begin
+select * into teacher from public.teacher_registry where active order by id limit 1;
+select * into otherteacher from public.teacher_registry where active and id<>teacher.id order by id limit 1;
+update public.equipment_direction_roles set teacher_registry_id=teacher.id where role='director';
+directorid:=teacher.national_id;
+insert into public.equipment_catalog(name,requires_direction_approval) values('TEST GNSS rollback',true) returning id into cat;
+insert into public.equipment_units(catalog_id,consecutive_code,brand,model) values(cat,'TEST-GNSS-ROLLBACK','Trimble','TDC6') returning id into unitid;
+denied:=false;begin perform public.create_equipment_loan_request(otherteacher.national_id,'academic',null,now()+interval '1 day',jsonb_build_array(jsonb_build_object('id',cat,'quantity',1)),signature);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL academic missing grant';end if;
+denied:=false;begin perform public.public_authorize_direction_equipment(otherteacher.national_id,otherteacher.id,'academic',cat,1,now()+interval '2 days','test reason',signature);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL unauthorized approver';end if;
+grantid:=public.public_authorize_direction_equipment(directorid,otherteacher.id,'academic',cat,1,now()+interval '2 days','test reason',signature);
+result:=public.create_equipment_loan_request(otherteacher.national_id,'academic',null,now()+interval '1 day',jsonb_build_array(jsonb_build_object('id',cat,'quantity',1)),signature);req:=(result->>'request_id')::bigint;
+if not exists(select 1 from public.equipment_direction_authorizations where id=grantid and used_request_id=req) then raise exception 'FAIL consume';end if;
+denied:=false;begin perform public.create_equipment_loan_request(otherteacher.national_id,'academic',null,now()+interval '1 day',jsonb_build_array(jsonb_build_object('id',cat,'quantity',1)),signature);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL reuse';end if;
+select id into itemid from public.student_loan_request_items where request_id=req;
+denied:=false;begin update public.student_loan_request_items set quantity=2 where id=itemid;exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL quantity';end if;
+update public.student_loan_requests set status='approved' where id=req;
+insert into public.loan_request_unit_assignments(request_item_id,equipment_unit_id) values(itemid,unitid);
+update public.student_loan_requests set status='delivered' where id=req;
+denied:=false;begin update public.student_loan_requests set expected_return_at=now()+interval '3 days' where id=req;exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL extension';end if;
+update public.equipment_direction_authorizations set active=false where id=grantid;
+denied:=false;begin insert into public.loan_request_unit_assignments(request_item_id,equipment_unit_id) values(itemid,unitid);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL revoked';end if;
+update public.equipment_direction_authorizations set active=true,authorized_at=now()-interval '2 days',valid_until=now()-interval '1 day' where id=grantid;
+denied:=false;begin insert into public.loan_request_unit_assignments(request_item_id,equipment_unit_id) values(itemid,unitid);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL expired';end if;
+update public.loan_request_unit_assignments set returned_at=now() where request_item_id=itemid;
+update public.student_loan_requests set status='returned' where id=req;
+select * into student from public.academic_students where active order by id limit 1;
+insert into public.equipment_authorizations(teacher_registry_id,scope,student_id,reason,reason_detail,signature_data) values(teacher.id,'individual',student.id,'other','GNSS rollback test',signature) returning id into ordinary;
+insert into public.student_loan_requests(student_id,authorization_id,expected_return_at) values(student.id,ordinary,now()+interval '1 day') returning id into req;
+denied:=false;begin insert into public.student_loan_request_items(request_id,equipment_catalog_id,quantity) values(req,cat,1);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL student missing direction';end if;
+grantid:=public.public_authorize_direction_equipment(directorid,student.id,'student',cat,1,now()+interval '2 days','test reason',signature);
+insert into public.student_loan_request_items(request_id,equipment_catalog_id,quantity) values(req,cat,1);
+if has_function_privilege('anon','public.warehouse_set_direction_role(text,bigint)','execute') or has_table_privilege('anon','public.equipment_direction_authorizations','select') then raise exception 'FAIL permissions';end if;
+
+perform set_config('request.jwt.claim.sub',(select user_id::text from public.warehouse_staff where active limit 1),true);
+result:=public.warehouse_dashboard_data();
+if not exists(select 1 from jsonb_array_elements(result->'requests') x where (x->>'id')::bigint=(select used_request_id from public.equipment_direction_authorizations where id=grantid)) then raise exception 'FAIL dashboard academic/student visibility';end if;
+perform public.warehouse_request_signatures(req);
+perform set_config('request.jwt.claim.sub',(select id::text from public.profiles where active and role='admin' and admin_scope='superadmin' limit 1),true);
+perform public.warehouse_set_direction_role('deputy',otherteacher.id);
+if public.equipment_direction_role(otherteacher.national_id) is distinct from 'deputy' then raise exception 'FAIL deputy assignment';end if;
+perform public.public_authorize_direction_equipment(otherteacher.national_id,student.id,'student',cat,1,now()+interval '2 days','test deputy',signature);
+perform public.warehouse_set_direction_role('director',null);
+denied:=false;begin perform public.public_authorize_direction_equipment(directorid,student.id,'student',cat,1,now()+interval '2 days','former director',signature);exception when insufficient_privilege then denied:=true;end;
+if not denied then raise exception 'FAIL former director';end if;
+if not exists(select 1 from public.equipment_direction_role_history where role='director' and previous_teacher_id=teacher.id) then raise exception 'FAIL role history';end if;
+
+end $test$;
+rollback;
