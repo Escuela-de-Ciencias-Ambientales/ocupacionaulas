@@ -92,3 +92,8 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Lista filtrada mientras se escribe nombre/apellidos, estudiantes y académicos; selección completa cédula y solicitante.
 - RPC limitado a 30 coincidencias activas y consulta mínima de dos caracteres, normalizada sin tildes; conserva comprobación del cargo vigente y permisos explícitos.
 - Pruebas de consulta real sin escrituras: ambos padrones, nombres sin tildes, vacío, sin resultados y rechazo de autoridad inválida. Pruebas UI sintéticas: selección, cambio de padrón, limpieza de selección, móvil y cédula aprobadas.
+
+## Botón GNSS después de la firma — 5 de octubre de 2026
+- Acción de autorización reubicada después del panel de firma, vinculada al formulario original para conservar sus campos obligatorios.
+- Se muestra únicamente con solicitante seleccionado; se oculta al cambiar la selección o completar autorización. Etiqueta de firma compartida adaptada a quien autoriza.
+- Verificado con datos sintéticos: orden en 1440/390 px, bloqueo sin firma y aprobación simulada con firma. Sin escrituras reales.

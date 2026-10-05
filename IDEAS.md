@@ -44,3 +44,5 @@ Estas mejoras quedan propuestas; la implementación actual guarda explícitament
 - Evaluar integrar Regresar en las barras de otros módulos si se reportan superposiciones; fuera del alcance de esta corrección.
 
 - Considerar extender búsqueda por nombre a autorizaciones docentes individuales en una solicitud futura.
+
+- La firma compartida mantiene una sola acción GNSS después del recuadro; no se propone duplicar firmas para este cambio.

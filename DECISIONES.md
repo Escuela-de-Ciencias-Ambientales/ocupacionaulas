@@ -64,3 +64,5 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Regresar en Bodega ocupa espacio en la barra de módulos; ajuste limitado a esta página para preservar las demás pantallas.
 
 - Búsqueda GNSS por nombre consulta el padrón en servidor tras 250 ms; no descarga el padrón completo. Al modificar texto o tipo se invalida la selección y se descartan respuestas antiguas.
+
+- Autorizar GNSS se ubica después de la firma compartida; atributo form conserva envío y validación del formulario original.

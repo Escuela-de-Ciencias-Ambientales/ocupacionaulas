@@ -54,6 +54,9 @@ legend { margin-bottom:8px; }
 .message.is-success { color:#0e5936; background:var(--green-soft); border-color:#a8d4bb; }
 button:disabled { opacity:.6; cursor:wait; }
 [hidden] { display:none !important; }
+.direction-submit { display:none; grid-column:1/-1; }
+.authorization-grid:has(#directionForm:not([hidden])) > .direction-submit { display:block; }
+.direction-submit .primary-action { width:100%; }
 .direction-search-results { list-style:none; margin:0 0 16px; padding:0; max-height:280px; overflow-y:auto; border:1px solid #b9cbc4; border-radius:12px; }
 .direction-search-results li + li { border-top:1px solid #d7e2de; }
 #directionSearchResults button { display:block; width:100%; padding:12px 16px; border:0; border-radius:0; background:#fff; color:var(--ink); text-align:left; white-space:normal; overflow-wrap:anywhere; }
