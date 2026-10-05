@@ -60,3 +60,5 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Catálogo compartido y RPC existentes; los borradores no modifican Supabase hasta Guardar.
 - Tabla compacta con desplazamiento horizontal, código fijo y cabecera fija. Observaciones se amplían al enfocar el campo.
 - Se protegen atributos operativos de unidades prestadas en la interfaz; no se alteran sus asignaciones ni historial.
+
+- Regresar en Bodega ocupa espacio en la barra de módulos; ajuste limitado a esta página para preservar las demás pantallas.

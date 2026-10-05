@@ -83,3 +83,7 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Tipo, estado y habilitación de unidades con préstamo activo quedan protegidos en la tabla; la devolución se registra mediante el flujo de préstamos.
 - Verificación con datos sintéticos: guardado, descarte, error por identificador repetido, búsqueda, filtro, paginación, conservación de borradores y ausencia de diálogo. Filas normales de aproximadamente 45 px.
 - Revisión visual móvil (390 px): el documento no se desborda; las columnas se desplazan dentro de la tabla. Sintaxis JavaScript y revisión de diferencias aprobadas. Publicado mediante PR #32, commit `ca71f000`, ejecución exitosa `37360354731`; tabla y recursos nuevos comprobados online.
+
+## Botón Regresar en Bodega — 5 de octubre de 2026
+- Integrado en la barra de módulos, conservando color y forma. Ya no se posiciona encima del contenido.
+- Verificado con una vista sintética de Dirección en 1440 y 390 px: posición estática y sin intersección con el enlace de autorización. Sintaxis JavaScript y diff aprobados.

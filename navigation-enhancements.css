@@ -38,3 +38,14 @@ body:has(.sigep-private-header) .global-back-button { top: 196px; }
 }
 @media (max-width: 600px) { .global-back-button { top: 92px; right: 10px; min-height: 42px; padding: 8px 14px; font-size: 14px; } body:has(.sigep-private-header) .global-back-button { top: 164px; } }
 @media print { .global-back-button { display: none !important; } }
+
+/* Bodega: reservar espacio en la barra de módulos, sin cubrir las vistas. */
+.sigep-module-toolbar:has(.warehouse-back-button) { flex-wrap: wrap; gap: 10px; }
+.sigep-module-toolbar .warehouse-back-button {
+  position: static;
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 8px 14px;
+  font-size: 14px;
+  box-shadow: none;
+}
