@@ -97,3 +97,11 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Acción de autorización reubicada después del panel de firma, vinculada al formulario original para conservar sus campos obligatorios.
 - Se muestra únicamente con solicitante seleccionado; se oculta al cambiar la selección o completar autorización. Etiqueta de firma compartida adaptada a quien autoriza.
 - Verificado con datos sintéticos: orden en 1440/390 px, bloqueo sin firma y aprobación simulada con firma. Sin escrituras reales.
+
+## Autorizaciones con sesión institucional — 5 de octubre de 2026
+- Se retira el enlace público y la entrada de cédula del autorizador. Desde el panel privado, la cuenta inicia la página con su sesión compartida y carga automáticamente su identidad y cursos.
+- Servidor exige auth.uid, perfil activo y vínculo por correo de Auth al padrón académico activo. No confía en la cédula enviada ni en metadatos editables. GNSS conserva cargo vigente y firma obligatoria.
+- Revocado EXECUTE anónimo de consultas/autorizaciones y acceso a versiones antiguas sin firma. Bodega conserva sus RPC administrativos.
+- Pruebas SQL con ROLLBACK: permisos, identidad ajena, cuenta inactiva, firma/identidad guardada, cursos y cargo GNSS. Pruebas UI sintéticas: inicio automático, búsqueda, firma, móvil, ausencia/cierre de sesión y redirección aprobadas.
+- Asesores: RPC SECURITY DEFINER autenticados intencionales con guardas explícitas; comprobación directa confirma ausencia de acceso anon a toda autorización. No se cambiaron préstamos ni autorizaciones históricas.
+- Las dos autoridades actuales están en padrón con correo, pero no tienen cuenta activa vinculada. Deben completar el registro institucional existente; no se crean contraseñas ni cuentas ficticias.

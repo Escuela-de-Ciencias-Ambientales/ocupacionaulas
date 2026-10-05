@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
   <title>Autorización de equipos | EDECA</title>
   <meta name="description" content="Autorización docente de préstamos de equipo para cursos y estudiantes de EDECA." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,24 +39,14 @@
         <h1>Autorización de préstamo de equipos</h1>
         <p>Autoriza a todo un curso o a un estudiante particular desde esta misma pantalla.</p>
       </div>
-      <div class="session-card"><span>Profesor</span><strong id="teacherName">Ingrese su cédula</strong></div>
+      <div class="session-card"><span>Profesor</span><strong id="teacherName">Comprobando sesión…</strong></div>
     </section>
 
     <div class="message" id="pageMessage" role="status" aria-live="polite" hidden></div>
 
     <section class="identity-card" aria-labelledby="identityTitle">
-      <div>
-        <p class="step">Paso único</p>
-        <h2 id="identityTitle">Ingrese su cédula</h2>
-        <p>Con ella cargaremos sus cursos y, si ocupa Dirección o Subdirección, el control especial de GNSS Trimble.</p>
-      </div>
-      <form id="identityForm" class="identity-form">
-        <label for="teacherId">Cédula del profesor</label>
-        <div class="input-action">
-          <input id="teacherId" name="teacherId" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="Ej.: 101230456" required />
-          <button type="submit" id="loadCoursesButton">Cargar mis autorizaciones</button>
-        </div>
-      </form>
+      <div><p class="step">Acceso privado</p><h2 id="identityTitle">Autorizaciones de su cuenta</h2><p>Sus cursos y permisos se cargan desde su sesión institucional.</p></div>
+      <a class="back-link" href="reservas.html">Volver al panel</a>
     </section>
 
     <div class="authorization-grid" id="authorizationArea" hidden>

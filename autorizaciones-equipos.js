@@ -45,17 +45,12 @@
 
   async function loadCourses(event) {
     resetDirectionSearch();
-    event.preventDefault(); clearMessage(); el('authorizationArea').hidden=true;el('directionPanel').hidden=true;el('directionForm').hidden=true;state.directionBorrower=null;clearSignature();
-    const nationalId = cleanId(el('teacherId').value);
-    if (nationalId.length < 7) return message('Revise el número de cédula.');
-    const button = el('loadCoursesButton'); busy(button, true, 'Cargando…');
-    const { data, error } = await state.client.rpc('public_equipment_teacher_context', { p_national_id:nationalId });
-    busy(button, false);
-    if (error) return message(friendly(error));
-    if (!data?.found) return message('No se encontró un profesor activo con esa cédula. Solicite a la administración que revise el registro docente.');
-    state.teacherNationalId = nationalId;
-    const direction=await state.client.rpc('public_equipment_direction_context',{p_national_id:nationalId});
-    if(direction.error)return message(direction.error.message);
+    event?.preventDefault(); clearMessage(); el('authorizationArea').hidden=true;el('directionPanel').hidden=true;el('directionForm').hidden=true;state.directionBorrower=null;clearSignature();
+    const { data, error } = await state.client.rpc('equipment_authorization_session_context');
+    if (error) { el('teacherName').textContent='Acceso no habilitado'; return message(friendly(error)); }
+    if (!data?.found) return message('Su cuenta no está vinculada a un académico activo. Solicite a la administración que revise el registro docente.');
+    state.teacherNationalId = data.national_id;
+    const direction={data:data.direction};
     el('directionPanel').hidden=!direction.data?.can_authorize;
     el('directionEquipment').innerHTML=(direction.data?.equipment||[]).map(x=>`<option value="${x.id}">${Sigep.escapeHtml(x.name)}</option>`).join('');
     el('directionUntil').value=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'America/Costa_Rica'}).format(new Date(Date.now()+7*86400000));
@@ -181,10 +176,19 @@
 
   async function init() {
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) return message('La conexión está pendiente de configuración.');
-    state.client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth:{ persistSession:false, autoRefreshToken:false, detectSessionInUrl:false } });
+    try {
+      state.client = Sigep.getClient();
+      const session = await Sigep.requireSession('ingreso.html?return=autorizaciones-equipos.html');
+      if (!session) return;
+      const {data,error} = await state.client.auth.getUser();
+      if(error || !data?.user) { location.replace('ingreso.html?return=autorizaciones-equipos.html'); return; }
+      state.client.auth.onAuthStateChange((event)=>{
+        if(event==='SIGNED_OUT') { el('authorizationArea').hidden=true;resetDirectionSearch();clearSignature();location.replace('ingreso.html?return=autorizaciones-equipos.html'); }
+      });
+      await loadCourses();
+    } catch(error) { message(friendly(error)); }
   }
 
-  el('identityForm').addEventListener('submit', loadCourses);
   el('courseForm').addEventListener('submit', authorizeCourse);
   el('studentSearchForm').addEventListener('submit', findStudent);
   el('individualForm').addEventListener('submit', authorizeStudent);

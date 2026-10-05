@@ -281,6 +281,8 @@
     elements.headerAccount.hidden = !loggedIn;
     elements.userView.hidden = !loggedIn; elements.scheduleBrowser.hidden = !loggedIn; elements.adminPanel.hidden = !loggedIn || !isAdmin();
     elements.manageUsersLink.hidden = !loggedIn || !isAdmin();
+    const authorizationNav = document.getElementById('equipmentAuthorizationNav');
+    if (authorizationNav) authorizationNav.hidden = !loggedIn || !state.profile?.active;
     if (!loggedIn) return;
     elements.currentUserName.textContent = state.profile.full_name;
     elements.currentUserRole.textContent = isSuperadmin() ? 'Superadministrador'

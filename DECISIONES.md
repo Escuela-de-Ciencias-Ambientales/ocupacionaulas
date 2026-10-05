@@ -66,3 +66,9 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Búsqueda GNSS por nombre consulta el padrón en servidor tras 250 ms; no descarga el padrón completo. Al modificar texto o tipo se invalida la selección y se descartan respuestas antiguas.
 
 - Autorizar GNSS se ubica después de la firma compartida; atributo form conserva envío y validación del formulario original.
+
+## Sustitución del acceso por cédula — 5 de octubre de 2026
+- Por instrucción del usuario, el flujo público por cédula documentado antes queda sustituido por usuario/correo y contraseña del acceso institucional existente.
+- La identidad se deriva de auth.uid y correo de Auth, vinculado al padrón; los parámetros de cédula de RPC por compatibilidad deben coincidir con esa identidad.
+- Autorización GNSS exige además que ese académico ocupe Dirección/Subdirección actualmente. Las autorizaciones previas mantienen validez/historial; no se revocan en bloque.
+- Se conserva el mecanismo de registro institucional existente. Este cambio protege las autorizaciones; no rediseña el alta de cuentas.
