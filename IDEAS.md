@@ -33,3 +33,10 @@ No convertir recomendaciones históricas de hardware en selecciones de compra vi
 - Evaluar avisos de aprobación pendientes y filtros del historial si crece el volumen; requieren definir canal y destinatarios.
 
 Estas propuestas no forman parte del alcance publicado ni habilitan envíos automáticos.
+
+## Ideas posteriores para la tabla de inventario
+
+- Evaluar guardar varias filas seleccionadas en una operación si el uso real lo requiere.
+- Evaluar detección de cambios concurrentes entre operadores para evitar sobrescrituras de registros desactualizados.
+
+Estas mejoras quedan propuestas; la implementación actual guarda explícitamente una fila por vez.

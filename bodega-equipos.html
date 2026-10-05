@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="sigep-brand.css?v=3" />
   <link rel="stylesheet" href="visual-system.css?v=3" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=3" />
+  <link rel="stylesheet" href="inventory-table.css?v=1" />
 </head>
   <body>
     <section id="loadingView" class="warehouse-loading"><div><img class="sigep-loading-logo" src="sigep-logo.png" alt="SIGEP" /><strong>Cargando Bodega…</strong></div></section>
@@ -69,9 +70,11 @@
         </section>
 
         <section id="equipmentView" class="view" hidden>
-          <div class="page-heading"><div><p class="eyebrow">Control de existencias</p><h1>Inventario por tipo</h1><span>La disponibilidad se calcula automáticamente con los equipos individuales.</span></div><button id="newEquipment">＋ Agregar equipo individual</button></div>
-          <div id="equipmentGrid" class="equipment-grid"></div>
-          <section id="unitDetail" class="unit-detail" hidden><div class="inventory-detail-heading"><div><h2 id="unitDetailTitle">Equipos</h2><span id="unitDetailCount"></span></div><label class="inventory-unit-filter"><span>Filtrar equipos</span><input id="unitSearch" type="search" placeholder="Código, activo, marca, modelo o serie" /></label></div><div class="table-wrap"><table><thead><tr><th>Código</th><th>Activo</th><th>Marca / modelo</th><th>Serie</th><th>Estado</th><th>Observaciones</th><th></th></tr></thead><tbody id="unitRows"></tbody></table></div></section>
+          <div class="page-heading"><div><p class="eyebrow">Control de existencias</p><h1>Inventario de equipos</h1><span>La disponibilidad se calcula automáticamente con los equipos individuales.</span></div><button id="newEquipment">＋ Agregar equipo individual</button></div>
+          <div id="equipmentGrid" class="inventory-toolbar"><label>Tipo de equipo<select id="unitTypeFilter"><option value="">Todos los tipos</option></select></label><label>Buscar equipo<input id="unitSearch" type="search" placeholder="Código, activo, tipo, marca, modelo, serie o uso" /></label><label>Filas por página<select id="inventoryPageSize"><option>25</option><option selected>50</option><option>100</option></select></label></div>
+          <p class="inventory-help">Edite los campos en la fila y pulse Guardar. Los cambios sin guardar se conservan al filtrar o cambiar de página. El tipo, estado y activación de equipos prestados se conservan hasta registrar su devolución.</p>
+          <datalist id="inventoryTypeOptions"></datalist>
+          <section id="unitDetail" class="unit-detail inventory-detail"><div class="inventory-detail-heading"><div><h2 id="unitDetailTitle">Equipos individuales</h2><span id="unitDetailCount" aria-live="polite"></span></div><div class="inventory-pager"><button id="inventoryPrev" type="button">← Anterior</button><span id="inventoryPageLabel"></span><button id="inventoryNext" type="button">Siguiente →</button></div></div><div class="table-wrap inventory-table-wrap"><table class="inventory-table"><thead><tr><th>Código</th><th>Tipo</th><th>Activo</th><th>Marca</th><th>Modelo</th><th>Serie</th><th>Uso</th><th>Estado</th><th>Observaciones</th><th>Habilitado</th><th>Cambios</th></tr></thead><tbody id="unitRows"></tbody></table></div></section>
         </section>
 
         <section id="loansView" class="view" hidden>
