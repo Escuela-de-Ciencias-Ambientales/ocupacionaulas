@@ -65,4 +65,11 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Pruebas SQL transaccionales aprobadas y revertidas: estudiantes y académicos, permisos, ambos cargos, cambio de autoridad, consumo único, cantidades, revocación, entrega, extensión de fecha y consultas de firmas/dashboard. Validación JavaScript y vistas con datos sintéticos aprobadas.
 - Las pruebas con ROLLBACK quedaron registradas por la herramienta de migración remota como entradas sin cambios efectivos; sus archivos locales documentan ese alcance.
 - La ruta pública reportada cargó el acceso institucional correctamente; no se reprodujeron las etiquetas Django. No se afirma una causa de aquella captura.
-- Frontend listo para publicar; la integración y la comprobación final de GitHub Pages se registrarán al finalizar.
+- Frontend publicado mediante PR #30, commit `ffdb3f1a`, con GitHub Pages finalizado correctamente (ejecución `37350146714`). El navegador online cargó los nuevos recursos y el formulario GNSS de Dirección desde Supabase.
+
+### Verificación final
+
+- Pruebas integrales de los RPC existentes aprobadas con ROLLBACK: solicitud común de académico, solicitud mixta, solicitud estudiantil con ambas aprobaciones, aprobación por Subdirección, entrega y devolución parcial/completa. No quedaron autorizaciones ni préstamos de prueba en producción.
+- Se corrigió una vía preexistente en `warehouse_deliver_request` que aceptaba unidades adicionales fuera de los tipos solicitados. Ahora rechaza unidades ajenas o repetidas antes de modificar inventario; migración `20261005174106_gnss_delivery_reject_unrequested_units` aplicada.
+- Recuento después de todas las pruebas: 660 unidades, 659 disponibles, cuatro solicitudes anteriores y cero autorizaciones de prueba. La restricción alcanza exactamente las 15 unidades Trimble TDC6 del Excel.
+- Revisión visual de escritorio y móvil (390 px) aprobada; los Trimble pueden buscarse por «GNSS» o «Trimble», aunque su categoría original diga «recolector de datos portátil».

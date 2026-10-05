@@ -34,15 +34,15 @@ El informe local contiene 153 incidencias de unidades; son anotaciones generadas
 
 ## Verificación y publicación
 
-- [ ] Probar estudiantes y académicos, con equipos comunes, Trimble y solicitudes mixtas.
-- [ ] Probar aprobación por director y por subdirector; rechazar a cualquier otro usuario.
-- [ ] Probar cambio de cargos y conservación del historial.
-- [ ] Probar ausencia, revocación y vencimiento de autorización según el alcance adoptado.
-- [ ] Probar selección, asignación física, entrega, devolución parcial y completa y edición administrativa.
-- [ ] Revisar escritorio y móvil; conservar logos, tipografía, colores y separación visual.
-- [ ] Verificar seguridad de tablas, RPC, firmas y datos personales.
-- [ ] Confirmar que aulas y vehículos continúan funcionando.
-- [ ] Publicar cambios del frontend y migraciones/servicios necesarios; esperar resultado de GitHub Pages.
+- [x] Probar estudiantes y académicos, con equipos comunes, Trimble y solicitudes mixtas.
+- [x] Probar aprobación por director y por subdirector; rechazar a cualquier otro usuario.
+- [x] Probar cambio de cargos y conservación del historial.
+- [x] Probar ausencia, revocación y vencimiento de autorización según el alcance adoptado.
+- [x] Probar selección, asignación física, entrega, devolución parcial/completa y controles de cantidad y extensión de fecha.
+- [x] Revisar escritorio y móvil; conservar logos, tipografía, colores y separación visual.
+- [x] Verificar seguridad de tablas, RPC, firmas y datos personales; revisar asesores y el alcance del proceso público actual.
+- [x] Verificar carga pública de aulas y vehículos (HTTP 200); sus archivos no se modificaron. No se realizaron reservas reales de prueba.
+- [x] Publicar cambios del frontend y migraciones/servicios necesarios; GitHub Pages completado correctamente.
 - [ ] Verificar la URL pública y datos reales, sin afirmar despliegue por pruebas locales.
 - [ ] Actualizar AVANCE, DECISIONES y este archivo con evidencia y fecha.
 
@@ -55,7 +55,7 @@ El informe local contiene 153 incidencias de unidades; son anotaciones generadas
 
 ## Estado después de implementar
 
-La funcionalidad y la carga están implementadas en Supabase. Antes de cerrar publicación: verificar GitHub Pages con los nuevos recursos y registrar el resultado. Los criterios anteriores son requisitos de cierre; la evidencia actual y los límites de pruebas están en AVANCE.md.
+La funcionalidad y la carga están implementadas en Supabase y el frontend fue publicado y verificado en GitHub Pages. Los criterios anteriores son requisitos de cierre; la evidencia actual y los límites de pruebas están en AVANCE.md.
 
 Pendientes que requieren uso institucional: confirmar quién ocupa cada cargo (ambas personas ya pueden aprobar); revisar con bodega los lotes sin identificación individual y los 35 equipos preexistentes conservados. Verificar el primer comprobante real de académico durante una entrega autorizada; no se enviaron correos de prueba.
 
