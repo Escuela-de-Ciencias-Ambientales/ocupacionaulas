@@ -87,3 +87,27 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Declarar la URL publicada de restablecimiento para Supabase Auth.
 - [ ] Confirmar en Authentication > Emails > SMTP Settings que el remitente de Auth sea `bodegaedeca@gmail.com`; el SMTP de comprobantes no configura automáticamente el SMTP de Auth.
 - [ ] Tras publicar, solicitar un enlace únicamente para una cuenta institucional de prueba autorizada y verificar remitente, enlace, vencimiento y cambio efectivo.
+
+## Mejoras pendientes de inventario y solicitudes
+
+### Inventario y calidad de datos
+
+- [ ] Convertir el filtro **Tipo de equipo** en un campo con búsqueda por escritura, manteniendo selección de categorías normalizadas.
+- [ ] Revisar y conciliar las cantidades reales por categoría y por unidad antes de corregir datos en producción.
+- [ ] Estandarizar las categorías del inventario. Unificar las dos categorías actuales de cámaras bajo **Cámaras microscópicas**, previa revisión de los registros afectados.
+- [ ] Auditar posibles equipos duplicados por combinación de código, activo institucional, serie, marca y modelo. No eliminar automáticamente: distinguir duplicados reales de unidades legítimamente repetidas.
+- [ ] Incorporar las cintas métricas faltantes y verificar su cantidad, códigos, activos y demás atributos antes de la carga.
+- [ ] Crear un cuadro de mando con el resumen del inventario por categoría: total registrado, disponible, prestado, inactivo y en mantenimiento.
+
+### Tabla y administración de equipos
+
+- [ ] Permitir ordenar la tabla por código, tipo, activo institucional, marca y modelo.
+- [ ] Optimizar anchos de columnas para evitar texto oculto y espacio desperdiciado; admitir ajuste de ancho cuando sea viable y conservar desplazamiento horizontal en pantallas pequeñas.
+- [ ] Mantener la opción de agregar manualmente una unidad específica con todos sus atributos y validación contra duplicados.
+- [ ] Agregar eliminación permanente de una unidad particular solo para superadministración, con confirmación explícita, motivo y auditoría. Bloquearla si la unidad tiene préstamos o referencias históricas; en esos casos usar baja/inactivación para conservar trazabilidad.
+
+### Solicitud, autorización y teléfonos
+
+- [ ] Verificar y ajustar de extremo a extremo que la solicitud de equipos y las autorizaciones sean responsivas y utilizables desde teléfonos: formularios, firma táctil, listas, botones, mensajes y confirmaciones.
+- [ ] Añadir en la vista del estudiante un filtro por categoría de equipo, compatible con la búsqueda por nombre y las cantidades solicitadas.
+- [ ] Probar los flujos móviles en anchos representativos y documentar evidencia antes de marcarlos como terminados.
