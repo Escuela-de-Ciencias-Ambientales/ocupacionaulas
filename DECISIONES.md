@@ -72,3 +72,10 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - La identidad se deriva de auth.uid y correo de Auth, vinculado al padrón; los parámetros de cédula de RPC por compatibilidad deben coincidir con esa identidad.
 - Autorización GNSS exige además que ese académico ocupe Dirección/Subdirección actualmente. Las autorizaciones previas mantienen validez/historial; no se revocan en bloque.
 - Se conserva el mecanismo de registro institucional existente. Este cambio protege las autorizaciones; no rediseña el alta de cuentas.
+
+## Gestión integral de usuarios
+- El registro activo se basa en profiles/Auth y el padrón único teacher_registry. No se crea un padrón paralelo.
+- Eliminar retira el acceso activo y bloquea Auth; la fila histórica y relaciones permanecen para no perder préstamos, firmas ni reservas. Se puede reactivar desde el mismo panel.
+- Bloqueo completo separado del bloqueo anterior de reservas; solo superadministración aplica el nuevo control con motivo e historial.
+- Contraseña inicial ingresada por superadministración, enviada a Auth y limpiada del formulario al cerrar; no se devuelve en detalles ni se almacena en el historial.
+- Las pruebas de creación y ban de Auth usan un proveedor simulado; las transacciones reales de datos se revierten. No se envían correos ni se crean cuentas institucionales de prueba.

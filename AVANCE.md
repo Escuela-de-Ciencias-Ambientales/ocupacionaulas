@@ -105,3 +105,12 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Pruebas SQL con ROLLBACK: permisos, identidad ajena, cuenta inactiva, firma/identidad guardada, cursos y cargo GNSS. Pruebas UI sintéticas: inicio automático, búsqueda, firma, móvil, ausencia/cierre de sesión y redirección aprobadas.
 - Asesores: RPC SECURITY DEFINER autenticados intencionales con guardas explícitas; comprobación directa confirma ausencia de acceso anon a toda autorización. No se cambiaron préstamos ni autorizaciones históricas.
 - Las dos autoridades actuales están en padrón con correo, pero no tienen cuenta activa vinculada. Deben completar el registro institucional existente; no se crean contraseñas ni cuentas ficticias.
+
+## Panel de usuarios del superadministrador — 5 de octubre de 2026
+- Usuarios registrados en tabla con búsqueda, estados y paginación; añadido detalle de identidad, unidad, acceso, registro, último ingreso, confirmación de correo, bloqueo/baja e historial de acciones.
+- Registrar usuario individual con correo institucional, cédula, unidad, acceso y contraseña inicial. Puede seleccionar un académico pendiente del padrón o incorporar uno nuevo. Finalización transaccional reutiliza su identidad existente; compensación si falla después de crear Auth.
+- Bloquear cuenta completa con motivo, desbloquear, retirar del registro activo y reactivar. Se conserva historial y referencias; Auth bloquea futuros ingresos y servidor rechaza operaciones con perfil inactivo.
+- Histórico privado con RLS y RPC exclusivos de superadministración; autobloqueo protegido, último superadministrador protegido y cambios de acceso serializados.
+- Reforzadas políticas de escritura de aulas/vehículos para cuentas inactivas y el RPC autenticado de bitácora. Administración intermedia conserva sus permisos anteriores y no puede revertir un bloqueo integral.
+- Servicio admin-manage-users versión 6 desplegado con JWT obligatorio. No se registraron ni bloquearon personas reales; pruebas SQL con ROLLBACK y pruebas de Edge/UI con datos sintéticos aprobadas.
+- Edición de académico conserva el identificador del padrón al cambiar correo, manteniendo relaciones de cargos y cursos.

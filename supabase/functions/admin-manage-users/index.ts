@@ -58,6 +58,25 @@ Deno.serve(async (request) => {
 
     const payload = await request.json();
     const action = String(payload.action || '');
+    const callerIsSuperadmin = caller.admin_scope === 'superadmin';
+    if (action === 'create') {
+      if (!callerIsSuperadmin) return response({ok:false,error:'Solo superadministración puede registrar usuarios.'},403);
+      const fullName=String(payload.fullName||'').trim(), nationalId=String(payload.nationalId||'').replace(/\D/g,''), email=String(payload.email||'').trim().toLowerCase(), unit=String(payload.unit||''), accessType=String(payload.accessType||'teacher'), password=String(payload.password||'');
+      if(fullName.length<3||fullName.length>100||nationalId.length<7||nationalId.length>20||!teacherEmailPattern.test(email)||!allowedUnits.has(unit)||!['teacher','reservation_admin','operations_admin','superadmin'].includes(accessType)) return response({ok:false,error:'Revise nombre, cédula, correo institucional, unidad y acceso.'},400);
+      if(!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) return response({ok:false,error:'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.'},400);
+      const duplicates=await Promise.all([adminClient.from('profiles').select('id').eq('email',email).limit(1),adminClient.from('profiles').select('id').eq('national_id',nationalId).limit(1)]);
+      const lookupError=duplicates.find(x=>x.error)?.error;
+      if(lookupError)return response({ok:false,error:lookupError.message},400);
+      if(duplicates.some(x=>x.data?.length))return response({ok:false,error:'Correo o cédula ya registrados. Edite o reactive la cuenta existente.'},409);
+      const {data:created,error:createError}=await adminClient.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{full_name:fullName,unit}});
+      if(createError||!created.user)return response({ok:false,error:createError?.message||'No se pudo crear la cuenta.'},400);
+      const {error:finalizeError}=await callerClient.rpc('superadmin_finalize_user',{p_user_id:created.user.id,p_name:fullName,p_national_id:nationalId,p_email:email,p_unit:unit,p_access:accessType});
+      if(finalizeError){
+        const {error:cleanupError}=await adminClient.auth.admin.deleteUser(created.user.id);
+        return response({ok:false,error:finalizeError.message+(cleanupError?' La cuenta recién creada requiere revisión administrativa.':'')},400);
+      }
+      return response({ok:true,message:'Usuario registrado. Ya puede ingresar con su correo y contraseña.',userId:created.user.id});
+    }
     const targetId = String(payload.userId || '');
     if (!targetId) return response({ ok: false, error: 'Selecciona un usuario.' }, 400);
 
@@ -68,13 +87,30 @@ Deno.serve(async (request) => {
       .single();
     if (targetError || !target) return response({ ok: false, error: 'El usuario no existe.' }, 404);
 
-    const callerIsSuperadmin = caller.admin_scope === 'superadmin';
     const targetIsSuperadmin = target.role === 'admin' && target.admin_scope === 'superadmin';
     if (!callerIsSuperadmin && targetIsSuperadmin) {
       return response({ ok: false, error: 'El superadministrador solo puede ser modificado por otro superadministrador.' }, 403);
     }
     if (!callerIsSuperadmin && target.role === 'admin' && target.id !== caller.id) {
       return response({ ok: false, error: 'No puedes modificar la cuenta de otro administrador de reservas.' }, 403);
+    }
+    if(!callerIsSuperadmin && (target.access_blocked || target.access_removed_at))return response({ok:false,error:'Esta cuenta requiere gestión del superadministrador.'},403);
+
+    if(action==='detail') {
+      if(!callerIsSuperadmin)return response({ok:false,error:'Solo superadministración puede ver el detalle completo.'},403);
+      const {data:account,error}=await adminClient.auth.admin.getUserById(target.id);
+      if(error)return response({ok:false,error:error.message},400);
+      const {data:history,error:historyError}=await callerClient.rpc('superadmin_user_history',{p_user_id:target.id});
+      if(historyError)return response({ok:false,error:historyError.message},400);
+      return response({ok:true,detail:{...target,registered_at:account.user.created_at,last_sign_in_at:account.user.last_sign_in_at,email_confirmed_at:account.user.email_confirmed_at,banned_until:account.user.banned_until,history}});
+    }
+    if(['access_block','access_unblock','access_remove','access_restore'].includes(action)){
+      if(!callerIsSuperadmin)return response({ok:false,error:'Solo superadministración puede administrar el acceso completo.'},403);
+      const {error}=await callerClient.rpc('superadmin_set_user_access',{p_user_id:target.id,p_action:action,p_reason:String(payload.reason||'').trim()});
+      if(error)return response({ok:false,error:error.message},400);
+      const {error:banError}=await adminClient.auth.admin.updateUserById(target.id,{ban_duration:['access_block','access_remove'].includes(action)?'876000h':'none'});
+      if(banError)return response({ok:false,error:'El estado de acceso fue actualizado, pero Auth no pudo sincronizarse. Repita la acción: '+banError.message},500);
+      return response({ok:true,message:action==='access_block'?'Cuenta bloqueada en todo el sistema.':action==='access_remove'?'Cuenta retirada del registro activo; historial conservado.':'Acceso de la cuenta habilitado.'});
     }
 
     if (action === 'update') {
@@ -144,20 +180,19 @@ Deno.serve(async (request) => {
       }).eq('id', target.id);
       if (profileError) return response({ ok: false, error: profileError.message }, 400);
 
-      if (nextRole.role === 'teacher') {
-        if (target.email !== email) {
-          await adminClient.from('teacher_registry').update({ active: false }).eq('email', target.email);
-        }
-        await adminClient.from('teacher_registry').upsert({
+      const {data:registry, error:registryLookupError}=await adminClient.from('teacher_registry').select('id').eq('email',target.email).maybeSingle();
+      if(registryLookupError)return response({ok:false,error:registryLookupError.message},400);
+      if (registry || nextRole.role === 'teacher') {
+        const registryValues={
           email,
           full_name: fullName,
           national_id: nationalId,
           unit,
           active: target.active,
           claimed_at: target.created_at
-        }, { onConflict: 'email' });
-      } else if (target.role === 'teacher') {
-        await adminClient.from('teacher_registry').update({ active: false }).eq('email', target.email);
+        };
+        const {error:registryError}=registry?await adminClient.from('teacher_registry').update(registryValues).eq('id',registry.id):await adminClient.from('teacher_registry').insert(registryValues);
+        if(registryError)return response({ok:false,error:registryError.message},400);
       }
 
       return response({ ok: true, message: 'Datos del usuario actualizados.' });

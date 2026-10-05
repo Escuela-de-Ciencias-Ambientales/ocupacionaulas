@@ -46,8 +46,8 @@
       const searchMatch = !search || `${user.full_name} ${user.national_id || ''} ${user.email} ${user.unit || ''}`.toLocaleLowerCase('es').includes(search);
       const filterMatch = filter === 'all'
         || (filter === 'active' && user.active && !user.reservations_blocked)
-        || (filter === 'blocked' && user.active && user.reservations_blocked)
-        || (filter === 'inactive' && !user.active);
+        || (filter === 'blocked' && (user.access_blocked || (user.active && user.reservations_blocked)))
+        || (filter === 'inactive' && !user.active && !user.access_blocked);
       return searchMatch && filterMatch;
     });
   }
@@ -55,8 +55,8 @@
   function renderSummary() {
     $('usersTotalCount').textContent = state.users.length.toLocaleString('es-CR');
     $('usersActiveCount').textContent = state.users.filter((user) => user.active).length.toLocaleString('es-CR');
-    $('usersBlockedCount').textContent = state.users.filter((user) => user.active && user.reservations_blocked).length.toLocaleString('es-CR');
-    $('usersInactiveCount').textContent = state.users.filter((user) => !user.active).length.toLocaleString('es-CR');
+    $('usersBlockedCount').textContent = state.users.filter((user) => user.access_blocked || (user.active && user.reservations_blocked)).length.toLocaleString('es-CR');
+    $('usersInactiveCount').textContent = state.users.filter((user) => !user.active && !user.access_blocked).length.toLocaleString('es-CR');
   }
 
   function renderTable() {
@@ -71,12 +71,14 @@
       const editable = canEdit(user);
       const manageable = canManageAccess(user);
       const editButton = editable ? `<button class="secondary-button" type="button" data-edit-user="${user.id}">Editar</button>` : '';
-      const blockButton = manageable && user.active && !self
+      const blockButton = isSuperadmin() && !self && (user.active || user.access_blocked)
+        ? `<button class="secondary-button" type="button" data-user-action="${user.access_blocked ? 'access_unblock' : 'access_block'}" data-user-id="${user.id}">${user.access_blocked ? 'Desbloquear cuenta' : 'Bloquear cuenta'}</button>`
+        : manageable && user.active && !self
         ? `<button class="secondary-button" type="button" data-user-action="${user.reservations_blocked ? 'unblock' : 'block'}" data-user-id="${user.id}">${user.reservations_blocked ? 'Habilitar' : 'Bloquear'}</button>` : '';
       const activeButton = manageable && !self
-        ? `<button class="${user.active ? 'danger-button' : 'secondary-button'}" type="button" data-user-action="${user.active ? 'deactivate' : 'reactivate'}" data-user-id="${user.id}">${user.active ? 'Eliminar' : 'Reactivar'}</button>` : '';
+        ? `<button class="${user.active ? 'danger-button' : 'secondary-button'}" type="button" data-user-action="${isSuperadmin() ? (user.active || user.access_blocked ? 'access_remove' : 'access_restore') : (user.active ? 'deactivate' : 'reactivate')}" data-user-id="${user.id}">${user.active || user.access_blocked ? 'Eliminar' : 'Reactivar'}</button>` : '';
       const protectedLabel = !editable && !manageable ? '<span class="user-badge">Protegido</span>' : '';
-      const status = !user.active
+      const status = user.access_blocked ? `<span class="user-badge is-blocked">Cuenta bloqueada</span><small>${escapeHtml(user.access_block_reason || '')}</small>` : !user.active
         ? '<span class="user-badge is-inactive">Acceso eliminado</span>'
         : user.reservations_blocked
           ? `<span class="user-badge is-blocked">Reservas bloqueadas</span>${user.reservations_block_reason ? `<small>${escapeHtml(user.reservations_block_reason)}</small>` : ''}`
@@ -88,7 +90,7 @@
         <td data-label="Tipo de acceso"><span class="user-badge${user.role === 'admin' ? ' is-admin' : ''}">${escapeHtml(accessName(user))}</span></td>
         <td data-label="Servicios"><small class="service-access">${escapeHtml(serviceAccessName(user))}</small></td>
         <td data-label="Estado"><div class="user-status-stack">${status}</div></td>
-        <td data-label="Acciones"><div class="user-row-actions">${editButton}${blockButton}${activeButton}${protectedLabel}</div></td>
+        <td data-label="Acciones"><div class="user-row-actions">${isSuperadmin() ? `<button class="secondary-button" type="button" data-detail-user="${user.id}">Ver detalle</button>` : ''}${editButton}${blockButton}${activeButton}${protectedLabel}</div></td>
       </tr>`;
     }).join('') : '<tr><td colspan="7">No hay usuarios que coincidan con los filtros.</td></tr>';
 
@@ -99,7 +101,7 @@
 
   async function loadUsers() {
     const { data, error } = await state.client.from('profiles')
-      .select('id,full_name,national_id,email,unit,role,admin_scope,active,reservations_blocked,reservations_block_reason,created_at')
+      .select('id,full_name,national_id,email,unit,role,admin_scope,active,reservations_blocked,reservations_block_reason,created_at,updated_at,access_blocked,access_block_reason,access_blocked_at,access_removed_at')
       .order('full_name');
     if (error) throw error;
     state.users = data || [];
@@ -189,6 +191,7 @@
   function openEditor(userId) {
     const user = state.users.find((item) => item.id === userId);
     if (!user || !canEdit(user)) return;
+    configureCreate(false);
     $('editedUserId').value = user.id;
     $('editedUserName').value = user.full_name;
     $('editedUserNationalId').value = user.national_id || '';
@@ -201,8 +204,39 @@
     $('userEditorDialog').showModal();
   }
   function closeEditor() {
+    $('createPassword').value='';
     $('userEditorForm').reset();
     $('userEditorDialog').close();
+  }
+  function configureCreate(creating) {
+    $('userEditorTitle').textContent=creating?'Registrar usuario':'Editar cuenta';
+    $('createPasswordWrap').hidden=!creating; $('createAcademicWrap').hidden=!creating;
+    $('createPassword').required=creating; $('createPassword').disabled=!creating;
+    $('editedUserAccess').querySelector('[value="conserjeria_admin"]').hidden=creating;
+  }
+  function openCreate() {
+    if(!isSuperadmin())return;
+    $('userEditorForm').reset();configureCreate(true);
+    $('editedUserId').value='';$('editedUserAccess').disabled=false;
+    $('userRoleHelp').hidden=true;setEditorMessage('');
+    $('createAcademic').innerHTML='<option value="">Nuevo registro individual</option>'+(state.academics.professors||[]).filter(p=>p.active&&!academicAccount(p)).map(p=>`<option value="${p.id}">${escapeHtml(p.full_name)} · ${escapeHtml(p.national_id||'')}</option>`).join('');
+    $('userEditorDialog').showModal();
+  }
+  function fillCreateAcademic() {
+    const person=state.academics.professors.find(p=>p.id===Number($('createAcademic').value));
+    if(!person)return;
+    $('editedUserName').value=person.full_name;$('editedUserNationalId').value=person.national_id||'';$('editedUserEmail').value=person.email||'';$('editedUserUnit').value=person.unit||'Docencia';
+  }
+  async function showUserDetail(id) {
+    if(!isSuperadmin())return;
+    $('userDetailContent').textContent='Cargando información…';$('userDetailDialog').showModal();
+    try {
+      const {detail:u}=await invokeManagement({action:'detail',userId:id});
+      const date=v=>v?new Date(v).toLocaleString('es-CR',{timeZone:'America/Costa_Rica'}):'Sin registro';
+      const fields=[['Nombre',u.full_name],['Cédula',u.national_id],['Correo',u.email],['Unidad',u.unit],['Acceso',accessName(u)],['Estado',u.access_blocked?'Cuenta bloqueada':u.active?'Activo':'Retirado del registro activo'],['Motivo de bloqueo',u.access_block_reason],['Registro',date(u.registered_at)],['Último ingreso',date(u.last_sign_in_at)],['Correo confirmado',date(u.email_confirmed_at)],['Última modificación',date(u.updated_at)],['Fecha de bloqueo',date(u.access_blocked_at)],['Fecha de baja',date(u.access_removed_at)]];
+      const actions={created:'Registro individual',access_block:'Bloqueo de cuenta',access_unblock:'Desbloqueo',access_remove:'Baja del registro activo',access_restore:'Reactivación'};
+      $('userDetailContent').innerHTML=`<dl class="user-detail-grid">${fields.map(([name,value])=>`<div><dt>${escapeHtml(name)}</dt><dd>${escapeHtml(value||'—')}</dd></div>`).join('')}</dl><h3>Historial de acceso</h3>${(u.history||[]).map(h=>`<article class="user-history-item"><strong>${escapeHtml(actions[h.action]||h.action)}</strong><p>${escapeHtml(date(h.created_at))} · ${escapeHtml(h.actor)}</p><p>${escapeHtml(h.reason||'')}</p></article>`).join('')||'<p>Sin movimientos registrados en este nuevo control.</p>'}`;
+    } catch(error){$('userDetailContent').textContent=error.message;}
   }
 
   async function invokeManagement(body) {
@@ -223,7 +257,8 @@
     try {
       const editedId = $('editedUserId').value;
       const data = await invokeManagement({
-        action: 'update',
+        action: editedId ? 'update' : 'create',
+        password: editedId ? undefined : $('createPassword').value,
         userId: editedId,
         fullName: $('editedUserName').value.trim(),
         nationalId: $('editedUserNationalId').value.trim(),
@@ -234,6 +269,7 @@
       closeEditor();
       if (editedId === state.profile.id) await loadProfile();
       await loadUsers();
+      if (isSuperadmin()) await loadAcademics();
       setMessage(data.message || 'Usuario actualizado.', true);
     } catch (error) { setEditorMessage(error.message); }
     finally { setBusy(button, false); }
@@ -243,11 +279,16 @@
     const user = state.users.find((item) => item.id === userId);
     if (!user) return;
     let reason = '';
-    if (action === 'block') {
+    if (action === 'access_block' || action === 'access_remove') {
+      reason = window.prompt(`Indique el motivo para ${action === 'access_block' ? 'bloquear la cuenta' : 'retirar del registro activo'} de ${user.full_name}:`) || '';
+      if (!reason.trim()) return;
+    } else if (action === 'block') {
       reason = window.prompt(`Indica el motivo para bloquear las reservas de ${user.full_name}:`) || '';
       if (!reason.trim()) return;
     } else {
       const messages = {
+        access_unblock: `¿Desea desbloquear la cuenta de ${user.full_name}?`,
+        access_restore: `¿Desea reactivar la cuenta de ${user.full_name}?`,
         unblock: `¿Deseas habilitar nuevamente las reservas de ${user.full_name}?`,
         deactivate: `¿Deseas eliminar el acceso de ${user.full_name}? Su historial institucional se conservará.`,
         reactivate: `¿Deseas reactivar el acceso de ${user.full_name}?`
@@ -257,6 +298,7 @@
     try {
       const data = await invokeManagement({ action, userId, reason: reason.trim() });
       await loadUsers();
+      if (isSuperadmin()) await loadAcademics();
       setMessage(data.message || 'Usuario actualizado.', true);
     } catch (error) { setMessage(error.message); }
   }
@@ -293,10 +335,16 @@
     });
     $('previousUsersPage').addEventListener('click', () => { state.page -= 1; renderTable(); });
     $('nextUsersPage').addEventListener('click', () => { state.page += 1; renderTable(); });
+    $('createUser').addEventListener('click', openCreate);
+    $('userEditorDialog').addEventListener('close',()=>{$('createPassword').value='';});
+    $('createAcademic').addEventListener('change', fillCreateAcademic);
+    $('closeUserDetail').addEventListener('click', ()=>$('userDetailDialog').close());
     $('userEditorForm').addEventListener('submit', saveUser);
     $('closeUserEditor').addEventListener('click', closeEditor);
     $('cancelUserEditor').addEventListener('click', closeEditor);
     document.addEventListener('click', (event) => {
+      const detailButton = event.target.closest('[data-detail-user]');
+      if(detailButton) showUserDetail(detailButton.dataset.detailUser);
       const editButton = event.target.closest('[data-edit-user]');
       if (editButton) openEditor(editButton.dataset.editUser);
       const actionButton = event.target.closest('[data-user-action]');
@@ -322,7 +370,7 @@
       if (!state.session) return;
       await loadProfile();
       await loadUsers();
-      if (isSuperadmin()) { $('academicsPanel').hidden = false; await loadAcademics(); $('usersConfigLink').hidden = false; }
+      if (isSuperadmin()) { $('createUser').hidden=false; $('academicsPanel').hidden = false; await loadAcademics(); $('usersConfigLink').hidden = false; }
       $('usersConnectionStatus').textContent = 'Acceso administrativo';
     } catch (error) {
       $('usersConnectionStatus').textContent = 'No disponible';

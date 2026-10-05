@@ -48,7 +48,7 @@
       <div>
         <p class="eyebrow">Control de accesos</p>
         <h1>Administrar usuarios</h1>
-        <p>Edita los datos de las cuentas registradas, bloquea nuevas reservas o elimina el acceso conservando el historial institucional.</p>
+        <p>Edita los datos de las cuentas registradas, bloquea cuentas con motivo o elimina el acceso conservando el historial institucional.</p>
       </div>
       <span class="connection-status" id="usersConnectionStatus">Comprobando acceso…</span>
     </section>
@@ -56,7 +56,7 @@
     <section class="users-summary" aria-label="Resumen de usuarios">
       <div><span>Total registrados</span><strong id="usersTotalCount">—</strong></div>
       <div><span>Accesos activos</span><strong id="usersActiveCount">—</strong></div>
-      <div><span>Reservas bloqueadas</span><strong id="usersBlockedCount">—</strong></div>
+      <div><span>Bloqueados</span><strong id="usersBlockedCount">—</strong></div>
       <div><span>Accesos eliminados</span><strong id="usersInactiveCount">—</strong></div>
     </section>
 
@@ -69,12 +69,12 @@
     <section class="users-panel" aria-labelledby="usersTableTitle">
       <div class="users-panel-heading">
         <div><h2 id="usersTableTitle">Usuarios registrados</h2><p>La tabla muestra 15 usuarios por página.</p></div>
-        <button class="secondary-button compact-button" id="refreshUsersTable" type="button">Actualizar</button>
+        <div class="user-row-actions"><button class="primary-button compact-button" id="createUser" type="button" hidden>＋ Registrar usuario</button><button class="secondary-button compact-button" id="refreshUsersTable" type="button">Actualizar</button></div>
       </div>
 
       <div class="users-filters">
         <div><label for="usersSearch">Buscar usuario</label><input id="usersSearch" type="search" placeholder="Nombre, cédula, correo o unidad" /></div>
-        <div><label for="usersStatusFilter">Estado</label><select id="usersStatusFilter"><option value="all">Todos</option><option value="active">Activos</option><option value="blocked">Reservas bloqueadas</option><option value="inactive">Acceso eliminado</option></select></div>
+        <div><label for="usersStatusFilter">Estado</label><select id="usersStatusFilter"><option value="all">Todos</option><option value="active">Activos</option><option value="blocked">Bloqueados</option><option value="inactive">Acceso eliminado</option></select></div>
       </div>
 
       <div class="form-message" id="usersPageMessage" role="status" aria-live="polite" hidden></div>
@@ -104,17 +104,19 @@
   <dialog class="schedule-dialog user-editor-dialog" id="userEditorDialog">
     <form id="userEditorForm" method="dialog">
       <div class="dialog-heading">
-        <div><p class="eyebrow">Administración de usuarios</p><h2>Editar cuenta</h2></div>
+        <div><p class="eyebrow">Administración de usuarios</p><h2 id="userEditorTitle">Editar cuenta</h2></div>
         <button class="dialog-close" id="closeUserEditor" type="button" aria-label="Cerrar">×</button>
       </div>
       <input id="editedUserId" type="hidden" />
       <div class="form-message" id="userEditorMessage" role="status" aria-live="polite" hidden></div>
       <div class="user-editor-grid">
+        <div class="field-wide" id="createAcademicWrap" hidden><label for="createAcademic">Académico del padrón (opcional)</label><select id="createAcademic"><option value="">Nuevo registro individual</option></select></div>
         <div class="field-wide"><label for="editedUserName">Nombre completo</label><input id="editedUserName" maxlength="100" required /></div>
         <div><label for="editedUserNationalId">Número de cédula</label><input id="editedUserNationalId" inputmode="numeric" autocomplete="off" minlength="7" maxlength="20" required /></div>
         <div class="field-wide"><label for="editedUserEmail">Correo electrónico</label><input id="editedUserEmail" type="email" maxlength="140" required /></div>
         <div><label for="editedUserUnit">Unidad institucional</label><select id="editedUserUnit" required><option value="Docencia">Docencia</option><option value="Administrativo">Administrativo</option><option value="LAA">LAA</option><option value="PROCAME">PROCAME</option></select></div>
         <div><label for="editedUserAccess">Tipo de acceso</label><select id="editedUserAccess" required><option value="teacher">Docente</option><option value="reservation_admin">Administrador de reservas</option><option value="operations_admin">Administrador operativo</option><option value="conserjeria_admin">Administrador de conserjería</option><option value="superadmin">Superadministrador</option></select></div>
+        <div class="field-wide" id="createPasswordWrap" hidden><label for="createPassword">Contraseña inicial</label><input id="createPassword" type="password" autocomplete="new-password" minlength="8" /><small>Al menos 8 caracteres, una mayúscula y un número.</small></div>
       </div>
       <p class="schedule-dialog-help" id="userRoleHelp">Solo el superadministrador puede cambiar roles de acceso.</p>
       <div class="dialog-actions">
@@ -123,6 +125,8 @@
       </div>
     </form>
   </dialog>
+
+  <dialog class="schedule-dialog user-editor-dialog" id="userDetailDialog"><div class="user-detail-body"><div class="dialog-heading"><h2>Detalle del usuario</h2><button type="button" class="dialog-close" id="closeUserDetail" aria-label="Cerrar">×</button></div><div id="userDetailContent"></div></div></dialog>
 
   <dialog class="schedule-dialog academic-courses-dialog" id="academicCoursesDialog">
     <div class="academic-dialog-body">
