@@ -42,3 +42,5 @@ Estas propuestas no forman parte del alcance publicado ni habilitan envíos auto
 Estas mejoras quedan propuestas; la implementación actual guarda explícitamente una fila por vez.
 
 - Evaluar integrar Regresar en las barras de otros módulos si se reportan superposiciones; fuera del alcance de esta corrección.
+
+- Considerar extender búsqueda por nombre a autorizaciones docentes individuales en una solicitud futura.

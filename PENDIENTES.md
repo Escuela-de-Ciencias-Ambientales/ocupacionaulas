@@ -68,3 +68,5 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - Publicado y verificado: PR #32, commit `ca71f000`, GitHub Pages completado (ejecución `37360354731`). Tabla, filtros, JavaScript y estilos nuevos comprobados en los recursos online. No se realizaron cambios de prueba en el inventario real.
 
 - [x] Corregir Regresar superpuesto al enlace de autorización en Bodega; validado en escritorio y móvil.
+
+- [x] Añadir lista filtrada por nombre en autorización GNSS, manteniendo cédula y selección explícita.

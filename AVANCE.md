@@ -87,3 +87,8 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 ## Botón Regresar en Bodega — 5 de octubre de 2026
 - Integrado en la barra de módulos, conservando color y forma. Ya no se posiciona encima del contenido.
 - Verificado con una vista sintética de Dirección en 1440 y 390 px: posición estática y sin intersección con el enlace de autorización. Sintaxis JavaScript y diff aprobados.
+
+## Búsqueda por nombre en autorización GNSS — 5 de octubre de 2026
+- Lista filtrada mientras se escribe nombre/apellidos, estudiantes y académicos; selección completa cédula y solicitante.
+- RPC limitado a 30 coincidencias activas y consulta mínima de dos caracteres, normalizada sin tildes; conserva comprobación del cargo vigente y permisos explícitos.
+- Pruebas de consulta real sin escrituras: ambos padrones, nombres sin tildes, vacío, sin resultados y rechazo de autoridad inválida. Pruebas UI sintéticas: selección, cambio de padrón, limpieza de selección, móvil y cédula aprobadas.

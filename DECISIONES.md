@@ -62,3 +62,5 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Se protegen atributos operativos de unidades prestadas en la interfaz; no se alteran sus asignaciones ni historial.
 
 - Regresar en Bodega ocupa espacio en la barra de módulos; ajuste limitado a esta página para preservar las demás pantallas.
+
+- Búsqueda GNSS por nombre consulta el padrón en servidor tras 250 ms; no descarga el padrón completo. Al modificar texto o tipo se invalida la selección y se descartan respuestas antiguas.
