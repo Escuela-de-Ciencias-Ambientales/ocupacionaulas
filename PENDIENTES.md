@@ -76,3 +76,7 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Restringir autorizaciones a sesión institucional, eliminar acceso público y cerrar RPC anónimos y versiones sin firma.
 - [ ] Las autoridades actuales deben completar su registro institucional existente para utilizar autorización GNSS autenticada.
 - Las pruebas GNSS anteriores por cédula sin sesión describen el flujo sustituido; usar equipment_authorization_session.sql para el contrato de identidad vigente.
+
+- [x] Panel superadministrador: detalle de cuentas registradas, registro individual, bloqueo con motivo, baja y reactivación preservando historial.
+- [x] Validar permisos, bloqueo de cuentas inactivas, ausencia de duplicados del padrón, auditoría y vista móvil.
+- [ ] Verificar la primera alta institucional real durante su uso por superadministración; no se creó una cuenta real de prueba.

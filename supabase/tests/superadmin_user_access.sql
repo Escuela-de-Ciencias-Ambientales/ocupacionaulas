@@ -1,0 +1,30 @@
+begin;
+do $$
+declare actor uuid; target record; h jsonb; before_count bigint;
+begin
+ select id into actor from public.profiles where active and role='admin' and admin_scope='superadmin' limit 1;
+ select p.*,t.id registry_id into target from public.profiles p join public.teacher_registry t on lower(p.email)=lower(t.email) where p.active and p.role='teacher' and t.active and t.national_id is not null limit 1;
+ if actor is null or target.id is null then raise exception 'Falta usuario de prueba existente';end if;
+ perform set_config('request.jwt.claim.sub',target.id::text,true);
+ begin perform public.superadmin_set_user_access(target.id,'access_block','Prueba revertida');raise exception 'Docente pudo administrar';exception when insufficient_privilege then null;end;
+ perform set_config('request.jwt.claim.sub',actor::text,true);
+ begin perform public.superadmin_set_user_access(actor,'access_block','Prueba revertida');raise exception 'Autobloqueo permitido';exception when raise_exception then if sqlerrm='Autobloqueo permitido' then raise;end if;end;
+ begin perform public.superadmin_set_user_access(target.id,'access_block','');raise exception 'Sin motivo permitido';exception when raise_exception then if sqlerrm='Sin motivo permitido' then raise;end if;end;
+ select count(*) into before_count from public.reservations where user_id=target.id;
+ perform public.superadmin_set_user_access(target.id,'access_block','Prueba revertida de bloqueo');
+ if exists(select 1 from public.profiles where id=target.id and (active or not access_blocked)) then raise exception 'Bloqueo no aplicado';end if;
+ perform set_config('request.jwt.claim.sub',target.id::text,true);
+ begin perform public.equipment_authorization_session_context();raise exception 'Cuenta bloqueada autorizó';exception when insufficient_privilege then null;end;
+ perform set_config('request.jwt.claim.sub',actor::text,true);
+ perform public.superadmin_set_user_access(target.id,'access_unblock');
+ perform public.superadmin_set_user_access(target.id,'access_remove','Prueba revertida de baja');
+ if not exists(select 1 from public.profiles where id=target.id and not active and access_removed_at is not null) then raise exception 'Baja no aplicada';end if;
+ if (select count(*) from public.reservations where user_id=target.id)<>before_count then raise exception 'Historial alterado';end if;
+ perform public.superadmin_set_user_access(target.id,'access_restore');
+ if not exists(select 1 from public.profiles where id=target.id and active and not access_blocked and access_removed_at is null) then raise exception 'Reactivación no aplicada';end if;
+ h:=public.superadmin_user_history(target.id);
+ if jsonb_array_length(h)<4 then raise exception 'Auditoría incompleta';end if;
+ if has_function_privilege('anon','public.superadmin_set_user_access(uuid,text,text)','EXECUTE') then raise exception 'Acceso anónimo';end if;
+end $$;
+rollback;
+select 'Permisos, motivo, autobloqueo, bloqueo de autorizaciones, baja, reactivación e historial: OK; cambios revertidos' as resultado;
