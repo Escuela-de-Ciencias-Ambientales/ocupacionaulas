@@ -54,5 +54,10 @@ legend { margin-bottom:8px; }
 .message.is-success { color:#0e5936; background:var(--green-soft); border-color:#a8d4bb; }
 button:disabled { opacity:.6; cursor:wait; }
 [hidden] { display:none !important; }
+.direction-search-results { list-style:none; margin:0 0 16px; padding:0; max-height:280px; overflow-y:auto; border:1px solid #b9cbc4; border-radius:12px; }
+.direction-search-results li + li { border-top:1px solid #d7e2de; }
+#directionSearchResults button { display:block; width:100%; padding:12px 16px; border:0; border-radius:0; background:#fff; color:var(--ink); text-align:left; white-space:normal; overflow-wrap:anywhere; }
+#directionSearchResults button:hover,#directionSearchResults button:focus-visible { background:#e8f4ef; color:#075f41; }
+#directionSearchStatus { color:var(--muted); font-size:.9rem; }
 @media (max-width:820px) { .authorization-grid,.identity-card,.signature-panel { grid-template-columns:1fr; } .intro { align-items:flex-start; flex-direction:column; } .session-card { width:100%; } }
 @media (max-width:580px) { .site-header { min-height:88px; padding:10px 14px; } .brand img { width:60px;height:60px; } .brand span { font-size:13px; } .una-logo { display:none; } .logout-button { padding:8px 12px; } .page { width:min(100% - 22px,1160px); } .input-action { grid-template-columns:1fr; } .reason-options { grid-template-columns:1fr; } .reason-options span { min-height:45px; } .panel,.identity-card { padding:18px; } }

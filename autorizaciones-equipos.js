@@ -44,6 +44,7 @@
   function signatureData() { if (!state.signatureDrawn) throw new Error('Firme en el recuadro antes de autorizar.'); return el('teacherSignature').toDataURL('image/png'); }
 
   async function loadCourses(event) {
+    resetDirectionSearch();
     event.preventDefault(); clearMessage(); el('authorizationArea').hidden=true;el('directionPanel').hidden=true;el('directionForm').hidden=true;state.directionBorrower=null;clearSignature();
     const nationalId = cleanId(el('teacherId').value);
     if (nationalId.length < 7) return message('Revise el número de cédula.');
@@ -112,12 +113,60 @@
   }
 
 
+  let directionSearchTimer, directionSearchVersion=0;
+  function resetDirectionSearch() {
+    clearTimeout(directionSearchTimer); directionSearchVersion++;
+    state.directionBorrower=null; el('directionForm').hidden=true;
+    el('directionSearchResults').replaceChildren(); el('directionSearchResults').hidden=true;
+    el('directionSearchStatus').textContent='Escriba al menos 2 letras y seleccione una persona de la lista.';
+  }
+  function selectDirectionBorrower(data,kind) {
+    state.directionBorrower={...data,kind};
+    el('directionBorrowerName').textContent=data.full_name;
+    el('directionForm').hidden=false;
+  }
+  async function searchDirectionNames(version) {
+    const kind=el('directionKind').value, query=el('directionBorrowerSearch').value.trim();
+    el('directionSearchStatus').textContent='Buscando…';
+    try {
+      const {data,error}=await state.client.rpc('public_direction_search_borrowers',{p_director_national_id:state.teacherNationalId,p_query:query,p_kind:kind});
+      if(version!==directionSearchVersion)return;
+      if(error)throw error;
+      const results=el('directionSearchResults');
+      results.replaceChildren(); results.hidden=!data?.length;
+      (data||[]).forEach(person=>{
+        const row=document.createElement('li'), button=document.createElement('button');
+        button.type='button'; button.textContent=`${person.full_name} · ${person.national_id}`;
+        button.addEventListener('click',()=>{
+          resetDirectionSearch(); el('directionBorrowerId').value=person.national_id;
+          el('directionBorrowerSearch').value=person.full_name;
+          selectDirectionBorrower(person,kind);
+          el('directionSearchStatus').textContent=`Seleccionado: ${person.full_name}`;
+        });
+        row.appendChild(button); results.appendChild(row);
+      });
+      el('directionSearchStatus').textContent=data?.length ? `${data.length} coincidencia(s). Seleccione una persona.${data.length===30?' Afine el nombre para ver más resultados.':''}` : 'No se encontraron personas activas con ese nombre.';
+    } catch(error) {
+      if(version===directionSearchVersion)el('directionSearchStatus').textContent=error.message||'No se pudo buscar. Intente nuevamente.';
+    }
+  }
+  el('directionBorrowerSearch').addEventListener('input',()=>{
+    resetDirectionSearch(); el('directionBorrowerId').value='';
+    if(el('directionBorrowerSearch').value.trim().length>=2){
+      const version=directionSearchVersion;
+      directionSearchTimer=setTimeout(()=>searchDirectionNames(version),250);
+    }
+  });
+  el('directionBorrowerId').addEventListener('input',()=>{resetDirectionSearch();el('directionBorrowerSearch').value='';});
   async function findDirectionBorrower(event){
+    resetDirectionSearch();
     event.preventDefault(); state.directionBorrower=null; el('directionForm').hidden=true;
     const kind=el('directionKind').value;
+    const version=++directionSearchVersion;
     const {data,error}=await state.client.rpc('public_direction_find_borrower',{p_director_national_id:state.teacherNationalId,p_national_id:cleanId(el('directionBorrowerId').value),p_kind:kind});
+    if(version!==directionSearchVersion)return;
     if(error)return message(error.message); if(!data?.found)return message('Persona no encontrada en el padrón seleccionado.');
-    state.directionBorrower={...data,kind};el('directionBorrowerName').textContent=data.full_name;el('directionForm').hidden=false;
+    selectDirectionBorrower(data,kind);
   }
   async function authorizeDirection(event){
     event.preventDefault(); if(!state.directionBorrower)return message('Busque al solicitante.');
@@ -128,7 +177,7 @@
   }
   el('directionSearchForm').addEventListener('submit',findDirectionBorrower);
   el('directionForm').addEventListener('submit',authorizeDirection);
-  el('directionKind').addEventListener('change',()=>{state.directionBorrower=null;el('directionForm').hidden=true});
+  el('directionKind').addEventListener('change',()=>{resetDirectionSearch();el('directionBorrowerId').value='';if(el('directionBorrowerSearch').value.trim().length>=2)searchDirectionNames(directionSearchVersion);});
 
   async function init() {
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) return message('La conexión está pendiente de configuración.');
