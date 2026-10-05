@@ -82,4 +82,4 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Los borradores permanecen al filtrar, cambiar de página o guardar otra fila. Un error conserva los valores y se muestra en la fila. Borradores temporales en memoria: una recarga los descarta.
 - Tipo, estado y habilitación de unidades con préstamo activo quedan protegidos en la tabla; la devolución se registra mediante el flujo de préstamos.
 - Verificación con datos sintéticos: guardado, descarte, error por identificador repetido, búsqueda, filtro, paginación, conservación de borradores y ausencia de diálogo. Filas normales de aproximadamente 45 px.
-- Revisión visual móvil (390 px): el documento no se desborda; las columnas se desplazan dentro de la tabla. Sintaxis JavaScript y revisión de diferencias aprobadas. Publicación mediante el flujo de GitHub Pages al integrar este cambio.
+- Revisión visual móvil (390 px): el documento no se desborda; las columnas se desplazan dentro de la tabla. Sintaxis JavaScript y revisión de diferencias aprobadas. Publicado mediante PR #32, commit `ca71f000`, ejecución exitosa `37360354731`; tabla y recursos nuevos comprobados online.

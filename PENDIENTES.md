@@ -65,4 +65,4 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 
 - Implementado: edición directa de atributos por fila, filtros, paginación, guardado y descarte sin ventana de edición.
 - Verificado con datos sintéticos: persistencia del guardado mediante el RPC simulado, errores y conservación de borradores; formato compacto en escritorio y móvil.
-- Publicación y recursos servidos: verificar al completar la integración en GitHub Pages. No se realizaron cambios de prueba en el inventario real.
+- Publicado y verificado: PR #32, commit `ca71f000`, GitHub Pages completado (ejecución `37360354731`). Tabla, filtros, JavaScript y estilos nuevos comprobados en los recursos online. No se realizaron cambios de prueba en el inventario real.
