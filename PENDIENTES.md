@@ -1,6 +1,6 @@
 # Pendientes de SIGEP
 
-Actualizado: 5 de octubre de 2026, hora de Costa Rica.
+Actualizado: 6 de octubre de 2026, hora de Costa Rica.
 
 Estados: **pendiente**, **en revisión**, **terminado** y **bloqueado**. Marcar terminado solo con evidencia del entorno correspondiente.
 
@@ -113,3 +113,5 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Probar solicitud y autorización a 390 px sin desbordamiento horizontal ni errores de consola. La prueba funcional autenticada conserva sus controles de servidor existentes.
 
 La carga de cintas métricas permanece pendiente de recibir la fuente con las unidades adicionales. Producción ya contiene 47 cintas métricas; no se inventarán códigos ni activos para completar una cantidad no documentada.
+
+- [x] Retirar 78 unidades y 18 categorías ajenas al préstamo indicadas por el usuario, con conciliación previa, auditoría individual y eliminación de categorías vacías.

@@ -1,6 +1,6 @@
 # Avance de SIGEP
 
-Actualizado: 5 de octubre de 2026, hora de Costa Rica.
+Actualizado: 6 de octubre de 2026, hora de Costa Rica.
 
 ## Punto de partida
 
@@ -134,3 +134,10 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Prueba SQL transaccional aprobada y revertida: rechazo sin permiso, eliminación con auditoría, protección de historial, prevención de duplicados y ausencia de acceso anónimo.
 - Revisión de seguridad posterior: la bitácora de eliminaciones no tiene políticas de acceso directo de forma deliberada y conserva todos sus privilegios revocados; el único punto de entrada es el RPC autenticado, que valida `is_superadmin()` dentro del servidor. La prueba confirmó rechazo a una cuenta autenticada sin ese rol.
 - Las 47 cintas métricas existentes fueron verificadas. La incorporación de unidades adicionales queda pendiente del listado con identificación real.
+
+## Depuración de categorías ajenas al préstamo — 6 de octubre de 2026
+
+- Se retiraron definitivamente 78 unidades distribuidas en 18 categorías: U.P.S., tiendas de campaña, computadoras de escritorio —incluida la categoría especial—, computadoras portátiles, scanner, multifuncional, impresoras, sillas, sillas ergonómicas, módulos y mobiliario indicados por el usuario.
+- La conciliación previa confirmó cero préstamos históricos, préstamos activos, solicitudes y autorizaciones vinculadas a esas unidades y categorías.
+- La operación fue transaccional: registró una instantánea de cada unidad y el responsable en 78 entradas de auditoría antes de eliminar las unidades y las categorías vacías.
+- Verificación posterior: cero categorías objetivo restantes; inventario operativo de 582 unidades en 73 categorías, con 577 disponibles y 1 prestada al momento del control.
