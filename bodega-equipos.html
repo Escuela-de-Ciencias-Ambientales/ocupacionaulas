@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="sigep-brand.css?v=3" />
   <link rel="stylesheet" href="visual-system.css?v=3" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=3" />
-  <link rel="stylesheet" href="inventory-table.css?v=1" />
+  <link rel="stylesheet" href="inventory-table.css?v=2" />
 </head>
   <body>
     <section id="loadingView" class="warehouse-loading"><div><img class="sigep-loading-logo" src="sigep-logo.png" alt="SIGEP" /><strong>Cargando Bodega…</strong></div></section>
@@ -71,7 +71,8 @@
 
         <section id="equipmentView" class="view" hidden>
           <div class="page-heading"><div><p class="eyebrow">Control de existencias</p><h1>Inventario de equipos</h1><span>La disponibilidad se calcula automáticamente con los equipos individuales.</span></div><button id="newEquipment">＋ Agregar equipo individual</button></div>
-          <div id="equipmentGrid" class="inventory-toolbar"><label>Tipo de equipo<select id="unitTypeFilter"><option value="">Todos los tipos</option></select></label><label>Buscar equipo<input id="unitSearch" type="search" placeholder="Código, activo, tipo, marca, modelo, serie o uso" /></label><label>Filas por página<select id="inventoryPageSize"><option>25</option><option selected>50</option><option>100</option></select></label></div>
+          <section id="inventorySummary" class="inventory-summary" aria-label="Resumen del inventario"></section>
+          <div id="equipmentGrid" class="inventory-toolbar"><label>Tipo de equipo<input id="unitTypeFilter" type="search" list="inventoryTypeFilterOptions" placeholder="Escriba para filtrar" autocomplete="off" /><datalist id="inventoryTypeFilterOptions"></datalist></label><label>Buscar equipo<input id="unitSearch" type="search" placeholder="Código, activo, tipo, marca, modelo, serie o uso" /></label><label>Ordenar por<select id="inventorySort"><option value="code">Código</option><option value="type">Tipo</option><option value="asset">Activo</option><option value="brand_model">Marca / modelo</option><option value="serial">Serie</option></select></label><label>Dirección<select id="inventorySortDirection"><option value="asc">Ascendente</option><option value="desc">Descendente</option></select></label><label>Filas por página<select id="inventoryPageSize"><option>25</option><option selected>50</option><option>100</option></select></label></div>
           <p class="inventory-help">Edite los campos en la fila y pulse Guardar. Los cambios sin guardar se conservan al filtrar o cambiar de página. El tipo, estado y activación de equipos prestados se conservan hasta registrar su devolución.</p>
           <datalist id="inventoryTypeOptions"></datalist>
           <section id="unitDetail" class="unit-detail inventory-detail"><div class="inventory-detail-heading"><div><h2 id="unitDetailTitle">Equipos individuales</h2><span id="unitDetailCount" aria-live="polite"></span></div><div class="inventory-pager"><button id="inventoryPrev" type="button">← Anterior</button><span id="inventoryPageLabel"></span><button id="inventoryNext" type="button">Siguiente →</button></div></div><div class="table-wrap inventory-table-wrap"><table class="inventory-table"><thead><tr><th>Código</th><th>Tipo</th><th>Activo</th><th>Marca</th><th>Modelo</th><th>Serie</th><th>Uso</th><th>Estado</th><th>Observaciones</th><th>Habilitado</th><th>Cambios</th></tr></thead><tbody id="unitRows"></tbody></table></div></section>
@@ -153,7 +154,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="config.js?v=5"></script>
     <script src="shared-utils.js?v=1"></script>
-    <script src="bodega-equipos.js?v=14"></script>
+  <script src="bodega-equipos.js?v=15"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>
 </html>

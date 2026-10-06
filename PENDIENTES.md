@@ -92,22 +92,24 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 
 ### Inventario y calidad de datos
 
-- [ ] Convertir el filtro **Tipo de equipo** en un campo con búsqueda por escritura, manteniendo selección de categorías normalizadas.
-- [ ] Revisar y conciliar las cantidades reales por categoría y por unidad antes de corregir datos en producción.
-- [ ] Estandarizar las categorías del inventario. Unificar las dos categorías actuales de cámaras bajo **Cámaras microscópicas**, previa revisión de los registros afectados.
-- [ ] Auditar posibles equipos duplicados por combinación de código, activo institucional, serie, marca y modelo. No eliminar automáticamente: distinguir duplicados reales de unidades legítimamente repetidas.
+- [x] Convertir el filtro **Tipo de equipo** en un campo con búsqueda por escritura, manteniendo selección de categorías normalizadas.
+- [x] Revisar y conciliar las cantidades reales por categoría y por unidad antes de corregir datos en producción. Ver cifras y alcance en AVANCE.md.
+- [x] Estandarizar las dos categorías realmente microscópicas bajo **Cámaras microscópicas**. Las cámaras de video, fotográficas y web permanecen separadas porque son equipos distintos.
+- [x] Auditar posibles equipos duplicados por código, activo institucional y serie: no se encontraron duplicados exactos. Se añadieron restricciones normalizadas para impedir nuevos duplicados.
 - [ ] Incorporar las cintas métricas faltantes y verificar su cantidad, códigos, activos y demás atributos antes de la carga.
-- [ ] Crear un cuadro de mando con el resumen del inventario por categoría: total registrado, disponible, prestado, inactivo y en mantenimiento.
+- [x] Crear un cuadro de mando con el resumen del inventario por categoría: total registrado, disponible, prestado, inactivo y en mantenimiento.
 
 ### Tabla y administración de equipos
 
-- [ ] Permitir ordenar la tabla por código, tipo, activo institucional, marca y modelo.
-- [ ] Optimizar anchos de columnas para evitar texto oculto y espacio desperdiciado; admitir ajuste de ancho cuando sea viable y conservar desplazamiento horizontal en pantallas pequeñas.
-- [ ] Mantener la opción de agregar manualmente una unidad específica con todos sus atributos y validación contra duplicados.
-- [ ] Agregar eliminación permanente de una unidad particular solo para superadministración, con confirmación explícita, motivo y auditoría. Bloquearla si la unidad tiene préstamos o referencias históricas; en esos casos usar baja/inactivación para conservar trazabilidad.
+- [x] Permitir ordenar la tabla por código, tipo, activo institucional, marca/modelo y serie, ascendente o descendente.
+- [x] Optimizar anchos de columnas, admitir ajuste horizontal de encabezados y conservar desplazamiento dentro de la tabla en pantallas pequeñas.
+- [x] Mantener la opción de agregar manualmente una unidad específica con todos sus atributos y validación contra duplicados.
+- [x] Agregar eliminación permanente solo para superadministración, con doble confirmación, motivo y auditoría. Las unidades con historial no se eliminan y deben retirarse/inactivarse.
 
 ### Solicitud, autorización y teléfonos
 
-- [ ] Verificar y ajustar de extremo a extremo que la solicitud de equipos y las autorizaciones sean responsivas y utilizables desde teléfonos: formularios, firma táctil, listas, botones, mensajes y confirmaciones.
-- [ ] Añadir en la vista del estudiante un filtro por categoría de equipo, compatible con la búsqueda por nombre y las cantidades solicitadas.
-- [ ] Probar los flujos móviles en anchos representativos y documentar evidencia antes de marcarlos como terminados.
+- [x] Ajustar solicitud y autorizaciones para teléfonos: encabezados, formularios, firma táctil, listas y botones.
+- [x] Añadir en la vista del estudiante un filtro por categoría de equipo, compatible con la búsqueda por nombre y las cantidades solicitadas.
+- [x] Probar solicitud y autorización a 390 px sin desbordamiento horizontal ni errores de consola. La prueba funcional autenticada conserva sus controles de servidor existentes.
+
+La carga de cintas métricas permanece pendiente de recibir la fuente con las unidades adicionales. Producción ya contiene 47 cintas métricas; no se inventarán códigos ni activos para completar una cantidad no documentada.

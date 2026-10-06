@@ -15,9 +15,10 @@
     />
   <link rel="stylesheet" href="design-tokens.css?v=1" />
   <link rel="stylesheet" href="shared-header.css?v=1" />
-    <link rel="stylesheet" href="solicitar-equipo.css?v=1" />
+    <link rel="stylesheet" href="solicitar-equipo.css?v=2" />
     <link rel="stylesheet" href="request-signature.css?v=1" />
     <link rel="stylesheet" href="sigep-brand.css?v=2" />
+    <link rel="stylesheet" href="equipment-responsive.css?v=1" />
   <link rel="stylesheet" href="visual-system.css?v=3" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=3" />
 </head>
@@ -68,6 +69,7 @@
               type="search"
               placeholder="Ej.: cinta, GPS, brújula"
           /></label>
+          <label class="category-filter"><span>Filtrar por categoría</span><select id="categoryFilter"><option value="">Todas las categorías</option></select></label>
           <div id="equipmentList" class="equipment-list"></div>
           <div class="date">
             <label for="returnAt">Fecha prevista de devolución</label
@@ -94,7 +96,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
     <script src="shared-utils.js?v=1"></script>
-    <script src="solicitar-equipo.js?v=6"></script>
+    <script src="solicitar-equipo.js?v=7"></script>
     <script src="pwa-install.js?v=1"></script>
   <script src="navigation-enhancements.js?v=1"></script>
 </body>

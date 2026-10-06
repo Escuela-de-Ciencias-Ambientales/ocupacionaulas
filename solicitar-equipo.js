@@ -27,8 +27,9 @@
     return String(v).replace(/\D/g, "");
   }
   function render(filter = "") {
+    const category = $("categoryFilter").value;
     const list = (context.equipment || []).filter((x) =>
-      `${x.name} ${x.requires_direction ? 'GNSS Trimble TDC6' : ''}`.toLowerCase().includes(filter.toLowerCase()),
+      (!category || String(x.id) === category) && `${x.name} ${x.requires_direction ? 'GNSS Trimble TDC6' : ''}`.toLowerCase().includes(filter.toLowerCase()),
     );
     $("equipmentList").innerHTML =
       list
@@ -59,6 +60,7 @@
       );
     context = { ...data, nationalId: id };
     quantities = {};
+    $("categoryFilter").innerHTML='<option value="">Todas las categorías</option>'+data.equipment.map(x=>`<option value="${x.id}">${Sigep.escapeHtml(x.name)} (${x.available})</option>`).join("");
     $("studentName").textContent = data.full_name;
     $("borrowerLabel").textContent=data.kind==="academic"?"Académico":"Estudiante";
     $("authorization").textContent = `Autorizado: ${data.authorization_label}`;
@@ -94,6 +96,7 @@
   $("idForm").addEventListener("submit", identify);
   $("requestForm").addEventListener("submit", send);
   $("search").addEventListener("input", (e) => render(e.target.value));
+  $("categoryFilter").addEventListener("change", () => render($("search").value));
   $("equipmentList").addEventListener("click", (e) => {
     const b = e.target.closest("[data-id]");
     if (!b) return;
