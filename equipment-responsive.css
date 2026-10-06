@@ -1,0 +1,18 @@
+/* Ajustes compartidos para los flujos de solicitud y autorización en teléfono. */
+.category-filter{display:grid;gap:6px;margin-top:12px}
+.category-filter select{width:100%;min-height:52px;padding:11px 14px;border:1px solid #bdcac5;border-radius:11px;background:#fff;color:var(--ink);font:inherit}
+@media(max-width:580px){
+  .sigep-site-header,.site-header{min-height:78px;padding:8px 12px;gap:10px}
+  .sigep-site-header .sigep-primary-brand img,.site-header .brand img{width:54px;height:54px}
+  .sigep-module-name strong,.site-header .brand span{font-size:12px}
+  .site-header .header-actions{gap:6px}.site-header .una-logo,.sigep-site-header .una{display:none}
+  .site-header .logout-button,.site-header .install-button{min-height:40px;padding:7px 10px;font-size:.85rem}
+  .page{width:min(100% - 16px,1160px);margin-bottom:30px}.page .back-link{margin-top:14px}.page .intro{padding:12px 0 18px;gap:14px}.page .intro h1{font-size:31px}
+  .authorization-grid,.identity-card,.signature-panel{grid-template-columns:1fr}.authorization-grid{gap:14px;margin-top:14px}
+  .panel,.identity-card,.signature-panel{padding:16px;border-radius:14px}.panel-heading{min-height:0}.reason-options,.input-action{grid-template-columns:1fr}.reason-options span{min-height:45px}
+  .signature-box{min-width:0}#teacherSignature{height:150px}.signature-actions{align-items:flex-start;flex-direction:column}.signature-actions button,.primary-action{width:100%}input,select{min-width:0}
+}
+@media(max-width:540px){
+  .sigep-site-header{height:auto}main{width:min(100% - 16px,720px)}.hero{padding:22px 2px 16px}.card{padding:16px;border-radius:14px}
+  .equipment{grid-template-columns:minmax(0,1fr) auto;padding:12px 9px}.equipment strong{overflow-wrap:anywhere}.quantity{gap:3px}.quantity button{width:38px;min-height:38px;padding:0}.equipment-list{max-height:52vh}.request-signature canvas{height:150px!important}
+}

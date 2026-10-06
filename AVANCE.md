@@ -121,3 +121,16 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Supabase Auth genera el enlace de recuperación y lo dirige a una nueva pantalla EDECA donde se valida la sesión temporal y se define la contraseña nueva con las mismas reglas del registro.
 - Al completar el cambio se cierra la sesión temporal y la persona vuelve a ingresar normalmente. El cambio voluntario de contraseña dentro de la sesión se conserva sin duplicar credenciales.
 - La URL publicada de restablecimiento quedó declarada entre las redirecciones permitidas del proyecto. El canal SMTP de Auth debe usar `bodegaedeca@gmail.com`; esta configuración es independiente de la función que ya envía comprobantes desde esa cuenta.
+
+## Inventario, categorías y experiencia móvil — 6 de octubre de 2026
+
+- Producción conciliada: 91 categorías y 660 unidades; 655 disponibles, 1 prestada, 0 en mantenimiento y 4 retiradas o inactivas al momento de la revisión.
+- Auditoría normalizada de código consecutivo, activo institucional y serie: cero duplicados exactos. Se añadieron índices únicos parciales, insensibles a mayúsculas y espacios, para impedir nuevos duplicados no vacíos.
+- Se unificaron 16 cámaras AMSCOPE y 6 OPTO-EDU como **Cámaras microscópicas** (22 disponibles). Cámara de video, cámara fotográfica y cámara web permanecen en categorías propias.
+- La tabla de inventario ahora permite filtrar el tipo escribiendo, búsqueda general, ordenar por código/tipo/activo/marca-modelo/serie y escoger dirección. El resumen muestra categorías, registrados, disponibles, prestados, mantenimiento y retirados/inactivos.
+- Columnas compactadas con ajuste horizontal de encabezados y desplazamiento contenido. Se conserva el alta manual individual.
+- Eliminación permanente disponible solo para superadministración, con motivo, auditoría y doble confirmación. El servidor rechaza cualquier unidad con historial de préstamo; para esas unidades se conserva retiro/inactivación.
+- Solicitud estudiantil incorpora filtro por categoría. Solicitud y autorización comparten ajustes móviles; comprobadas a 390 px sin desbordamiento horizontal ni errores de consola.
+- Prueba SQL transaccional aprobada y revertida: rechazo sin permiso, eliminación con auditoría, protección de historial, prevención de duplicados y ausencia de acceso anónimo.
+- Revisión de seguridad posterior: la bitácora de eliminaciones no tiene políticas de acceso directo de forma deliberada y conserva todos sus privilegios revocados; el único punto de entrada es el RPC autenticado, que valida `is_superadmin()` dentro del servidor. La prueba confirmó rechazo a una cuenta autenticada sin ese rol.
+- Las 47 cintas métricas existentes fueron verificadas. La incorporación de unidades adicionales queda pendiente del listado con identificación real.

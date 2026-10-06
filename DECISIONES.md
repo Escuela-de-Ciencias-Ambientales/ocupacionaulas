@@ -86,3 +86,11 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - La recuperación se inicia con correo institucional y siempre muestra una respuesta neutra. El enlace abre una página propia de EDECA y solo permite cambiar la contraseña cuando Supabase valida la sesión temporal.
 - El remitente institucional acordado para correos de autenticación es `bodegaedeca@gmail.com`. El SMTP de Auth y el correo de comprobantes son integraciones separadas aunque utilicen la misma cuenta.
 - Las personas con sesión activa mantienen la opción existente de cambiar la contraseña sin solicitar correo.
+
+## Integridad y eliminación del inventario — 6 de octubre de 2026
+
+- Código consecutivo, activo institucional y serie no vacíos identifican una unidad y no pueden repetirse ignorando mayúsculas o espacios exteriores.
+- La eliminación permanente es excepcional y exclusiva de superadministración. Requiere motivo y auditoría; si existe cualquier asignación histórica, la unidad se retira o inactiva en lugar de borrarse.
+- Solo se agrupan como **Cámaras microscópicas** los equipos cuya marca/modelo y descripción confirman ese uso. Cámaras de video, fotográficas y web no se mezclan.
+- Las cantidades del cuadro de mando se calculan desde las unidades registradas; nunca se introducen manualmente.
+- No se crean cintas métricas ni identificadores patrimoniales sin una fuente institucional que detalle cada unidad.
