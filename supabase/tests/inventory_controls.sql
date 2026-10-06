@@ -18,21 +18,21 @@ begin
 
   perform set_config('request.jwt.claim.sub',non_admin::text,true);
   begin
-    perform public.warehouse_delete_equipment_unit(candidate,'Intento sin permiso');
+    perform public.warehouse_delete_equipment_unit(candidate);
     raise exception 'Usuario no autorizado pudo eliminar';
   exception when insufficient_privilege then null;
   end;
 
   perform set_config('request.jwt.claim.sub',actor::text,true);
-  snapshot:=public.warehouse_delete_equipment_unit(candidate,'Prueba transaccional revertida');
+  snapshot:=public.warehouse_delete_equipment_unit(candidate);
   if exists(select 1 from public.equipment_units where id=candidate) then raise exception 'La unidad no fue eliminada'; end if;
-  if not exists(select 1 from public.equipment_unit_deletion_audit where equipment_unit_id=candidate and deleted_by=actor) then raise exception 'No se registró auditoría'; end if;
+  if not exists(select 1 from public.equipment_unit_deletion_audit where equipment_unit_id=candidate and deleted_by=actor and reason='Eliminación manual desde inventario') then raise exception 'No se registró auditoría automática'; end if;
   if snapshot->>'consecutive_code'<>'TEST-DELETE-INVENTORY' then raise exception 'Instantánea incorrecta'; end if;
 
   select equipment_unit_id into protected_unit from public.loan_request_unit_assignments limit 1;
   if protected_unit is not null then
     begin
-      perform public.warehouse_delete_equipment_unit(protected_unit,'Debe conservar historial');
+      perform public.warehouse_delete_equipment_unit(protected_unit);
       raise exception 'Se eliminó una unidad con historial';
     exception when foreign_key_violation then null;
     end;

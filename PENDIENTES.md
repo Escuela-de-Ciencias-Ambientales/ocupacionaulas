@@ -104,7 +104,7 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Permitir ordenar la tabla por código, tipo, activo institucional, marca/modelo y serie, ascendente o descendente.
 - [x] Optimizar anchos de columnas, admitir ajuste horizontal de encabezados y conservar desplazamiento dentro de la tabla en pantallas pequeñas.
 - [x] Mantener la opción de agregar manualmente una unidad específica con todos sus atributos y validación contra duplicados.
-- [x] Agregar eliminación permanente solo para superadministración, con doble confirmación, motivo y auditoría. Las unidades con historial no se eliminan y deben retirarse/inactivarse.
+- [x] Agregar eliminación permanente solo para superadministración, con confirmación y auditoría automática, sin solicitar justificación. Las unidades con historial no se eliminan y deben retirarse/inactivarse.
 
 ### Solicitud, autorización y teléfonos
 

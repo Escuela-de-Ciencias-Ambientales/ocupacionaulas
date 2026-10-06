@@ -90,7 +90,7 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 ## Integridad y eliminación del inventario — 6 de octubre de 2026
 
 - Código consecutivo, activo institucional y serie no vacíos identifican una unidad y no pueden repetirse ignorando mayúsculas o espacios exteriores.
-- La eliminación permanente es excepcional y exclusiva de superadministración. Requiere motivo y auditoría; si existe cualquier asignación histórica, la unidad se retira o inactiva en lugar de borrarse.
+- La eliminación permanente es excepcional y exclusiva de superadministración. No solicita justificación; conserva confirmación, identidad del responsable, fecha e instantánea automática en la auditoría. Si existe cualquier asignación histórica, la unidad se retira o inactiva en lugar de borrarse.
 - Solo se agrupan como **Cámaras microscópicas** los equipos cuya marca/modelo y descripción confirman ese uso. Cámaras de video, fotográficas y web no se mezclan.
 - Las cantidades del cuadro de mando se calculan desde las unidades registradas; nunca se introducen manualmente.
 - No se crean cintas métricas ni identificadores patrimoniales sin una fuente institucional que detalle cada unidad.
