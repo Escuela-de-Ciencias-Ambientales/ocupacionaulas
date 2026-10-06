@@ -111,6 +111,8 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 - [x] Ajustar solicitud y autorizaciones para teléfonos: encabezados, formularios, firma táctil, listas y botones.
 - [x] Añadir en la vista del estudiante un filtro por categoría de equipo, compatible con la búsqueda por nombre y las cantidades solicitadas.
 - [x] Probar solicitud y autorización a 390 px sin desbordamiento horizontal ni errores de consola. La prueba funcional autenticada conserva sus controles de servidor existentes.
+- [x] Convertir la solicitud estudiantil en una PWA identificada como **Préstamo Equipos EDECA**, con botón de instalación y apertura directa en la solicitud.
+- [x] Reubicar Regresar en la vista móvil de solicitud para que no cubra el título, y verificarlo a 390 px.
 
 La carga de cintas métricas permanece pendiente de recibir la fuente con las unidades adicionales. Producción ya contiene 47 cintas métricas; no se inventarán códigos ni activos para completar una cantidad no documentada.
 

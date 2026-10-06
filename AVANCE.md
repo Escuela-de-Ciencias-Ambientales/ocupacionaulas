@@ -148,3 +148,10 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Filas por página incorpora **Todas**, que presenta el inventario filtrado completo y deshabilita la paginación mientras esté seleccionada.
 - El selector **Columnas** permite ocultar y volver a mostrar los campos de datos, incluidas Observaciones, y conserva la preferencia en ese navegador.
 - Los selectores anteriores de campo y dirección permanecen disponibles y sincronizados con los encabezados.
+
+## PWA de préstamos y ajuste móvil — 6 de octubre de 2026
+
+- La solicitud estudiantil usa un manifiesto PWA propio, con nombre **Préstamo Equipos EDECA** y apertura directa en `solicitar-equipo.html`; no cambia la identidad de la PWA general de reservas.
+- Se añadió un botón visible para instalar en el teléfono. En navegadores compatibles invoca el diálogo nativo y, cuando este no está disponible, muestra instrucciones para instalar o agregar a la pantalla de inicio.
+- El botón Regresar dejó de flotar sobre el encabezado de la solicitud y ahora ocupa una fila propia antes del título.
+- Verificación automatizada a 390 × 844 px: cero solapamiento, botón de instalación de ancho completo, service worker activo, manifiesto sin errores de análisis, cero errores de instalabilidad y cero errores de consola.

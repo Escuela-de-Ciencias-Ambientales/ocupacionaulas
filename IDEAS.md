@@ -51,3 +51,8 @@ Estas mejoras quedan propuestas; la implementación actual guarda explícitament
 - Evaluar verificación de propiedad del correo durante el registro institucional en una revisión posterior del alta de cuentas.
 
 - Evaluar invitación institucional y cambio obligatorio de contraseña inicial en un futuro ajuste del alta; no se realizan envíos automáticos en esta implementación.
+
+## Seguimiento de la PWA de préstamos
+
+- La instalación específica y el ajuste móvil ya están implementados; no quedan como propuesta.
+- Evaluar en el futuro notificaciones PWA solo si se define previamente qué eventos deben avisarse, quién puede recibirlos y cómo evitar duplicados con el correo.

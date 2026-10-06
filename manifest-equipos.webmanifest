@@ -1,0 +1,19 @@
+{
+  "id": "./solicitar-equipo.html",
+  "name": "Préstamo Equipos EDECA",
+  "short_name": "Equipos EDECA",
+  "description": "Solicitud de préstamos de equipos de la Escuela de Ciencias Ambientales de la Universidad Nacional.",
+  "start_url": "./solicitar-equipo.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F4F7F5",
+  "theme_color": "#177649",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

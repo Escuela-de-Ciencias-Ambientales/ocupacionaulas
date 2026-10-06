@@ -12,7 +12,11 @@
     if (sameApp && history.length > 1) history.back(); else location.href = fallback;
   });
   const warehouseToolbar = page === 'bodega-equipos.html' && document.querySelector('.sigep-module-toolbar');
-  if (warehouseToolbar) {
+  const studentMain = page === 'solicitar-equipo.html' && document.querySelector('main');
+  if (studentMain) {
+    button.classList.add('student-back-button');
+    studentMain.prepend(button);
+  } else if (warehouseToolbar) {
     button.classList.add('warehouse-back-button');
     warehouseToolbar.appendChild(button);
   } else {

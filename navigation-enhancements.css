@@ -49,3 +49,20 @@ body:has(.sigep-private-header) .global-back-button { top: 196px; }
   font-size: 14px;
   box-shadow: none;
 }
+
+/* Solicitud estudiantil: Regresar forma parte del flujo y nunca cubre el título. */
+.student-request-page main > .student-back-button {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  margin: 18px 4px 0 !important;
+  min-height: 46px;
+  width: auto !important;
+  box-shadow: 0 6px 18px rgba(4, 48, 34, .18);
+}
+@media (max-width: 600px) {
+  .student-request-page main > .student-back-button {
+    margin-top: 14px !important;
+  }
+  .student-request-page .hero { padding-top: 20px; }
+}

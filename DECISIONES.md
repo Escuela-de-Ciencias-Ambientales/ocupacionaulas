@@ -95,3 +95,9 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Las cantidades del cuadro de mando se calculan desde las unidades registradas; nunca se introducen manualmente.
 - No se crean cintas métricas ni identificadores patrimoniales sin una fuente institucional que detalle cada unidad.
 - Por instrucción del usuario se excluyen del inventario de préstamos U.P.S., tiendas de campaña, computadoras de escritorio y portátiles, scanner, multifuncionales, impresoras, sillas y el mobiliario administrativo especificado. La categoría “Computadora de escritorio especial” se incluye dentro de ese alcance.
+
+## PWA de préstamos — 6 de octubre de 2026
+
+- La instalación desde la vista estudiantil debe identificarse como **Préstamo Equipos EDECA** y abrir directamente la solicitud de equipos.
+- Se conserva por separado el manifiesto general de reservas para no renombrar ni cambiar el inicio de la aplicación institucional existente.
+- Regresar forma parte del flujo del documento en la vista estudiantil; no se superpone de forma fija al encabezado en teléfonos.
