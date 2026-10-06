@@ -1,6 +1,6 @@
 # Decisiones de SIGEP
 
-Actualizado: 5 de octubre de 2026, hora de Costa Rica.
+Actualizado: 6 de octubre de 2026, hora de Costa Rica.
 
 ## Decisiones confirmadas por el usuario o por el contrato del proyecto
 
@@ -94,3 +94,4 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - Solo se agrupan como **Cámaras microscópicas** los equipos cuya marca/modelo y descripción confirman ese uso. Cámaras de video, fotográficas y web no se mezclan.
 - Las cantidades del cuadro de mando se calculan desde las unidades registradas; nunca se introducen manualmente.
 - No se crean cintas métricas ni identificadores patrimoniales sin una fuente institucional que detalle cada unidad.
+- Por instrucción del usuario se excluyen del inventario de préstamos U.P.S., tiendas de campaña, computadoras de escritorio y portátiles, scanner, multifuncionales, impresoras, sillas y el mobiliario administrativo especificado. La categoría “Computadora de escritorio especial” se incluye dentro de ese alcance.
