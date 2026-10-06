@@ -141,3 +141,10 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - La conciliación previa confirmó cero préstamos históricos, préstamos activos, solicitudes y autorizaciones vinculadas a esas unidades y categorías.
 - La operación fue transaccional: registró una instantánea de cada unidad y el responsable en 78 entradas de auditoría antes de eliminar las unidades y las categorías vacías.
 - Verificación posterior: cero categorías objetivo restantes; inventario operativo de 582 unidades en 73 categorías, con 577 disponibles y 1 prestada al momento del control.
+
+## Controles de tabla del inventario — 6 de octubre de 2026
+
+- Código, tipo, activo, marca, modelo y serie se pueden pulsar en el encabezado para ordenar; un segundo clic invierte entre ascendente y descendente y muestra la dirección activa.
+- Filas por página incorpora **Todas**, que presenta el inventario filtrado completo y deshabilita la paginación mientras esté seleccionada.
+- El selector **Columnas** permite ocultar y volver a mostrar los campos de datos, incluidas Observaciones, y conserva la preferencia en ese navegador.
+- Los selectores anteriores de campo y dirección permanecen disponibles y sincronizados con los encabezados.

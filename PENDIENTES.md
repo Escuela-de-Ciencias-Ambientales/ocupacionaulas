@@ -115,3 +115,4 @@ La captura antigua con etiquetas Django no pudo reproducirse en la ruta publicad
 La carga de cintas métricas permanece pendiente de recibir la fuente con las unidades adicionales. Producción ya contiene 47 cintas métricas; no se inventarán códigos ni activos para completar una cantidad no documentada.
 
 - [x] Retirar 78 unidades y 18 categorías ajenas al préstamo indicadas por el usuario, con conciliación previa, auditoría individual y eliminación de categorías vacías.
+- [x] Permitir ordenar al pulsar encabezados, mostrar todas las filas y ocultar o restaurar columnas del inventario con preferencia local.
