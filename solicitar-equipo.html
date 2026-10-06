@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Solicitar equipo | EDECA</title>
     <meta name="theme-color" content="#177649" />
-    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="manifest" href="manifest-equipos.webmanifest" />
     <link rel="icon" href="icons/icon-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,14 +15,14 @@
     />
   <link rel="stylesheet" href="design-tokens.css?v=1" />
   <link rel="stylesheet" href="shared-header.css?v=1" />
-    <link rel="stylesheet" href="solicitar-equipo.css?v=2" />
+    <link rel="stylesheet" href="solicitar-equipo.css?v=3" />
     <link rel="stylesheet" href="request-signature.css?v=1" />
     <link rel="stylesheet" href="sigep-brand.css?v=2" />
     <link rel="stylesheet" href="equipment-responsive.css?v=1" />
   <link rel="stylesheet" href="visual-system.css?v=3" />
   <link rel="stylesheet" href="navigation-enhancements.css?v=3" />
 </head>
-  <body>
+  <body class="student-request-page">
     <header class="sigep-site-header">
       <a class="sigep-primary-brand" href="index.html" aria-label="Volver al inicio"><img src="sigep-logo.png" alt="SIGEP — Sistema Integrado de Gestión de Equipos y Préstamos" /></a>
       <div class="sigep-module-name"><strong>Escuela de Ciencias Ambientales · UNA</strong><span>Solicitud de préstamo de equipos</span></div>
@@ -36,6 +36,9 @@
           >Complete la solicitud desde su teléfono. La bodega recibirá el
           detalle inmediatamente.</span
         >
+        <button class="student-install-button" type="button" data-pwa-install data-pwa-install-always>
+          <span aria-hidden="true">↓</span> Instale la app en su teléfono
+        </button>
       </section>
       <div id="message" class="message" hidden></div>
       <section class="card" id="identify">
@@ -92,12 +95,17 @@
         <p>Presente este número en la bodega.</p>
         <button id="newRequest" type="button">Finalizar</button>
       </dialog>
+      <dialog id="pwaInstallHelp" class="pwa-install-help" data-pwa-install-help>
+        <h2>Instalar Préstamo Equipos EDECA</h2>
+        <p data-pwa-install-help-text>Abra el menú de su navegador y seleccione <strong>Instalar aplicación</strong> o <strong>Agregar a la pantalla de inicio</strong>.</p>
+        <button type="button" data-pwa-install-help-close>Entendido</button>
+      </dialog>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
     <script src="shared-utils.js?v=1"></script>
     <script src="solicitar-equipo.js?v=7"></script>
-    <script src="pwa-install.js?v=1"></script>
-  <script src="navigation-enhancements.js?v=1"></script>
+    <script src="pwa-install.js?v=2"></script>
+  <script src="navigation-enhancements.js?v=2"></script>
 </body>
 </html>
