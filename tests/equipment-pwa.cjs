@@ -24,7 +24,7 @@ const assert=require('node:assert/strict');
  const standalone=await browser.newContext({viewport:{width:390,height:844}});
  await standalone.addInitScript(()=>{const original=window.matchMedia.bind(window);window.matchMedia=q=>q==='(display-mode: standalone)'?{matches:true,addEventListener:()=>{}}:original(q)});
  const sp=await standalone.newPage();await sp.goto('http://127.0.0.1:8766/solicitar-equipo.html');assert.equal(await sp.locator('[data-pwa-install]').isVisible(),true);assert.equal(await sp.locator('#studentBack').isVisible(),false);await sp.locator('[data-pwa-install]').click();assert.match(await sp.locator('[data-pwa-install-help-text]').textContent(),/modo aplicación/);
- 
+
  await page.waitForFunction(async()=>{const r=await navigator.serviceWorker.getRegistration(location.href);return r?.active?.scriptURL.endsWith('/equipos-service-worker.js')});
  await page.reload();await page.waitForFunction(()=>navigator.serviceWorker.controller?.scriptURL.endsWith('/equipos-service-worker.js'));
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
