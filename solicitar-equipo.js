@@ -4,6 +4,7 @@
     cfg = window.RESERVAS_CONFIG || {};
   let client,
     context,
+    identifyVersion = 0,
     quantities = {}, signatureDrawn = false, drawing = false;
   const signatureCanvas = () => $("studentSignature");
   const signatureContext = () => signatureCanvas().getContext("2d");
@@ -43,10 +44,12 @@
     e.preventDefault();
     $("message").hidden = true;
     $("requestArea").hidden=true; context=null; quantities={}; clearSignature();
+    const version = ++identifyVersion;
     const id = clean($("nationalId").value);
     const { data, error } = await client.rpc("public_equipment_loan_context", {
       p_national_id: id,
     });
+    if (version !== identifyVersion) return;
     if (error) return msg(error.message);
     if (!data?.found)
       return msg("No encontramos un estudiante o académico registrado con esa cédula.");
@@ -58,6 +61,7 @@
       return msg(
         "Todavía no existe una autorización docente vigente para solicitar equipos.",
       );
+    $("identify").hidden = true;
     context = { ...data, nationalId: id };
     quantities = {};
     $("categoryFilter").innerHTML='<option value="">Todas las categorías</option>'+data.equipment.map(x=>`<option value="${x.id}">${Sigep.escapeHtml(x.name)} (${x.available})</option>`).join("");
@@ -93,6 +97,24 @@
     $("requestNumber").textContent = data.request_number;
     $("confirmation").showModal();
   }
+  function returnToIdentification() {
+    ++identifyVersion; // Ignore an identification response arriving after Regresar.
+    context = null;
+    quantities = {};
+    drawing = false;
+    clearSignature();
+    $("requestForm").reset();
+    $("equipmentList").replaceChildren();
+    $("studentName").textContent = "";
+    $("authorization").textContent = "";
+    $("requestArea").hidden = true;
+    $("identify").hidden = false;
+    $("message").hidden = true;
+    $("idForm").reset();
+    $("nationalId").focus();
+    $("identify").scrollIntoView({ behavior: "smooth" });
+  }
+  $("studentBack").addEventListener("click", returnToIdentification);
   $("idForm").addEventListener("submit", identify);
   $("requestForm").addEventListener("submit", send);
   $("search").addEventListener("input", (e) => render(e.target.value));
@@ -108,7 +130,7 @@
     );
     render($("search").value);
   });
-  $("newRequest").addEventListener("click", () => location.reload());
+  $("newRequest").addEventListener("click", () => { $("confirmation").close(); returnToIdentification(); });
   $("clearStudentSignature").addEventListener("click", clearSignature);
   signatureCanvas().addEventListener("pointerdown", startSignature); signatureCanvas().addEventListener("pointermove", moveSignature);
   ["pointerup","pointercancel","pointerleave"].forEach((name)=>signatureCanvas().addEventListener(name,stopSignature));
