@@ -58,3 +58,5 @@ Estas mejoras quedan propuestas; la implementación actual guarda explícitament
 - Evaluar en el futuro notificaciones PWA solo si se define previamente qué eventos deben avisarse, quién puede recibirlos y cómo evitar duplicados con el correo.
 
 - 15 de octubre de 2026: navegación interna y aislamiento de PWA estudiantil implementados por solicitud expresa; no se agregan propuestas ni notificaciones a este alcance.
+
+- 16 de octubre: visibilidad persistente y orientación para Chrome Android implementadas por reporte del usuario; no se incorporan notificaciones ni nuevas funciones de préstamos.

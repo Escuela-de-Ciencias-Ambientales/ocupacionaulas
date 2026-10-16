@@ -32,7 +32,7 @@
       <img class="una" src="logo-una.png" alt="Universidad Nacional" />
     </header>
     <main>
-      <button id="studentBack" class="global-back-button student-back-button" type="button">← Regresar</button>
+      <button id="studentBack" hidden class="global-back-button student-back-button" type="button">← Regresar</button>
       <section class="hero">
         <p>Solicitud móvil</p>
         <h1>¿Qué equipo necesita?</h1>
@@ -41,8 +41,9 @@
           detalle inmediatamente.</span
         >
         <button class="student-install-button" type="button" data-pwa-install data-pwa-install-always>
-          <span aria-hidden="true">↓</span> Instale la app en su teléfono
+          <span aria-hidden="true">↓</span> <span data-pwa-install-label>Instalar app en el teléfono</span>
         </button>
+        <p id="installStatus" role="status" aria-live="polite" hidden></p>
       </section>
       <div id="message" class="message" hidden></div>
       <section class="card" id="identify">

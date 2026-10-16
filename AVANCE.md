@@ -165,3 +165,8 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 ## Publicación autorizada — 16 de octubre de 2026
 - Usuario solicita publicar. Pruebas móviles automatizadas aprobadas nuevamente antes del envío.
 - Caché de equipos ajustada para tolerar las versiones de archivos que agrega el despliegue de GitHub Pages; no cambia el workflow compartido.
+
+## Instalación visible y Regresar contextual — 16 de octubre de 2026
+- Regresar oculto en ingreso de cédula; aparece al seleccionar equipos y se oculta al volver.
+- Botón de instalación/ayuda siempre accesible, incluso en modo standalone y después de appinstalled. Chrome Android conserva llamada directa al diálogo desde el clic y distingue solicitud aceptada, cancelada y error; no certifica presencia del icono. Ayuda explica localizar Equipos EDECA, instalar desde Chrome o crear acceso directo.
+- Caché de equipos v2. Pruebas Edge móviles aprobadas para inicio, selección, estados de instalación simulados, modo standalone, ayuda Android/iOS, apertura offline y ausencia de errores JS. Comprobación CDP del manifiesto publicado sin errores de análisis; perfil de prueba informa in-incognito, por lo que no certifica instalación física.

@@ -125,3 +125,7 @@ La carga de cintas métricas permanece pendiente de recibir la fuente con las un
 - [x] Aislar manifiesto, instalación y caché de la PWA de equipos.
 - [x] Pruebas móviles automatizadas con servicios e instalación simulados.
 - [ ] Publicar estos cambios locales y verificar instalación real en Android/iPhone; la simulación de navegador no certifica instalación en dispositivos físicos.
+
+- [x] Publicados los cambios de navegación y PWA del 15 de octubre mediante PR #46.
+- [x] Corregir botón oculto en standalone/appinstalled, feedback de instalación y ocultar Regresar en inicio.
+- [ ] Confirmar con el usuario aparición del icono en Chrome Android tras esta corrección; ningún evento web garantiza la ubicación del icono en el lanzador.
