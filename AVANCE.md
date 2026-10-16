@@ -155,3 +155,13 @@ Consultar [PENDIENTES.md](PENDIENTES.md) para el orden de implementación y [DEC
 - Se añadió un botón visible para instalar en el teléfono. En navegadores compatibles invoca el diálogo nativo y, cuando este no está disponible, muestra instrucciones para instalar o agregar a la pantalla de inicio.
 - El botón Regresar dejó de flotar sobre el encabezado de la solicitud y ahora ocupa una fila propia antes del título.
 - Verificación automatizada a 390 × 844 px: cero solapamiento, botón de instalación de ancho completo, service worker activo, manifiesto sin errores de análisis, cero errores de instalabilidad y cero errores de consola.
+
+## Navegación estudiantil y PWA aislada — 15 de octubre de 2026
+
+- Regresar en la solicitud vuelve al ingreso de cédula, tanto desde el inicio como desde equipos; elimina cantidades, firma e identidad y descarta identificaciones tardías. Encabezado y Finalizar conservan el flujo de préstamos.
+- Se conserva el manifiesto de equipos y se limita su alcance a solicitar-equipo.html. Instalador y service worker exclusivos de equipos; no se modifican archivos compartidos ni aulas. Caché propia sin respuestas RPC ni datos personales; fallback de navegación a la solicitud.
+- Pruebas automatizadas en Edge a 390 × 844: navegación, limpieza, diálogo Android simulado, ayuda iOS simulada, instalación completada, worker activo, apertura offline y ausencia de desbordamiento/errores JS aprobados. No hubo escrituras en Supabase. Cambios locales, sin publicación.
+
+## Publicación autorizada — 16 de octubre de 2026
+- Usuario solicita publicar. Pruebas móviles automatizadas aprobadas nuevamente antes del envío.
+- Caché de equipos ajustada para tolerar las versiones de archivos que agrega el despliegue de GitHub Pages; no cambia el workflow compartido.

@@ -118,3 +118,10 @@ La carga de cintas métricas permanece pendiente de recibir la fuente con las un
 
 - [x] Retirar 78 unidades y 18 categorías ajenas al préstamo indicadas por el usuario, con conciliación previa, auditoría individual y eliminación de categorías vacías.
 - [x] Permitir ordenar al pulsar encabezados, mostrar todas las filas y ocultar o restaurar columnas del inventario con preferencia local.
+
+## Verificación de préstamos — 15 de octubre de 2026
+
+- [x] Corregir Regresar y evitar enlaces de salida hacia aulas en solicitud estudiantil.
+- [x] Aislar manifiesto, instalación y caché de la PWA de equipos.
+- [x] Pruebas móviles automatizadas con servicios e instalación simulados.
+- [ ] Publicar estos cambios locales y verificar instalación real en Android/iPhone; la simulación de navegador no certifica instalación en dispositivos físicos.

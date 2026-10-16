@@ -101,3 +101,8 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 - La instalación desde la vista estudiantil debe identificarse como **Préstamo Equipos EDECA** y abrir directamente la solicitud de equipos.
 - Se conserva por separado el manifiesto general de reservas para no renombrar ni cambiar el inicio de la aplicación institucional existente.
 - Regresar forma parte del flujo del documento en la vista estudiantil; no se superpone de forma fija al encabezado en teléfonos.
+
+## Flujo estudiantil autocontenido — 15 de octubre de 2026
+
+- La solicitud no carga navigation-enhancements.js ni pwa-install.js generales. Regresar restaura el paso de identificación sin history.back ni destinos de aulas.
+- Worker propio con scope solicitar-equipo.html y cachés edeca-equipos-*; no modifica ni elimina las cachés generales. Manifiesto conserva el id existente. Solicitar y enviar siguen necesitando conexión.

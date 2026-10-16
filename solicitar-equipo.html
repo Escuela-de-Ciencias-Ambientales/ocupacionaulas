@@ -6,6 +6,9 @@
     <title>Solicitar equipo | EDECA</title>
     <meta name="theme-color" content="#177649" />
     <link rel="manifest" href="manifest-equipos.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Equipos EDECA" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <link rel="icon" href="icons/icon-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,11 +27,12 @@
 </head>
   <body class="student-request-page">
     <header class="sigep-site-header">
-      <a class="sigep-primary-brand" href="index.html" aria-label="Volver al inicio"><img src="sigep-logo.png" alt="SIGEP — Sistema Integrado de Gestión de Equipos y Préstamos" /></a>
+      <a class="sigep-primary-brand" href="solicitar-equipo.html" aria-label="Volver al ingreso de cédula"><img src="sigep-logo.png" alt="SIGEP — Sistema Integrado de Gestión de Equipos y Préstamos" /></a>
       <div class="sigep-module-name"><strong>Escuela de Ciencias Ambientales · UNA</strong><span>Solicitud de préstamo de equipos</span></div>
       <img class="una" src="logo-una.png" alt="Universidad Nacional" />
     </header>
     <main>
+      <button id="studentBack" class="global-back-button student-back-button" type="button">← Regresar</button>
       <section class="hero">
         <p>Solicitud móvil</p>
         <h1>¿Qué equipo necesita?</h1>
@@ -104,8 +108,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js?v=5"></script>
     <script src="shared-utils.js?v=1"></script>
-    <script src="solicitar-equipo.js?v=7"></script>
-    <script src="pwa-install.js?v=2"></script>
-  <script src="navigation-enhancements.js?v=2"></script>
+    <script src="solicitar-equipo.js?v=8"></script>
+    <script src="equipos-pwa-install.js?v=1"></script>
+
 </body>
 </html>

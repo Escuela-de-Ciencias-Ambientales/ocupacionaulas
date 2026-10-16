@@ -4,7 +4,7 @@
   "short_name": "Equipos EDECA",
   "description": "Solicitud de préstamos de equipos de la Escuela de Ciencias Ambientales de la Universidad Nacional.",
   "start_url": "./solicitar-equipo.html?source=pwa",
-  "scope": "./",
+  "scope": "./solicitar-equipo.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#F4F7F5",
