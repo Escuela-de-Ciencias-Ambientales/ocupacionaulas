@@ -1,4 +1,4 @@
-const CACHE = 'edeca-equipos-v1';
+const CACHE = 'edeca-equipos-v2';
 const PAGE = new URL('solicitar-equipo.html', self.location).href;
 const SHELL = ['solicitar-equipo.html', 'solicitar-equipo.js', 'equipos-pwa-install.js', 'config.js', 'shared-utils.js', 'design-tokens.css', 'shared-header.css', 'solicitar-equipo.css', 'request-signature.css', 'sigep-brand.css', 'equipment-responsive.css', 'visual-system.css', 'navigation-enhancements.css', 'sigep-logo.png', 'logo-una.png', 'manifest-equipos.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting())));

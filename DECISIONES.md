@@ -106,3 +106,5 @@ Fuentes: instrucciones del usuario del 5 de octubre, chat «Actualiza ocupación
 
 - La solicitud no carga navigation-enhancements.js ni pwa-install.js generales. Regresar restaura el paso de identificación sin history.back ni destinos de aulas.
 - Worker propio con scope solicitar-equipo.html y cachés edeca-equipos-*; no modifica ni elimina las cachés generales. Manifiesto conserva el id existente. Solicitar y enviar siguen necesitando conexión.
+
+- 16 de octubre: Regresar solo aparece cuando existe un paso anterior. La ayuda de instalación permanece visible en modo aplicación y tras appinstalled; aceptación del diálogo se comunica como solicitud recibida, sin afirmar que exista icono. No se altera aulas ni se cambia identidad del manifiesto.

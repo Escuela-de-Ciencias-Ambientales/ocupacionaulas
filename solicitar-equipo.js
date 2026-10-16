@@ -62,6 +62,7 @@
         "Todavía no existe una autorización docente vigente para solicitar equipos.",
       );
     $("identify").hidden = true;
+    $("studentBack").hidden = false;
     context = { ...data, nationalId: id };
     quantities = {};
     $("categoryFilter").innerHTML='<option value="">Todas las categorías</option>'+data.equipment.map(x=>`<option value="${x.id}">${Sigep.escapeHtml(x.name)} (${x.available})</option>`).join("");
@@ -109,6 +110,7 @@
     $("authorization").textContent = "";
     $("requestArea").hidden = true;
     $("identify").hidden = false;
+    $("studentBack").hidden = true;
     $("message").hidden = true;
     $("idForm").reset();
     $("nationalId").focus();
